@@ -1,9 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-const navItems = [
-  { to: "/store", label: "Store" },
-  { to: "/community-guidelines", label: "Guidelines" },
-] as const;
+const navItems = [{ to: "/community-guidelines", label: "Guidelines" }] as const;
 
 export function SiteHeader() {
   return (
