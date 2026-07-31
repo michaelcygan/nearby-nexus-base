@@ -149,5 +149,20 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* Thin printed rule used between newsprint-style sections. */
+@utility rule-print {
+  border-top: 1px solid var(--color-border);
 }
