@@ -19,11 +19,11 @@ export function BlockButton({ neighborId }: { neighborId: string }) {
   const isSelf = session?.user.id === neighborId;
   const isBlocked = blocked.data?.blockedIds.includes(neighborId) ?? false;
 
-  const mutation = useMutation({
-    mutationFn: () =>
+  const mutation = useMutation<{ blocked: boolean }>({
+    mutationFn: async () =>
       isBlocked
-        ? unblockNeighbor({ data: { neighborId } })
-        : blockNeighbor({ data: { neighborId } }),
+        ? await unblockNeighbor({ data: { neighborId } })
+        : await blockNeighbor({ data: { neighborId } }),
     onSuccess: (result) => {
       toast.success(result.blocked ? "Blocked. You won't see them around." : "Block removed.");
       void queryClient.invalidateQueries({ queryKey: ["moderation"] });
