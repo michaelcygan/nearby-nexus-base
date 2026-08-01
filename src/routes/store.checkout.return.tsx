@@ -8,9 +8,8 @@ import { formatMoney, storeOrderStatusLabels } from "@/features/store/types";
 import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/store/checkout/return")({
-  validateSearch: (search: Record<string, unknown>): { session_id?: string } => ({
-    session_id: typeof search["session_id"] === "string" ? search["session_id"] : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { session_id?: string } =>
+    typeof search["session_id"] === "string" ? { session_id: search["session_id"] } : {},
   head: () => ({
     meta: [
       { title: "Order confirmation — Neighborhood Today" },
@@ -52,15 +51,15 @@ function CheckoutReturn() {
         </p>
       ) : order.data ? (
         <div className="mt-4 rounded-md border border-border bg-card p-4">
-          <p className="font-display text-lg font-semibold">{order.data.listing_title}</p>
+          <p className="font-display text-lg font-semibold">{order.data.listing?.title ?? "Store item"}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {formatMoney(order.data.amount_cents, order.data.currency)} ·{" "}
             {storeOrderStatusLabels[order.data.status]}
           </p>
-          {order.data.pickup_notes ? (
+          {order.data.listing?.pickup_notes ? (
             <p className="mt-3 text-sm">
               <span className="uppercase tracking-[0.12em] text-muted-foreground">Pickup: </span>
-              {order.data.pickup_notes}
+              {order.data.listing.pickup_notes}
             </p>
           ) : null}
         </div>

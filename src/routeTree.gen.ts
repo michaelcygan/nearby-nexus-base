@@ -32,6 +32,7 @@ import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketpla
 import { Route as NSlugPlansRouteImport } from './routes/n.$slug.plans'
 import { Route as NSlugStoreRouteImport } from './routes/n.$slug.store'
 import { Route as NSlugVolunteerRouteImport } from './routes/n.$slug.volunteer'
+import { Route as StoreCheckoutReturnRouteImport } from './routes/store.checkout.return'
 import { Route as AuthenticatedPostPostIdEditRouteImport } from './routes/_authenticated/post.$postId.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as NSlugItemListingIdRouteImport } from './routes/n.$slug.item.$listingId'
@@ -157,6 +158,11 @@ const NSlugVolunteerRoute = NSlugVolunteerRouteImport.update({
   path: '/volunteer',
   getParentRoute: () => NSlugRoute,
 } as any)
+const StoreCheckoutReturnRoute = StoreCheckoutReturnRouteImport.update({
+  id: '/store/checkout/return',
+  path: '/store/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedPostPostIdEditRoute =
   AuthenticatedPostPostIdEditRouteImport.update({
     id: '/post/$postId/edit',
@@ -206,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/store': typeof NSlugStoreRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
+  '/store/checkout/return': typeof StoreCheckoutReturnRoute
   '/messages/': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug/': typeof NSlugIndexRoute
   '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
@@ -234,6 +241,7 @@ export interface FileRoutesByTo {
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/store': typeof NSlugStoreRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
+  '/store/checkout/return': typeof StoreCheckoutReturnRoute
   '/messages': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug': typeof NSlugIndexRoute
   '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
@@ -265,6 +273,7 @@ export interface FileRoutesById {
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/store': typeof NSlugStoreRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
+  '/store/checkout/return': typeof StoreCheckoutReturnRoute
   '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug/': typeof NSlugIndexRoute
   '/_authenticated/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
@@ -296,6 +305,7 @@ export interface FileRouteTypes {
     | '/n/$slug/plans'
     | '/n/$slug/store'
     | '/n/$slug/volunteer'
+    | '/store/checkout/return'
     | '/messages/'
     | '/n/$slug/'
     | '/post/$postId/edit'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/n/$slug/plans'
     | '/n/$slug/store'
     | '/n/$slug/volunteer'
+    | '/store/checkout/return'
     | '/messages'
     | '/n/$slug'
     | '/post/$postId/edit'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/n/$slug/plans'
     | '/n/$slug/store'
     | '/n/$slug/volunteer'
+    | '/store/checkout/return'
     | '/_authenticated/messages/'
     | '/n/$slug/'
     | '/_authenticated/post/$postId/edit'
@@ -373,6 +385,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   NSlugRoute: typeof NSlugRouteWithChildren
   UProfileIdRoute: typeof UProfileIdRoute
+  StoreCheckoutReturnRoute: typeof StoreCheckoutReturnRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -539,6 +552,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugVolunteerRouteImport
       parentRoute: typeof NSlugRoute
     }
+    '/store/checkout/return': {
+      id: '/store/checkout/return'
+      path: '/store/checkout/return'
+      fullPath: '/store/checkout/return'
+      preLoaderRoute: typeof StoreCheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/post/$postId/edit': {
       id: '/_authenticated/post/$postId/edit'
       path: '/post/$postId/edit'
@@ -640,6 +660,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   NSlugRoute: NSlugRouteWithChildren,
   UProfileIdRoute: UProfileIdRoute,
+  StoreCheckoutReturnRoute: StoreCheckoutReturnRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
