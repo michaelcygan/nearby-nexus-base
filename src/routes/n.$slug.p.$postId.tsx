@@ -75,6 +75,20 @@ function PostDetailPage() {
         {postTypeLabels[post.type]}
       </p>
       <h2 className="mt-2 text-2xl sm:text-3xl">{post.title}</h2>
+      {post.image_urls.length > 0 ? (
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+          {post.image_urls.map((url) => (
+            <li key={url}>
+              <img
+                src={url}
+                alt={`Photo from ${post.title}`}
+                loading="lazy"
+                className="w-full rounded-sm border border-border object-cover"
+              />
+            </li>
+          ))}
+        </ul>
+      ) : null}
       {post.status !== "active" ? (
         <p className="mt-3 inline-block rounded-sm border border-border px-2 py-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
           {post.status}

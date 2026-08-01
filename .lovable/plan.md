@@ -1,43 +1,33 @@
-## Wave 2 — Auth + lightweight profiles
+## Wave 3 — Post creation
 
-Verified current state: the project has no auth routes, no protected route gate, no `profiles`/`user_roles`/`saved_neighborhoods` tables, no storage buckets, and `src/start.ts` registers no client middleware for attaching a signed-in token. Everything below is new.
+Signed-in neighbors can publish Plans, Marketplace listings and Volunteer asks to a neighborhood board, with compressed photos. Directory listings stay admin-only for now (you'll sell vetted listings later).
 
-### 1. Database
+### Database (one migration)
+- `posts`: add author write access — INSERT policy for `authenticated` where `author_id = auth.uid()`, UPDATE/DELETE policies for the author on their own rows, and grants for `authenticated`. Make `author_id` NOT NULL going forward for new rows via trigger default (`auth.uid()`), keeping seeded rows intact.
+- Add owner-side SELECT policy so authors can read their own non-active (completed/removed) posts — otherwise their own edits/manage views come back empty.
+- Validation trigger per type: plans require `starts_at`; marketplace requires either `is_free` or `price_cents`; volunteer requires `needed_by` or `slots`. Enforced server-side too.
+- `places`: INSERT/UPDATE/DELETE policies restricted to `has_role(auth.uid(), 'admin')`.
+- New private storage bucket `post-images` with policies: authenticated users write only inside their own `{user_id}/…` folder; reads via signed URLs.
 
-One migration, with grants + RLS for every table:
+### Photos (kept cheap)
+- Compression happens in the browser before upload: canvas resize to max 1600px on the long edge, JPEG quality ~0.72, hard cap of ~400KB per image and 4 images per post. Files above the cap after compression are rejected with a clear message.
+- Only compressed derivatives are stored — no originals — so storage and egress stay small. Detail pages request signed URLs at a display size and lazy-load them.
 
-- `profiles` — `id` (matches the signed-in user), `display_name`, `about`, `avatar_path`, `home_neighborhood_id` (→ `neighborhoods`), timestamps + updated-at trigger. Readable by everyone (public neighbor pages), writable only by the owner. A signup trigger creates a row automatically with a display name derived from Google metadata or the email local-part.
-- `user_roles` + `app_role` enum (`admin`, `moderator`, `member`) and a `has_role()` security-definer function — roles live in their own table, never on profiles. Needed now so Waves 3–5 can build on it.
-- `saved_neighborhoods` — owner + neighborhood, unique per pair, owner-only read/write.
+### Server layer
+- `src/features/posts/schemas.ts` — Zod schemas per post type (shared base + type-specific fields), reused by form and server.
+- `src/features/posts/post.functions.ts` — `createPost`, `updateMyPost`, `deleteMyPost`, `listMyPosts`, `setPostImagePaths`, each with `requireSupabaseAuth`; `author_id` always derived from the verified session, never from request data.
+- `src/features/posts/data.server.ts` — signed-URL helper for image paths; extend neighborhood fetchers to return image URLs on cards and detail pages.
+- `src/features/directory/place.functions.ts` — admin-gated `createPlace` / `updatePlace` / `deletePlace` that verify the admin role through the user's own client before writing.
 
-### 2. Auth configuration
+### UI
+- `src/components/posts/post-form.tsx` — one shared form; a type switch reveals only that module's fields (Plan: date/time, location, capacity; Marketplace: price or free, condition; Volunteer: needed-by, slots). Includes the image dropzone with compression progress.
+- New routes: `/_authenticated/n/$slug/new` (type chosen via search param, so `?type=plan` deep-links from a board), `/_authenticated/posts` (my posts: edit, mark completed, delete), `/_authenticated/posts/$postId/edit`.
+- Boards gain a "Post to this board" action; signed-out visitors see an inline "Sign in to post" CTA instead of a redirect.
+- Admin-only Directory management at `/_authenticated/admin/directory` (add/edit/remove places), hidden for non-admins.
+- Post cards and detail pages render the first photo with the rest in a simple gallery.
 
-- Enable Google sign-in through the managed broker (configured the same turn the button ships, otherwise the first sign-in errors).
-- Email/password stays on. No anonymous sign-ups, no auto-confirm — signup shows a "check your email" state rather than pretending the user is logged in.
-- Avatars bucket in storage: public read, owner-scoped writes under a per-user folder.
-
-### 3. Routes
-
-- `/auth` — public. Email/password sign-in and sign-up plus "Continue with Google", tabs between the two modes, zod-validated fields, honest error and confirm-your-email states. Redirects a signed-in visitor away, and preserves a `redirect` target so a click on a protected link returns there.
-- `/reset-password` — public. Requesting a reset link lives on `/auth`; this page sets the new password.
-- `src/routes/_authenticated/route.tsx` — the protected gate (client-only session check, redirect to `/auth`). Public neighborhood pages stay untouched and keep server rendering.
-- `/_authenticated/profile` — edit display name, about, home neighborhood, avatar upload with alt text and client-side resizing; shows the saved-neighborhoods list with remove buttons.
-- `/_authenticated/activity` — a stub-free placeholder is not acceptable, so this page shows what exists today: your saved neighborhoods and your profile completeness. Post/thread activity arrives with Waves 3–4.
-- `/u/$profileId` — public neighbor page: display name, avatar, about, home neighborhood. Own metadata, error and not-found states.
-
-### 4. Session-aware chrome
-
-- Header shows an account menu (avatar + display name, links to profile and activity, sign out) when signed in, and a "Sign in" link when not — driven by the session, so a successful sign-in visibly changes the header.
-- Sign-out cancels in-flight queries, clears the cache, signs out, then replaces history with `/auth`.
-- A single `onAuthStateChange` subscriber in the root route invalidates the router and query cache on identity changes only.
-- Neighborhood pages gain a "Save this neighborhood" button that prompts sign-in when anonymous rather than failing silently.
-
-### 5. Verification before I call it done
-
-Driving the real app in a browser: anonymous visit to `/_authenticated/profile` redirects to `/auth`; sign-up shows the confirm-email state; a signed-in session can edit its profile and see the change persist after reload; avatar upload lands in storage and renders on `/u/$profileId`; a second account cannot edit the first one's profile; saving a neighborhood persists; sign-out returns to `/auth` and Back does not restore the protected page. Plus typecheck and a clean console.
+### Verification
+Typecheck, then a browser pass: publish one post of each type, confirm it appears on the right tab and detail page, confirm image compression stays under the cap, confirm a non-admin cannot reach directory management, and confirm signed-out users see the CTA rather than a broken form.
 
 ### Technical notes
-
-- Profile reads/writes go through `createServerFn`; owner-scoped writes use the authenticated middleware, and `src/start.ts` gains the bearer-token client middleware appended to its existing middleware list.
-- Public profile reads use the publishable-key server client already in place for neighborhood data, behind a narrow public policy.
-- Google's redirect target is the public app origin; the intended destination is stored separately and applied only once a session is confirmed.
+Ownership is always taken from the validated bearer token in the handler; client-supplied author fields are ignored. Route protection uses the existing `_authenticated` gate. Admin checks run against the user's RLS-scoped client via `has_role`, never the service-role client.

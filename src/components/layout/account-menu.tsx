@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { myProfileQuery } from "@/features/account/queries";
 import { initialsFor } from "@/features/account/types";
+import { myAdminStatusQuery } from "@/features/directory/queries";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -21,6 +22,7 @@ export function AccountMenu() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const profile = useQuery({ ...myProfileQuery(), enabled: Boolean(session) });
+  const admin = useQuery({ ...myAdminStatusQuery(), enabled: Boolean(session) });
 
   if (loading) {
     return <span className="h-8 w-16" aria-hidden />;
@@ -62,11 +64,19 @@ export function AccountMenu() {
         <DropdownMenuItem asChild>
           <Link to="/profile">Your profile</Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/posts">Your posts</Link>
+        </DropdownMenuItem>
         {profile.data ? (
           <DropdownMenuItem asChild>
             <Link to="/u/$profileId" params={{ profileId: profile.data.id }}>
               Public neighbor page
             </Link>
+          </DropdownMenuItem>
+        ) : null}
+        {admin.data?.isAdmin ? (
+          <DropdownMenuItem asChild>
+            <Link to="/admin/directory">Directory listings</Link>
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuSeparator />
