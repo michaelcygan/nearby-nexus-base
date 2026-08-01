@@ -21,6 +21,9 @@ import { initialsFor, profileSchema } from "@/features/account/types";
 import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
 import { myParticipationQuery } from "@/features/participation/queries";
 import { roleLabels } from "@/features/participation/types";
+import { unblockNeighbor } from "@/features/moderation/block.functions";
+import { myBlocksQuery, myReportsQuery } from "@/features/moderation/queries";
+import { reportReasonLabels, reportStatusLabels, reportTargetLabels } from "@/features/moderation/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -351,9 +354,102 @@ function ProfilePage() {
                 </ul>
               )}
             </section>
+
+            <section className="mt-12">
+              <h2 className="font-display text-xl">Safety</h2>
+              <div className="rule-print my-4" />
+              <BlockedNeighbors />
+              <MyReports />
+            </section>
           </>
         )}
       </PageContainer>
     </AppShell>
+  );
+}
+
+function BlockedNeighbors() {
+  const queryClient = useQueryClient();
+  const blocks = useQuery(myBlocksQuery());
+
+  const unblock = useMutation({
+    mutationFn: (neighborId: string) => unblockNeighbor({ data: { neighborId } }),
+    onSuccess: () => {
+      toast.success("Block removed.");
+      void queryClient.invalidateQueries({ queryKey: ["moderation"] });
+    },
+    onError: () => toast.error("That didn't go through."),
+  });
+
+  return (
+    <div>
+      <h3 className="font-display text-base font-semibold">Neighbors you blocked</h3>
+      <p className="mt-1 max-w-prose text-sm text-muted-foreground">
+        Blocking is private. Their posts stay hidden from your boards and neither of you can start a
+        new conversation with the other.
+      </p>
+      {blocks.isPending ? (
+        <Skeleton className="mt-3 h-10 w-full max-w-md" />
+      ) : (blocks.data ?? []).length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">You haven't blocked anyone.</p>
+      ) : (
+        <ul className="mt-3 space-y-2">
+          {(blocks.data ?? []).map((block) => (
+            <li
+              key={block.neighbor_id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-card p-3"
+            >
+              <Link
+                to="/u/$profileId"
+                params={{ profileId: block.neighbor_id }}
+                className="font-display text-base underline underline-offset-4"
+              >
+                {block.display_name}
+              </Link>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={unblock.isPending}
+                onClick={() => unblock.mutate(block.neighbor_id)}
+              >
+                Unblock
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function MyReports() {
+  const reports = useQuery(myReportsQuery());
+
+  return (
+    <div className="mt-8">
+      <h3 className="font-display text-base font-semibold">Reports you filed</h3>
+      <p className="mt-1 max-w-prose text-sm text-muted-foreground">
+        Only you and the moderators can see these.
+      </p>
+      {reports.isPending ? (
+        <Skeleton className="mt-3 h-10 w-full max-w-md" />
+      ) : (reports.data ?? []).length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">Nothing reported yet.</p>
+      ) : (
+        <ul className="mt-3 space-y-2 text-sm">
+          {(reports.data ?? []).map((report) => (
+            <li key={report.id} className="rounded-md border border-border bg-card p-3">
+              <p className="font-display text-base">
+                {reportTargetLabels[report.target_type]} · {reportReasonLabels[report.reason]}
+              </p>
+              <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                {reportStatusLabels[report.status]} ·{" "}
+                {new Date(report.created_at).toLocaleDateString()}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
