@@ -8,12 +8,13 @@ import { ParticipationBlock } from "@/components/posts/participation-block";
 import { ErrorState } from "@/components/common/error-state";
 import { postQuery } from "@/features/neighborhoods/queries";
 import {
-import { canonicalUrl } from "@/lib/seo";
   formatDate,
   formatDateTime,
   formatPrice,
   postTypeLabels,
 } from "@/features/neighborhoods/types";
+import { canonicalUrl } from "@/lib/seo";
+
 
 export const Route = createFileRoute("/n/$slug/p/$postId")({
   loader: async ({ params, context }) => {
