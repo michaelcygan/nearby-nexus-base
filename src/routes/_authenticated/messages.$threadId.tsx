@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { threadQuery } from "@/features/messages/queries";
+import { formatTimestamp } from "@/features/neighborhoods/types";
+
 import { markThreadRead, sendMessage } from "@/features/messages/thread.functions";
 
 export const Route = createFileRoute("/_authenticated/messages/$threadId")({
