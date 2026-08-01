@@ -140,8 +140,10 @@ export type Database = {
           condition: string | null
           created_at: string
           expires_at: string | null
+          going_count: number
           id: string
           image_paths: string[]
+          interested_count: number
           is_free: boolean | null
           location: string | null
           needed_by: string | null
@@ -153,6 +155,7 @@ export type Database = {
           title: string
           type: Database["public"]["Enums"]["post_type"]
           updated_at: string
+          volunteer_count: number
         }
         Insert: {
           author_id?: string | null
@@ -161,8 +164,10 @@ export type Database = {
           condition?: string | null
           created_at?: string
           expires_at?: string | null
+          going_count?: number
           id?: string
           image_paths?: string[]
+          interested_count?: number
           is_free?: boolean | null
           location?: string | null
           needed_by?: string | null
@@ -174,6 +179,7 @@ export type Database = {
           title: string
           type: Database["public"]["Enums"]["post_type"]
           updated_at?: string
+          volunteer_count?: number
         }
         Update: {
           author_id?: string | null
@@ -182,8 +188,10 @@ export type Database = {
           condition?: string | null
           created_at?: string
           expires_at?: string | null
+          going_count?: number
           id?: string
           image_paths?: string[]
+          interested_count?: number
           is_free?: boolean | null
           location?: string | null
           needed_by?: string | null
@@ -195,6 +203,7 @@ export type Database = {
           title?: string
           type?: Database["public"]["Enums"]["post_type"]
           updated_at?: string
+          volunteer_count?: number
         }
         Relationships: [
           {
@@ -372,23 +381,7 @@ export type Database = {
       }
     }
     Views: {
-      post_participation_counts: {
-        Row: {
-          going_count: number | null
-          interested_count: number | null
-          post_id: string | null
-          volunteer_count: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "post_participants_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "posts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       has_role: {
