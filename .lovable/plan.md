@@ -1,47 +1,45 @@
-## Where things stand
+## Wave 6 — Neighborhood Store
 
-Waves 1–4 are complete and verified on public routes. No moderation code exists yet (no reports, blocks, or moderation surfaces anywhere in the codebase), so Wave 5 is a clean build.
+A single operator-run store per neighborhood: admins create listings, neighbors buy them with card checkout, each listing is a one-of-a-kind item that goes "sold" once paid, and pickup is arranged locally (no shipping fields).
 
-Two carry-over items to handle first:
+### 1. Enable payments
+Enable Lovable's built-in Stripe payments (no Stripe account or API key needed to start — a test environment is created immediately; accepting real money later needs an account claim). Because these are physical goods, tax handling is set to calculation and collection only: Stripe computes and collects the right tax at checkout, and you handle registration/filing/remittance.
 
-1. **Live signed-in verification** — my sandbox still has no session. Sign in once in the preview and I'll re-verify publishing, joining, and messaging end to end at the start of this wave.
-2. **Public profile exposure (security scan, error level)** — `profiles` is currently readable by anyone on the internet, including bios and home neighborhood. Since neighbor names must show on public boards, the fix is to expose only the fields boards actually need to visitors, and keep bio + home neighborhood for signed-in members.
+Then create the store products in Stripe from the listing details you give me (or seeded examples), each with a tax code matched to its product type.
 
-## Wave 5 — Moderation and safety
+### 2. Database
+New tables:
 
-The goal: the board stays civil without you reading every post. Members flag problems, blocked people disappear from each other's view, and admins/moderators get one screen to act from.
+- `store_listings` — neighborhood, title, description, price, currency, condition, photos, pickup notes, status (`draft`, `available`, `reserved`, `sold`, `archived`), Stripe product/price references, hidden/removed flags for moderation.
+- `store_orders` — listing, buyer, buyer contact name/email, amount paid, currency, status (`pending`, `paid`, `cancelled`, `refunded`, `fulfilled`), Stripe checkout session + payment intent ids, pickup arrangement note, timestamps.
 
-### Reporting
-- Members can report a post, a directory place, a profile, or a message thread, with a reason (spam, unsafe, wrong board, not neighborly, other) and an optional note.
-- Reporters see a confirmation and their own report history; they cannot see other people's reports.
-- A "Report" action appears on post detail pages, place pages, public neighbor pages, and inside message threads.
+Access rules in plain English:
+- Anyone can view available, non-hidden listings; admins can see and manage all of them.
+- Buyers can see only their own orders; admins can see every order.
+- Orders are never created or edited directly from the browser — only the server writes them, so prices and paid status can't be forged.
+- A database check prevents two paid orders on the same one-of-a-kind listing.
 
-### Blocking
-- A member can block another member. After that: their posts drop out of the blocker's feeds, existing threads between them are hidden, and neither can start a new thread with the other.
-- Blocks are private — the blocked person is never told.
-- Manage blocks from a section on the profile page.
+Grants are added for every new table alongside the policies.
 
-### Author + moderator actions
-- Authors already delete their own posts; add "hide" so they can pull something without losing it.
-- Moderators and admins get `/admin/moderation`: open reports queue with the reported content inline, and actions to dismiss, hide the content, or remove it. Every action is written to an audit log with who did it and why.
-- Removed content shows a plain "This post was removed by a moderator" state rather than a broken page.
-- Admins can grant or revoke the moderator role from `/admin/members`.
+### 3. Server logic
+- `listStoreListings` / `getStoreListing` — public reads through the publishable client, safe columns only.
+- `createCheckoutSession` — authenticated: validates the listing is still available, re-reads the price from the database (never from the client), creates a Stripe Checkout Session with `automatic_tax`, records a `pending` order, returns the checkout URL.
+- Stripe webhook at `src/routes/api/public/webhooks/stripe.ts` — verifies the signature over the raw body before anything else, then on `checkout.session.completed` marks the order `paid` and the listing `sold`; on expiry/cancel releases the listing back to `available`. Idempotent on session id.
+- Admin functions: create/update/archive listing, list orders, mark an order `fulfilled` (picked up), cancel an order.
 
-### Rate limits and guardrails
-- Cap posts and thread starts per member per day, enforced in the database so it can't be bypassed from the browser.
-- Cap reports per member per day so reporting can't be used as harassment.
-- Community guidelines page gets links from the report dialogs so the rules are visible at the moment they matter.
+### 4. UI
+- `/n/$slug/store` — new board tab beside Plans / Marketplace / Volunteer: grid of available listings with photo, price, condition, "Buy" CTA. Signed-out visitors see an inline "Sign in to buy" prompt rather than a redirect.
+- `/n/$slug/store/$listingId` — listing detail: gallery, description, pickup notes, price with tax note, Buy button, report button (consistent with other content types).
+- `/store/checkout/success` and `/store/checkout/cancelled` — public confirmation pages; success polls the order until the webhook marks it paid, then shows pickup instructions.
+- `/orders` (authenticated) — the buyer's purchases with status and pickup notes.
+- `/admin/store` (admin-only, linked from the account menu) — listing manager (create/edit/archive, reusing the existing image uploader with browser-side compression) and an order queue with a "picked up" action.
+- Moderation: store listings become a reportable target so the existing moderator queue can hide or remove them.
 
-## Technical notes
+### 5. SEO & verification
+Unique `head()` metadata on every new content route (store index, listing detail), with the listing's photo as the OG image when one exists. Then a typecheck plus a browser pass over the store board, a listing page, the signed-out buy prompt, and the admin manager — checking for console errors and mobile overflow.
 
-- **New tables**: `reports` (target type + id, reporter, reason, note, status, resolution), `blocks` (blocker, blocked, unique pair), `moderation_actions` (audit log: actor, action, target, reason).
-- **RLS**: reporters read only their own reports; moderators/admins read all via `has_role`. Blocks readable only by the blocker. Audit log readable by moderators/admins, insertable only through server functions.
-- **Status handling**: `posts.status` already has `removed`; add `hidden` to `post_status` and a `status` column to `places` so removal/hiding is uniform. Public SELECT policies filter to `active`; authors and moderators keep owner/role-scoped read paths so hidden rows stay reachable from `/posts` and the moderation queue.
-- **Block filtering** happens server-side in the existing feed and thread fetchers via a security-definer helper, so blocked content never reaches the browser.
-- **Rate limits** are enforced by triggers on `posts`, `threads`, and `reports` counting the actor's rows in the last 24 hours.
-- **Profiles fix**: narrow the public SELECT policy to display name + avatar only (via a restricted public view or column-limited policy), and serve full profile detail through an authenticated server function. Public boards keep showing names; bios and home neighborhood become sign-in-only.
-- **Server layer**: `src/features/moderation/` with `report.functions.ts`, `block.functions.ts`, `moderation.functions.ts` (role-gated), and query options; all mutations go through `createServerFn` with `requireSupabaseAuth`.
-- The two remaining `SECURITY DEFINER` scan warnings are the intended `has_role` / `is_thread_member` RLS-helper pattern and stay as-is; new helpers follow the same shape with `EXECUTE` revoked from `anon`.
-
-### Verification
-Typecheck, then browser checks: report dialog opens and submits, removed post shows its removed state, moderation queue is unreachable without the role, public board still shows author names while a signed-out visit to `/u/{id}` no longer exposes bio. Signed-in paths get live verification if a preview session is available.
+### Technical notes
+- Prices are stored in integer cents; the checkout session amount always comes from the database row, never the request body.
+- The webhook is the only writer of `paid` status; the success page never grants fulfilment on its own.
+- Listing reservation is short-lived: creating a session marks the listing `reserved` with an expiry, and expired sessions release it.
+- Multi-seller payouts (each neighbor paid directly) are deliberately out of scope — that needs Stripe Connect onboarding per seller and can be a later wave.
