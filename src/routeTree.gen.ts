@@ -25,6 +25,7 @@ import { Route as NSlugDirectoryRouteImport } from './routes/n.$slug.directory'
 import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketplace'
 import { Route as NSlugPlansRouteImport } from './routes/n.$slug.plans'
 import { Route as NSlugVolunteerRouteImport } from './routes/n.$slug.volunteer'
+import { Route as AuthenticatedPostPostIdEditRouteImport } from './routes/_authenticated/post.$postId.edit'
 import { Route as NSlugPPostIdRouteImport } from './routes/n.$slug.p.$postId'
 import { Route as NSlugPlacePlaceIdRouteImport } from './routes/n.$slug.place.$placeId'
 
@@ -107,6 +108,12 @@ const NSlugVolunteerRoute = NSlugVolunteerRouteImport.update({
   path: '/volunteer',
   getParentRoute: () => NSlugRoute,
 } as any)
+const AuthenticatedPostPostIdEditRoute =
+  AuthenticatedPostPostIdEditRouteImport.update({
+    id: '/post/$postId/edit',
+    path: '/post/$postId/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const NSlugPPostIdRoute = NSlugPPostIdRouteImport.update({
   id: '/p/$postId',
   path: '/p/$postId',
@@ -134,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
   '/n/$slug/': typeof NSlugIndexRoute
+  '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -152,6 +160,7 @@ export interface FileRoutesByTo {
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
   '/n/$slug': typeof NSlugIndexRoute
+  '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -173,6 +182,7 @@ export interface FileRoutesById {
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
   '/n/$slug/': typeof NSlugIndexRoute
+  '/_authenticated/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/n/$slug/plans'
     | '/n/$slug/volunteer'
     | '/n/$slug/'
+    | '/post/$postId/edit'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   fileRoutesByTo: FileRoutesByTo
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/n/$slug/plans'
     | '/n/$slug/volunteer'
     | '/n/$slug'
+    | '/post/$postId/edit'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   id:
@@ -232,6 +244,7 @@ export interface FileRouteTypes {
     | '/n/$slug/plans'
     | '/n/$slug/volunteer'
     | '/n/$slug/'
+    | '/_authenticated/post/$postId/edit'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   fileRoutesById: FileRoutesById
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugVolunteerRouteImport
       parentRoute: typeof NSlugRoute
     }
+    '/_authenticated/post/$postId/edit': {
+      id: '/_authenticated/post/$postId/edit'
+      path: '/post/$postId/edit'
+      fullPath: '/post/$postId/edit'
+      preLoaderRoute: typeof AuthenticatedPostPostIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/n/$slug/p/$postId': {
       id: '/n/$slug/p/$postId'
       path: '/p/$postId'
@@ -382,11 +402,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedPostNewRoute: typeof AuthenticatedPostNewRoute
+  AuthenticatedPostPostIdEditRoute: typeof AuthenticatedPostPostIdEditRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedPostNewRoute: AuthenticatedPostNewRoute,
+  AuthenticatedPostPostIdEditRoute: AuthenticatedPostPostIdEditRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
