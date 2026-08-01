@@ -125,12 +125,8 @@ function ThreadPage() {
                 <p className="whitespace-pre-line">{message.body}</p>
                 <p className="mt-2 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
                   {mine ? "You" : detail.other_name} ·{" "}
-                  {new Date(message.created_at).toLocaleString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
+                  {formatTimestamp(message.created_at)}
+
                 </p>
               </li>
             );
