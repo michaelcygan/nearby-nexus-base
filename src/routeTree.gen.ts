@@ -30,6 +30,7 @@ import { Route as NSlugIndexRouteImport } from './routes/n.$slug.index'
 import { Route as NSlugDirectoryRouteImport } from './routes/n.$slug.directory'
 import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketplace'
 import { Route as NSlugPlansRouteImport } from './routes/n.$slug.plans'
+import { Route as NSlugStoreRouteImport } from './routes/n.$slug.store'
 import { Route as NSlugVolunteerRouteImport } from './routes/n.$slug.volunteer'
 import { Route as AuthenticatedPostPostIdEditRouteImport } from './routes/_authenticated/post.$postId.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -145,6 +146,11 @@ const NSlugPlansRoute = NSlugPlansRouteImport.update({
   path: '/plans',
   getParentRoute: () => NSlugRoute,
 } as any)
+const NSlugStoreRoute = NSlugStoreRouteImport.update({
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => NSlugRoute,
+} as any)
 const NSlugVolunteerRoute = NSlugVolunteerRouteImport.update({
   id: '/volunteer',
   path: '/volunteer',
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
+  '/n/$slug/store': typeof NSlugStoreRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
   '/messages/': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug/': typeof NSlugIndexRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
+  '/n/$slug/store': typeof NSlugStoreRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
   '/messages': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug': typeof NSlugIndexRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
+  '/n/$slug/store': typeof NSlugStoreRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
   '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug/': typeof NSlugIndexRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
+    | '/n/$slug/store'
     | '/n/$slug/volunteer'
     | '/messages/'
     | '/n/$slug/'
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
+    | '/n/$slug/store'
     | '/n/$slug/volunteer'
     | '/messages'
     | '/n/$slug'
@@ -330,6 +341,7 @@ export interface FileRouteTypes {
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
+    | '/n/$slug/store'
     | '/n/$slug/volunteer'
     | '/_authenticated/messages/'
     | '/n/$slug/'
@@ -501,6 +513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugPlansRouteImport
       parentRoute: typeof NSlugRoute
     }
+    '/n/$slug/store': {
+      id: '/n/$slug/store'
+      path: '/store'
+      fullPath: '/n/$slug/store'
+      preLoaderRoute: typeof NSlugStoreRouteImport
+      parentRoute: typeof NSlugRoute
+    }
     '/n/$slug/volunteer': {
       id: '/n/$slug/volunteer'
       path: '/volunteer'
@@ -570,6 +589,7 @@ interface NSlugRouteChildren {
   NSlugDirectoryRoute: typeof NSlugDirectoryRoute
   NSlugMarketplaceRoute: typeof NSlugMarketplaceRoute
   NSlugPlansRoute: typeof NSlugPlansRoute
+  NSlugStoreRoute: typeof NSlugStoreRoute
   NSlugVolunteerRoute: typeof NSlugVolunteerRoute
   NSlugIndexRoute: typeof NSlugIndexRoute
   NSlugPPostIdRoute: typeof NSlugPPostIdRoute
@@ -580,6 +600,7 @@ const NSlugRouteChildren: NSlugRouteChildren = {
   NSlugDirectoryRoute: NSlugDirectoryRoute,
   NSlugMarketplaceRoute: NSlugMarketplaceRoute,
   NSlugPlansRoute: NSlugPlansRoute,
+  NSlugStoreRoute: NSlugStoreRoute,
   NSlugVolunteerRoute: NSlugVolunteerRoute,
   NSlugIndexRoute: NSlugIndexRoute,
   NSlugPPostIdRoute: NSlugPPostIdRoute,
