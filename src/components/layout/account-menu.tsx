@@ -92,6 +92,12 @@ export function AccountMenu() {
             <Link to="/admin/store">Store listings</Link>
           </DropdownMenuItem>
         ) : null}
+        {admin.data?.isAdmin ? (
+          <DropdownMenuItem asChild>
+            <Link to="/admin/access-points">Access points</Link>
+          </DropdownMenuItem>
+        ) : null}
+
         {moderation.data?.canModerate ? (
           <DropdownMenuItem asChild>
             <Link to="/admin/moderation">Moderation queue</Link>
