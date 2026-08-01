@@ -34,6 +34,7 @@ import { Route as NSlugStoreRouteImport } from './routes/n.$slug.store'
 import { Route as NSlugVolunteerRouteImport } from './routes/n.$slug.volunteer'
 import { Route as AuthenticatedPostPostIdEditRouteImport } from './routes/_authenticated/post.$postId.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as NSlugItemListingIdRouteImport } from './routes/n.$slug.item.$listingId'
 import { Route as NSlugPPostIdRouteImport } from './routes/n.$slug.p.$postId'
 import { Route as NSlugPlacePlaceIdRouteImport } from './routes/n.$slug.place.$placeId'
 
@@ -168,6 +169,11 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const NSlugItemListingIdRoute = NSlugItemListingIdRouteImport.update({
+  id: '/item/$listingId',
+  path: '/item/$listingId',
+  getParentRoute: () => NSlugRoute,
+} as any)
 const NSlugPPostIdRoute = NSlugPPostIdRouteImport.update({
   id: '/p/$postId',
   path: '/p/$postId',
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/n/$slug/': typeof NSlugIndexRoute
   '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/n/$slug/item/$listingId': typeof NSlugItemListingIdRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -231,6 +238,7 @@ export interface FileRoutesByTo {
   '/n/$slug': typeof NSlugIndexRoute
   '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/n/$slug/item/$listingId': typeof NSlugItemListingIdRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/n/$slug/': typeof NSlugIndexRoute
   '/_authenticated/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/n/$slug/item/$listingId': typeof NSlugItemListingIdRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/n/$slug/'
     | '/post/$postId/edit'
     | '/api/public/payments/webhook'
+    | '/n/$slug/item/$listingId'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   fileRoutesByTo: FileRoutesByTo
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/n/$slug'
     | '/post/$postId/edit'
     | '/api/public/payments/webhook'
+    | '/n/$slug/item/$listingId'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   id:
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/n/$slug/'
     | '/_authenticated/post/$postId/edit'
     | '/api/public/payments/webhook'
+    | '/n/$slug/item/$listingId'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   fileRoutesById: FileRoutesById
@@ -541,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/n/$slug/item/$listingId': {
+      id: '/n/$slug/item/$listingId'
+      path: '/item/$listingId'
+      fullPath: '/n/$slug/item/$listingId'
+      preLoaderRoute: typeof NSlugItemListingIdRouteImport
+      parentRoute: typeof NSlugRoute
+    }
     '/n/$slug/p/$postId': {
       id: '/n/$slug/p/$postId'
       path: '/p/$postId'
@@ -592,6 +611,7 @@ interface NSlugRouteChildren {
   NSlugStoreRoute: typeof NSlugStoreRoute
   NSlugVolunteerRoute: typeof NSlugVolunteerRoute
   NSlugIndexRoute: typeof NSlugIndexRoute
+  NSlugItemListingIdRoute: typeof NSlugItemListingIdRoute
   NSlugPPostIdRoute: typeof NSlugPPostIdRoute
   NSlugPlacePlaceIdRoute: typeof NSlugPlacePlaceIdRoute
 }
@@ -603,6 +623,7 @@ const NSlugRouteChildren: NSlugRouteChildren = {
   NSlugStoreRoute: NSlugStoreRoute,
   NSlugVolunteerRoute: NSlugVolunteerRoute,
   NSlugIndexRoute: NSlugIndexRoute,
+  NSlugItemListingIdRoute: NSlugItemListingIdRoute,
   NSlugPPostIdRoute: NSlugPPostIdRoute,
   NSlugPlacePlaceIdRoute: NSlugPlacePlaceIdRoute,
 }
