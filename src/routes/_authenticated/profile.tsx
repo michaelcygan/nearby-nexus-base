@@ -396,12 +396,12 @@ function BlockedNeighbors() {
         <ul className="mt-3 space-y-2">
           {(blocks.data ?? []).map((block) => (
             <li
-              key={block.neighbor_id}
+              key={block.blocked_id}
               className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-card p-3"
             >
               <Link
                 to="/u/$profileId"
-                params={{ profileId: block.neighbor_id }}
+                params={{ profileId: block.blocked_id }}
                 className="font-display text-base underline underline-offset-4"
               >
                 {block.display_name}
@@ -410,7 +410,7 @@ function BlockedNeighbors() {
                 size="sm"
                 variant="outline"
                 disabled={unblock.isPending}
-                onClick={() => unblock.mutate(block.neighbor_id)}
+                onClick={() => unblock.mutate(block.blocked_id)}
               >
                 Unblock
               </Button>
