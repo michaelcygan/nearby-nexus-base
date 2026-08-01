@@ -14,7 +14,163 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      neighborhoods: {
+        Row: {
+          about: string | null
+          city: string
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          about?: string | null
+          city: string
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          about?: string | null
+          city?: string
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          tagline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      places: {
+        Row: {
+          address: string | null
+          category: string
+          created_at: string
+          description: string | null
+          hours: string | null
+          id: string
+          name: string
+          neighborhood_id: string
+          phone: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          category: string
+          created_at?: string
+          description?: string | null
+          hours?: string | null
+          id?: string
+          name: string
+          neighborhood_id: string
+          phone?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          hours?: string | null
+          id?: string
+          name?: string
+          neighborhood_id?: string
+          phone?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "places_neighborhood_id_fkey"
+            columns: ["neighborhood_id"]
+            isOneToOne: false
+            referencedRelation: "neighborhoods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_id: string | null
+          body: string
+          capacity: number | null
+          condition: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          image_paths: string[]
+          is_free: boolean | null
+          location: string | null
+          needed_by: string | null
+          neighborhood_id: string
+          price_cents: number | null
+          slots: number | null
+          starts_at: string | null
+          status: Database["public"]["Enums"]["post_status"]
+          title: string
+          type: Database["public"]["Enums"]["post_type"]
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          capacity?: number | null
+          condition?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          image_paths?: string[]
+          is_free?: boolean | null
+          location?: string | null
+          needed_by?: string | null
+          neighborhood_id: string
+          price_cents?: number | null
+          slots?: number | null
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["post_status"]
+          title: string
+          type: Database["public"]["Enums"]["post_type"]
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          capacity?: number | null
+          condition?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          image_paths?: string[]
+          is_free?: boolean | null
+          location?: string | null
+          needed_by?: string | null
+          neighborhood_id?: string
+          price_cents?: number | null
+          slots?: number | null
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["post_status"]
+          title?: string
+          type?: Database["public"]["Enums"]["post_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_neighborhood_id_fkey"
+            columns: ["neighborhood_id"]
+            isOneToOne: false
+            referencedRelation: "neighborhoods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +179,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      post_status: "active" | "completed" | "expired" | "removed"
+      post_type: "plan" | "marketplace" | "volunteer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +307,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      post_status: ["active", "completed", "expired", "removed"],
+      post_type: ["plan", "marketplace", "volunteer"],
+    },
   },
 } as const
