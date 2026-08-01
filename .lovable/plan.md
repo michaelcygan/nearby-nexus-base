@@ -1,45 +1,40 @@
-## Wave 6 — Neighborhood Store
+# Wave 7: NFC-ready links + launch hardening
 
-A single operator-run store per neighborhood: admins create listings, neighbors buy them with card checkout, each listing is a one-of-a-kind item that goes "sold" once paid, and pickup is arranged locally (no shipping fields).
+## Goal
+Prepare the app for physical NFC/QR deployment and publish it. The user programs their own chips and QR codes, so we only need to expose a clean, copyable neighborhood URL — visible to admins only — and fix the remaining SSR/client mismatch before launch.
 
-### 1. Enable payments
-Enable Lovable's built-in Stripe payments (no Stripe account or API key needed to start — a test environment is created immediately; accepting real money later needs an account claim). Because these are physical goods, tax handling is set to calculation and collection only: Stripe computes and collects the right tax at checkout, and you handle registration/filing/remittance.
+## What we already know
+- All six feature waves are in place: public boards, auth/profiles, posting, participation/messaging, moderation, and the neighborhood store.
+- A sticker/scan should land on the public neighborhood home page (`/n/$slug`) — no redirect or tracking layer.
+- The user physically programs their own NFC chips and generates their own QR codes; they only need the URL surfaced in the UI.
+- There is a live hydration mismatch on post cards caused by timezone-sensitive date formatting (`formatDate` / `formatDateTime` in `src/features/neighborhoods/types.ts`) producing different server and client output.
 
-Then create the store products in Stripe from the listing details you give me (or seeded examples), each with a tax code matched to its product type.
+## Work
 
-### 2. Database
-New tables:
+### 1. Fix the timezone hydration mismatch
+- Add a `timezone` column to `public.neighborhoods`, defaulting to `America/New_York` for the existing Pittsburgh neighborhoods.
+- Update `formatDate` and `formatDateTime` to format against an explicit timezone so server and client render identical strings.
+- Audit other date display sites (post detail, store listing, message timestamps, order history) and apply the same fixed timezone.
 
-- `store_listings` — neighborhood, title, description, price, currency, condition, photos, pickup notes, status (`draft`, `available`, `reserved`, `sold`, `archived`), Stripe product/price references, hidden/removed flags for moderation.
-- `store_orders` — listing, buyer, buyer contact name/email, amount paid, currency, status (`pending`, `paid`, `cancelled`, `refunded`, `fulfilled`), Stripe checkout session + payment intent ids, pickup arrangement note, timestamps.
+### 2. Admin-only NFC/QR link tool
+Confirmed per your note: this is an admin surface, not public.
+- New admin page: `/admin/access-points`, gated behind the existing moderator/admin role check.
+- Lists every neighborhood with its canonical scan URL (e.g., `https://nearby-nexus-base.lovable.app/n/bloomfield`) and a one-click copy button.
+- Includes a printable sticker card per neighborhood (neighborhood name + URL) so you can print labels before attaching chips.
+- Link it from the account menu alongside the existing moderation and store admin links, visible only to admins.
+- Nothing about NFC/QR appears on public neighborhood pages.
 
-Access rules in plain English:
-- Anyone can view available, non-hidden listings; admins can see and manage all of them.
-- Buyers can see only their own orders; admins can see every order.
-- Orders are never created or edited directly from the browser — only the server writes them, so prices and paid status can't be forged.
-- A database check prevents two paid orders on the same one-of-a-kind listing.
+### 3. Launch hardening
+- Verify every route has unique `head()` metadata (title, description, og:title, og:description) with self-referencing canonical and og:url.
+- Final browser pass: console errors, network errors, mobile overflow, basic accessibility.
+- Confirm the store remains in Stripe test mode with the test-mode banner visible.
+- Run a security scan and resolve new findings.
 
-Grants are added for every new table alongside the policies.
+### 4. Publish and handoff
+- Publish to the default `.lovable.app` URL.
+- Summarize the launch URL and the `/n/<slug>` URL pattern to program into your chips.
 
-### 3. Server logic
-- `listStoreListings` / `getStoreListing` — public reads through the publishable client, safe columns only.
-- `createCheckoutSession` — authenticated: validates the listing is still available, re-reads the price from the database (never from the client), creates a Stripe Checkout Session with `automatic_tax`, records a `pending` order, returns the checkout URL.
-- Stripe webhook at `src/routes/api/public/webhooks/stripe.ts` — verifies the signature over the raw body before anything else, then on `checkout.session.completed` marks the order `paid` and the listing `sold`; on expiry/cancel releases the listing back to `available`. Idempotent on session id.
-- Admin functions: create/update/archive listing, list orders, mark an order `fulfilled` (picked up), cancel an order.
-
-### 4. UI
-- `/n/$slug/store` — new board tab beside Plans / Marketplace / Volunteer: grid of available listings with photo, price, condition, "Buy" CTA. Signed-out visitors see an inline "Sign in to buy" prompt rather than a redirect.
-- `/n/$slug/store/$listingId` — listing detail: gallery, description, pickup notes, price with tax note, Buy button, report button (consistent with other content types).
-- `/store/checkout/success` and `/store/checkout/cancelled` — public confirmation pages; success polls the order until the webhook marks it paid, then shows pickup instructions.
-- `/orders` (authenticated) — the buyer's purchases with status and pickup notes.
-- `/admin/store` (admin-only, linked from the account menu) — listing manager (create/edit/archive, reusing the existing image uploader with browser-side compression) and an order queue with a "picked up" action.
-- Moderation: store listings become a reportable target so the existing moderator queue can hide or remove them.
-
-### 5. SEO & verification
-Unique `head()` metadata on every new content route (store index, listing detail), with the listing's photo as the OG image when one exists. Then a typecheck plus a browser pass over the store board, a listing page, the signed-out buy prompt, and the admin manager — checking for console errors and mobile overflow.
-
-### Technical notes
-- Prices are stored in integer cents; the checkout session amount always comes from the database row, never the request body.
-- The webhook is the only writer of `paid` status; the success page never grants fulfilment on its own.
-- Listing reservation is short-lived: creating a session marks the listing `reserved` with an expiry, and expired sessions release it.
-- Multi-seller payouts (each neighbor paid directly) are deliberately out of scope — that needs Stripe Connect onboarding per seller and can be a later wave.
+## Out of scope
+- Custom QR/NFC generator, redirect service, or scan analytics (deferred).
+- Custom domain setup unless you provide a domain.
+- New feature modules beyond the existing six waves.
