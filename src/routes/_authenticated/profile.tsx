@@ -19,6 +19,8 @@ import {
 } from "@/features/account/profile.functions";
 import { initialsFor, profileSchema } from "@/features/account/types";
 import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
+import { formatTimestamp } from "@/features/neighborhoods/types";
+
 import { myParticipationQuery } from "@/features/participation/queries";
 import { roleLabels } from "@/features/participation/types";
 import { unblockNeighbor } from "@/features/moderation/block.functions";
