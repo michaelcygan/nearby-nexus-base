@@ -11,6 +11,7 @@ import {
   neighborhoodPostsQuery,
   neighborhoodQuery,
 } from "@/features/neighborhoods/queries";
+import { canonicalUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/n/$slug/")({
   loader: ({ params, context }) => {
