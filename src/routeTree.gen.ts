@@ -20,6 +20,7 @@ import { Route as AuthenticatedPostsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
 import { Route as UProfileIdRouteImport } from './routes/u.$profileId'
+import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin.directory'
 import { Route as AuthenticatedPostNewRouteImport } from './routes/_authenticated/post.new'
 import { Route as NSlugIndexRouteImport } from './routes/n.$slug.index'
 import { Route as NSlugDirectoryRouteImport } from './routes/n.$slug.directory'
@@ -84,6 +85,12 @@ const UProfileIdRoute = UProfileIdRouteImport.update({
   path: '/u/$profileId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminDirectoryRoute =
+  AuthenticatedAdminDirectoryRouteImport.update({
+    id: '/admin/directory',
+    path: '/admin/directory',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPostNewRoute = AuthenticatedPostNewRouteImport.update({
   id: '/post/new',
   path: '/post/new',
@@ -142,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/n/$slug': typeof NSlugRouteWithChildren
   '/u/$profileId': typeof UProfileIdRoute
+  '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
@@ -162,6 +170,7 @@ export interface FileRoutesByTo {
   '/posts': typeof AuthenticatedPostsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/u/$profileId': typeof UProfileIdRoute
+  '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
@@ -185,6 +194,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/n/$slug': typeof NSlugRouteWithChildren
   '/u/$profileId': typeof UProfileIdRoute
+  '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/_authenticated/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/n/$slug'
     | '/u/$profileId'
+    | '/admin/directory'
     | '/post/new'
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/posts'
     | '/profile'
     | '/u/$profileId'
+    | '/admin/directory'
     | '/post/new'
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
@@ -250,6 +262,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/n/$slug'
     | '/u/$profileId'
+    | '/_authenticated/admin/directory'
     | '/_authenticated/post/new'
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
@@ -352,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UProfileIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/directory': {
+      id: '/_authenticated/admin/directory'
+      path: '/admin/directory'
+      fullPath: '/admin/directory'
+      preLoaderRoute: typeof AuthenticatedAdminDirectoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/post/new': {
       id: '/_authenticated/post/new'
       path: '/post/new'
@@ -421,6 +441,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPostsRoute: typeof AuthenticatedPostsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
   AuthenticatedPostNewRoute: typeof AuthenticatedPostNewRoute
   AuthenticatedPostPostIdEditRoute: typeof AuthenticatedPostPostIdEditRoute
 }
@@ -428,6 +449,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPostsRoute: AuthenticatedPostsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedAdminDirectoryRoute: AuthenticatedAdminDirectoryRoute,
   AuthenticatedPostNewRoute: AuthenticatedPostNewRoute,
   AuthenticatedPostPostIdEditRoute: AuthenticatedPostPostIdEditRoute,
 }

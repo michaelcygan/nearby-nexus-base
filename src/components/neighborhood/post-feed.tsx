@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { EmptyState } from "@/components/common/empty-state";
 import { PostListSkeleton } from "@/components/common/post-list-skeleton";
 import { PostCard } from "@/components/neighborhood/post-card";
+import { PostCta } from "@/components/posts/post-cta";
 import { neighborhoodPostsQuery } from "@/features/neighborhoods/queries";
 import type { PostType } from "@/features/neighborhoods/types";
 
@@ -24,8 +25,13 @@ export function PostFeed({
 }) {
   return (
     <section>
-      <h2 className="text-xl">{heading}</h2>
-      <p className="mt-2 max-w-prose text-sm text-muted-foreground">{intro}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-xl">{heading}</h2>
+          <p className="mt-2 max-w-prose text-sm text-muted-foreground">{intro}</p>
+        </div>
+        <PostCta slug={slug} type={type} />
+      </div>
       <Suspense
         fallback={
           <div className="mt-5">

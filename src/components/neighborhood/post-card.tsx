@@ -34,6 +34,14 @@ export function PostCard({ post, slug }: { post: PostSummary; slug: string }) {
         <p className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-primary">
           {postTypeLabels[post.type]}
         </p>
+        {post.image_urls?.[0] ? (
+          <img
+            src={post.image_urls[0]}
+            alt=""
+            loading="lazy"
+            className="mt-3 h-40 w-full rounded-sm border border-border object-cover"
+          />
+        ) : null}
         <h3 className="mt-2 font-display text-lg font-semibold leading-snug">{post.title}</h3>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.body}</p>
         {meta.length > 0 ? (
