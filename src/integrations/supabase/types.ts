@@ -398,6 +398,139 @@ export type Database = {
           },
         ]
       }
+      store_listings: {
+        Row: {
+          condition: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string
+          hidden: boolean
+          id: string
+          image_paths: string[]
+          neighborhood_id: string
+          pickup_notes: string | null
+          price_cents: number
+          removed: boolean
+          reserved_until: string | null
+          status: Database["public"]["Enums"]["store_listing_status"]
+          stripe_price_lookup_key: string | null
+          stripe_product_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          condition?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description: string
+          hidden?: boolean
+          id?: string
+          image_paths?: string[]
+          neighborhood_id: string
+          pickup_notes?: string | null
+          price_cents: number
+          removed?: boolean
+          reserved_until?: string | null
+          status?: Database["public"]["Enums"]["store_listing_status"]
+          stripe_price_lookup_key?: string | null
+          stripe_product_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          condition?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string
+          hidden?: boolean
+          id?: string
+          image_paths?: string[]
+          neighborhood_id?: string
+          pickup_notes?: string | null
+          price_cents?: number
+          removed?: boolean
+          reserved_until?: string | null
+          status?: Database["public"]["Enums"]["store_listing_status"]
+          stripe_price_lookup_key?: string | null
+          stripe_product_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_listings_neighborhood_id_fkey"
+            columns: ["neighborhood_id"]
+            isOneToOne: false
+            referencedRelation: "neighborhoods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_orders: {
+        Row: {
+          amount_cents: number
+          buyer_email: string | null
+          buyer_id: string | null
+          created_at: string
+          currency: string
+          environment: string
+          fulfilled_at: string | null
+          id: string
+          listing_id: string
+          paid_at: string | null
+          pickup_note: string | null
+          status: Database["public"]["Enums"]["store_order_status"]
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          buyer_email?: string | null
+          buyer_id?: string | null
+          created_at?: string
+          currency?: string
+          environment?: string
+          fulfilled_at?: string | null
+          id?: string
+          listing_id: string
+          paid_at?: string | null
+          pickup_note?: string | null
+          status?: Database["public"]["Enums"]["store_order_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_session_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          buyer_email?: string | null
+          buyer_id?: string | null
+          created_at?: string
+          currency?: string
+          environment?: string
+          fulfilled_at?: string | null
+          id?: string
+          listing_id?: string
+          paid_at?: string | null
+          pickup_note?: string | null
+          status?: Database["public"]["Enums"]["store_order_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_orders_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "store_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       thread_messages: {
         Row: {
           body: string
@@ -526,7 +659,19 @@ export type Database = {
         | "not_neighborly"
         | "other"
       report_status: "open" | "dismissed" | "actioned"
-      report_target: "post" | "place" | "profile" | "thread"
+      report_target: "post" | "place" | "profile" | "thread" | "store_listing"
+      store_listing_status:
+        | "draft"
+        | "available"
+        | "reserved"
+        | "sold"
+        | "archived"
+      store_order_status:
+        | "pending"
+        | "paid"
+        | "cancelled"
+        | "refunded"
+        | "fulfilled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -667,7 +812,21 @@ export const Constants = {
         "other",
       ],
       report_status: ["open", "dismissed", "actioned"],
-      report_target: ["post", "place", "profile", "thread"],
+      report_target: ["post", "place", "profile", "thread", "store_listing"],
+      store_listing_status: [
+        "draft",
+        "available",
+        "reserved",
+        "sold",
+        "archived",
+      ],
+      store_order_status: [
+        "pending",
+        "paid",
+        "cancelled",
+        "refunded",
+        "fulfilled",
+      ],
     },
   },
 } as const

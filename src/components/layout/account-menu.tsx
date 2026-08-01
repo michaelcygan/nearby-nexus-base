@@ -72,6 +72,9 @@ export function AccountMenu() {
         <DropdownMenuItem asChild>
           <Link to="/messages">Messages</Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/orders">Your orders</Link>
+        </DropdownMenuItem>
         {profile.data ? (
           <DropdownMenuItem asChild>
             <Link to="/u/$profileId" params={{ profileId: profile.data.id }}>
@@ -82,6 +85,11 @@ export function AccountMenu() {
         {admin.data?.isAdmin ? (
           <DropdownMenuItem asChild>
             <Link to="/admin/directory">Directory listings</Link>
+          </DropdownMenuItem>
+        ) : null}
+        {admin.data?.isAdmin ? (
+          <DropdownMenuItem asChild>
+            <Link to="/admin/store">Store listings</Link>
           </DropdownMenuItem>
         ) : null}
         {moderation.data?.canModerate ? (

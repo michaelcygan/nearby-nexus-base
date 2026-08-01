@@ -16,6 +16,7 @@ import { Route as CommunityGuidelinesRouteImport } from './routes/community-guid
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
 import { Route as AuthenticatedPostsRouteImport } from './routes/_authenticated/posts'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
@@ -23,6 +24,7 @@ import { Route as UProfileIdRouteImport } from './routes/u.$profileId'
 import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin.directory'
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin.moderation'
+import { Route as AuthenticatedAdminStoreRouteImport } from './routes/_authenticated/admin.store'
 import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authenticated/messages.index'
 import { Route as AuthenticatedMessagesThreadIdRouteImport } from './routes/_authenticated/messages.$threadId'
 import { Route as AuthenticatedPostNewRouteImport } from './routes/_authenticated/post.new'
@@ -30,8 +32,12 @@ import { Route as NSlugIndexRouteImport } from './routes/n.$slug.index'
 import { Route as NSlugDirectoryRouteImport } from './routes/n.$slug.directory'
 import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketplace'
 import { Route as NSlugPlansRouteImport } from './routes/n.$slug.plans'
+import { Route as NSlugStoreRouteImport } from './routes/n.$slug.store'
 import { Route as NSlugVolunteerRouteImport } from './routes/n.$slug.volunteer'
+import { Route as StoreCheckoutReturnRouteImport } from './routes/store.checkout.return'
 import { Route as AuthenticatedPostPostIdEditRouteImport } from './routes/_authenticated/post.$postId.edit'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as NSlugItemListingIdRouteImport } from './routes/n.$slug.item.$listingId'
 import { Route as NSlugPPostIdRouteImport } from './routes/n.$slug.p.$postId'
 import { Route as NSlugPlacePlaceIdRouteImport } from './routes/n.$slug.place.$placeId'
 
@@ -68,6 +74,11 @@ const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPostsRoute = AuthenticatedPostsRouteImport.update({
   id: '/posts',
@@ -107,6 +118,11 @@ const AuthenticatedAdminModerationRoute =
     path: '/admin/moderation',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminStoreRoute = AuthenticatedAdminStoreRouteImport.update({
+  id: '/admin/store',
+  path: '/admin/store',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMessagesIndexRoute =
   AuthenticatedMessagesIndexRouteImport.update({
     id: '/messages/',
@@ -144,10 +160,20 @@ const NSlugPlansRoute = NSlugPlansRouteImport.update({
   path: '/plans',
   getParentRoute: () => NSlugRoute,
 } as any)
+const NSlugStoreRoute = NSlugStoreRouteImport.update({
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => NSlugRoute,
+} as any)
 const NSlugVolunteerRoute = NSlugVolunteerRouteImport.update({
   id: '/volunteer',
   path: '/volunteer',
   getParentRoute: () => NSlugRoute,
+} as any)
+const StoreCheckoutReturnRoute = StoreCheckoutReturnRouteImport.update({
+  id: '/store/checkout/return',
+  path: '/store/checkout/return',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPostPostIdEditRoute =
   AuthenticatedPostPostIdEditRouteImport.update({
@@ -155,6 +181,17 @@ const AuthenticatedPostPostIdEditRoute =
     path: '/post/$postId/edit',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const NSlugItemListingIdRoute = NSlugItemListingIdRouteImport.update({
+  id: '/item/$listingId',
+  path: '/item/$listingId',
+  getParentRoute: () => NSlugRoute,
+} as any)
 const NSlugPPostIdRoute = NSlugPPostIdRouteImport.update({
   id: '/p/$postId',
   path: '/p/$postId',
@@ -173,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
+  '/orders': typeof AuthenticatedOrdersRoute
   '/posts': typeof AuthenticatedPostsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/n/$slug': typeof NSlugRouteWithChildren
@@ -180,15 +218,20 @@ export interface FileRoutesByFullPath {
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/admin/moderation': typeof AuthenticatedAdminModerationRoute
+  '/admin/store': typeof AuthenticatedAdminStoreRoute
   '/messages/$threadId': typeof AuthenticatedMessagesThreadIdRoute
   '/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
+  '/n/$slug/store': typeof NSlugStoreRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
+  '/store/checkout/return': typeof StoreCheckoutReturnRoute
   '/messages/': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug/': typeof NSlugIndexRoute
   '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/n/$slug/item/$listingId': typeof NSlugItemListingIdRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -199,21 +242,27 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
+  '/orders': typeof AuthenticatedOrdersRoute
   '/posts': typeof AuthenticatedPostsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/u/$profileId': typeof UProfileIdRoute
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/admin/moderation': typeof AuthenticatedAdminModerationRoute
+  '/admin/store': typeof AuthenticatedAdminStoreRoute
   '/messages/$threadId': typeof AuthenticatedMessagesThreadIdRoute
   '/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
+  '/n/$slug/store': typeof NSlugStoreRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
+  '/store/checkout/return': typeof StoreCheckoutReturnRoute
   '/messages': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug': typeof NSlugIndexRoute
   '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/n/$slug/item/$listingId': typeof NSlugItemListingIdRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -226,6 +275,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
+  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/posts': typeof AuthenticatedPostsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/n/$slug': typeof NSlugRouteWithChildren
@@ -233,15 +283,20 @@ export interface FileRoutesById {
   '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
   '/_authenticated/admin/moderation': typeof AuthenticatedAdminModerationRoute
+  '/_authenticated/admin/store': typeof AuthenticatedAdminStoreRoute
   '/_authenticated/messages/$threadId': typeof AuthenticatedMessagesThreadIdRoute
   '/_authenticated/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
+  '/n/$slug/store': typeof NSlugStoreRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
+  '/store/checkout/return': typeof StoreCheckoutReturnRoute
   '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug/': typeof NSlugIndexRoute
   '/_authenticated/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/n/$slug/item/$listingId': typeof NSlugItemListingIdRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -254,6 +309,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/terms'
+    | '/orders'
     | '/posts'
     | '/profile'
     | '/n/$slug'
@@ -261,15 +317,20 @@ export interface FileRouteTypes {
     | '/admin/directory'
     | '/admin/members'
     | '/admin/moderation'
+    | '/admin/store'
     | '/messages/$threadId'
     | '/post/new'
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
+    | '/n/$slug/store'
     | '/n/$slug/volunteer'
+    | '/store/checkout/return'
     | '/messages/'
     | '/n/$slug/'
     | '/post/$postId/edit'
+    | '/api/public/payments/webhook'
+    | '/n/$slug/item/$listingId'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   fileRoutesByTo: FileRoutesByTo
@@ -280,21 +341,27 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/terms'
+    | '/orders'
     | '/posts'
     | '/profile'
     | '/u/$profileId'
     | '/admin/directory'
     | '/admin/members'
     | '/admin/moderation'
+    | '/admin/store'
     | '/messages/$threadId'
     | '/post/new'
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
+    | '/n/$slug/store'
     | '/n/$slug/volunteer'
+    | '/store/checkout/return'
     | '/messages'
     | '/n/$slug'
     | '/post/$postId/edit'
+    | '/api/public/payments/webhook'
+    | '/n/$slug/item/$listingId'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   id:
@@ -306,6 +373,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/terms'
+    | '/_authenticated/orders'
     | '/_authenticated/posts'
     | '/_authenticated/profile'
     | '/n/$slug'
@@ -313,15 +381,20 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/directory'
     | '/_authenticated/admin/members'
     | '/_authenticated/admin/moderation'
+    | '/_authenticated/admin/store'
     | '/_authenticated/messages/$threadId'
     | '/_authenticated/post/new'
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
+    | '/n/$slug/store'
     | '/n/$slug/volunteer'
+    | '/store/checkout/return'
     | '/_authenticated/messages/'
     | '/n/$slug/'
     | '/_authenticated/post/$postId/edit'
+    | '/api/public/payments/webhook'
+    | '/n/$slug/item/$listingId'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   fileRoutesById: FileRoutesById
@@ -336,6 +409,8 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   NSlugRoute: typeof NSlugRouteWithChildren
   UProfileIdRoute: typeof UProfileIdRoute
+  StoreCheckoutReturnRoute: typeof StoreCheckoutReturnRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -389,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/orders': {
+      id: '/_authenticated/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof AuthenticatedOrdersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/posts': {
       id: '/_authenticated/posts'
       path: '/posts'
@@ -436,6 +518,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/moderation'
       fullPath: '/admin/moderation'
       preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/store': {
+      id: '/_authenticated/admin/store'
+      path: '/admin/store'
+      fullPath: '/admin/store'
+      preLoaderRoute: typeof AuthenticatedAdminStoreRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/messages/': {
@@ -487,6 +576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugPlansRouteImport
       parentRoute: typeof NSlugRoute
     }
+    '/n/$slug/store': {
+      id: '/n/$slug/store'
+      path: '/store'
+      fullPath: '/n/$slug/store'
+      preLoaderRoute: typeof NSlugStoreRouteImport
+      parentRoute: typeof NSlugRoute
+    }
     '/n/$slug/volunteer': {
       id: '/n/$slug/volunteer'
       path: '/volunteer'
@@ -494,12 +590,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugVolunteerRouteImport
       parentRoute: typeof NSlugRoute
     }
+    '/store/checkout/return': {
+      id: '/store/checkout/return'
+      path: '/store/checkout/return'
+      fullPath: '/store/checkout/return'
+      preLoaderRoute: typeof StoreCheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/post/$postId/edit': {
       id: '/_authenticated/post/$postId/edit'
       path: '/post/$postId/edit'
       fullPath: '/post/$postId/edit'
       preLoaderRoute: typeof AuthenticatedPostPostIdEditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/n/$slug/item/$listingId': {
+      id: '/n/$slug/item/$listingId'
+      path: '/item/$listingId'
+      fullPath: '/n/$slug/item/$listingId'
+      preLoaderRoute: typeof NSlugItemListingIdRouteImport
+      parentRoute: typeof NSlugRoute
     }
     '/n/$slug/p/$postId': {
       id: '/n/$slug/p/$postId'
@@ -519,11 +636,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedPostsRoute: typeof AuthenticatedPostsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
   AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
+  AuthenticatedAdminStoreRoute: typeof AuthenticatedAdminStoreRoute
   AuthenticatedMessagesThreadIdRoute: typeof AuthenticatedMessagesThreadIdRoute
   AuthenticatedPostNewRoute: typeof AuthenticatedPostNewRoute
   AuthenticatedMessagesIndexRoute: typeof AuthenticatedMessagesIndexRoute
@@ -531,11 +650,13 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedPostsRoute: AuthenticatedPostsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedAdminDirectoryRoute: AuthenticatedAdminDirectoryRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
   AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
+  AuthenticatedAdminStoreRoute: AuthenticatedAdminStoreRoute,
   AuthenticatedMessagesThreadIdRoute: AuthenticatedMessagesThreadIdRoute,
   AuthenticatedPostNewRoute: AuthenticatedPostNewRoute,
   AuthenticatedMessagesIndexRoute: AuthenticatedMessagesIndexRoute,
@@ -549,8 +670,10 @@ interface NSlugRouteChildren {
   NSlugDirectoryRoute: typeof NSlugDirectoryRoute
   NSlugMarketplaceRoute: typeof NSlugMarketplaceRoute
   NSlugPlansRoute: typeof NSlugPlansRoute
+  NSlugStoreRoute: typeof NSlugStoreRoute
   NSlugVolunteerRoute: typeof NSlugVolunteerRoute
   NSlugIndexRoute: typeof NSlugIndexRoute
+  NSlugItemListingIdRoute: typeof NSlugItemListingIdRoute
   NSlugPPostIdRoute: typeof NSlugPPostIdRoute
   NSlugPlacePlaceIdRoute: typeof NSlugPlacePlaceIdRoute
 }
@@ -559,8 +682,10 @@ const NSlugRouteChildren: NSlugRouteChildren = {
   NSlugDirectoryRoute: NSlugDirectoryRoute,
   NSlugMarketplaceRoute: NSlugMarketplaceRoute,
   NSlugPlansRoute: NSlugPlansRoute,
+  NSlugStoreRoute: NSlugStoreRoute,
   NSlugVolunteerRoute: NSlugVolunteerRoute,
   NSlugIndexRoute: NSlugIndexRoute,
+  NSlugItemListingIdRoute: NSlugItemListingIdRoute,
   NSlugPPostIdRoute: NSlugPPostIdRoute,
   NSlugPlacePlaceIdRoute: NSlugPlacePlaceIdRoute,
 }
@@ -577,17 +702,9 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   NSlugRoute: NSlugRouteWithChildren,
   UProfileIdRoute: UProfileIdRoute,
+  StoreCheckoutReturnRoute: StoreCheckoutReturnRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

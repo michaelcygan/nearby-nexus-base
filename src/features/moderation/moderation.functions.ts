@@ -79,8 +79,10 @@ export const listReports = createServerFn({ method: "GET" })
     const postIds = idsFor("post");
     const placeIds = idsFor("place");
     const profileIds = idsFor("profile");
+    const listingIds = idsFor("store_listing");
 
-    const [{ data: posts }, { data: places }, { data: profiles }] = await Promise.all([
+    const [{ data: posts }, { data: places }, { data: profiles }, { data: listings }] =
+      await Promise.all([
       postIds.length
         ? supabase
             .from("posts")
@@ -96,11 +98,20 @@ export const listReports = createServerFn({ method: "GET" })
       profileIds.length
         ? supabase.from("profiles").select("id, display_name, about").in("id", profileIds)
         : Promise.resolve({ data: [] as never[] }),
-    ]);
+        listingIds.length
+          ? supabase
+              .from("store_listings")
+              .select(
+                "id, title, description, hidden, removed, neighborhoods:neighborhood_id(slug)",
+              )
+              .in("id", listingIds)
+          : Promise.resolve({ data: [] as never[] }),
+      ]);
 
     const postMap = new Map((posts ?? []).map((p) => [p.id, p]));
     const placeMap = new Map((places ?? []).map((p) => [p.id, p]));
     const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+    const listingMap = new Map((listings ?? []).map((l) => [l.id, l]));
 
     return rows.map((row) => {
       let preview: ModerationQueueItem["preview"] = {
@@ -138,6 +149,21 @@ export const listReports = createServerFn({ method: "GET" })
             removed: place.removed,
             link: null,
             placeLink: slug ? { slug, placeId: place.id } : null,
+            profileId: null,
+          };
+        }
+      } else if (row.target_type === "store_listing") {
+        const listing = listingMap.get(row.target_id);
+        if (listing) {
+          const slug = (listing.neighborhoods as { slug: string } | null)?.slug ?? null;
+          preview = {
+            title: listing.title,
+            detail: listing.description?.slice(0, 240) ?? null,
+            hidden: listing.hidden,
+            removed: listing.removed,
+            link: null,
+            placeLink: null,
+            storeLink: slug ? { slug, listingId: listing.id } : null,
             profileId: null,
           };
         }
@@ -223,6 +249,18 @@ export const actOnReport = createServerFn({ method: "POST" })
               ? { hidden: true, removed: true }
               : { hidden: false, removed: false };
         const { error } = await supabase.from("places").update(patch).eq("id", report.target_id);
+        if (error) throw new Error(error.message);
+      } else if (targetType === "store_listing") {
+        const patch =
+          data.action === "hide"
+            ? { hidden: true }
+            : data.action === "remove"
+              ? { hidden: true, removed: true, status: "archived" as const }
+              : { hidden: false, removed: false };
+        const { error } = await supabase
+          .from("store_listings")
+          .update(patch)
+          .eq("id", report.target_id);
         if (error) throw new Error(error.message);
       } else {
         throw new Error("Neighbors and conversations can't be hidden — dismiss or handle by role.");
