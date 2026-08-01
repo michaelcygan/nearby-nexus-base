@@ -25,6 +25,11 @@ export const startThread = createServerFn({ method: "POST" })
     if (!post.author_id) throw new Error("This post has no author to message.");
     if (post.author_id === userId) throw new Error("This is your own post.");
 
+    const { isBlockedPair } = await import("@/features/moderation/blocks.server");
+    if (await isBlockedPair(userId, post.author_id)) {
+      throw new Error("You can't start a conversation with this neighbor.");
+    }
+
     const { data: existing, error: existingError } = await supabase
       .from("threads")
       .select("id")
@@ -74,6 +79,12 @@ export const sendMessage = createServerFn({ method: "POST" })
       .maybeSingle();
     if (threadError) throw new Error(threadError.message);
     if (!thread) throw new Error("That conversation is not available.");
+
+    const otherSide = thread.author_id === userId ? thread.initiator_id : thread.author_id;
+    const { isBlockedPair } = await import("@/features/moderation/blocks.server");
+    if (await isBlockedPair(userId, otherSide)) {
+      throw new Error("This conversation is closed.");
+    }
 
     const { error } = await supabase
       .from("thread_messages")

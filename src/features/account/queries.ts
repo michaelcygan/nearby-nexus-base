@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 
 import {
   getMyProfile,
+  getNeighborProfile,
   getPublicProfile,
   listMySavedNeighborhoods,
 } from "./profile.functions";
@@ -22,4 +23,10 @@ export const mySavedNeighborhoodsQuery = () =>
   queryOptions({
     queryKey: ["my-saved-neighborhoods"],
     queryFn: () => listMySavedNeighborhoods(),
+  });
+
+export const neighborProfileQuery = (profileId: string) =>
+  queryOptions({
+    queryKey: ["neighbor-profile", profileId],
+    queryFn: () => getNeighborProfile({ data: { profileId } }),
   });

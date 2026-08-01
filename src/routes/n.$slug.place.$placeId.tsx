@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 
+import { ReportButton } from "@/components/moderation/report-button";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { placeQuery } from "@/features/neighborhoods/queries";
@@ -86,7 +87,11 @@ function PlaceDetailPage() {
         </p>
       ) : null}
 
-      <p className="mt-8 text-sm">
+      <div className="mt-8">
+        <ReportButton targetType="place" targetId={place.id} />
+      </div>
+
+      <p className="mt-4 text-sm">
         <Link
           to="/n/$slug/directory"
           params={{ slug }}

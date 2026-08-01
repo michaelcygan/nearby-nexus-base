@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      moderation_actions: {
+        Row: {
+          action: Database["public"]["Enums"]["moderation_action"]
+          actor_id: string
+          created_at: string
+          id: string
+          reason: string | null
+          report_id: string | null
+          target_id: string
+          target_type: Database["public"]["Enums"]["report_target"]
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["moderation_action"]
+          actor_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          report_id?: string | null
+          target_id: string
+          target_type: Database["public"]["Enums"]["report_target"]
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["moderation_action"]
+          actor_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          report_id?: string | null
+          target_id?: string
+          target_type?: Database["public"]["Enums"]["report_target"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_actions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       neighborhoods: {
         Row: {
           about: string | null
@@ -53,11 +115,13 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          hidden: boolean
           hours: string | null
           id: string
           name: string
           neighborhood_id: string
           phone: string | null
+          removed: boolean
           updated_at: string
           website: string | null
         }
@@ -66,11 +130,13 @@ export type Database = {
           category: string
           created_at?: string
           description?: string | null
+          hidden?: boolean
           hours?: string | null
           id?: string
           name: string
           neighborhood_id: string
           phone?: string | null
+          removed?: boolean
           updated_at?: string
           website?: string | null
         }
@@ -79,11 +145,13 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          hidden?: boolean
           hours?: string | null
           id?: string
           name?: string
           neighborhood_id?: string
           phone?: string | null
+          removed?: boolean
           updated_at?: string
           website?: string | null
         }
@@ -141,6 +209,7 @@ export type Database = {
           created_at: string
           expires_at: string | null
           going_count: number
+          hidden: boolean
           id: string
           image_paths: string[]
           interested_count: number
@@ -165,6 +234,7 @@ export type Database = {
           created_at?: string
           expires_at?: string | null
           going_count?: number
+          hidden?: boolean
           id?: string
           image_paths?: string[]
           interested_count?: number
@@ -189,6 +259,7 @@ export type Database = {
           created_at?: string
           expires_at?: string | null
           going_count?: number
+          hidden?: boolean
           id?: string
           image_paths?: string[]
           interested_count?: number
@@ -252,6 +323,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      reports: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          reason: Database["public"]["Enums"]["report_reason"]
+          reporter_id: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: Database["public"]["Enums"]["report_status"]
+          target_id: string
+          target_type: Database["public"]["Enums"]["report_target"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason: Database["public"]["Enums"]["report_reason"]
+          reporter_id?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          target_id: string
+          target_type: Database["public"]["Enums"]["report_target"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason?: Database["public"]["Enums"]["report_reason"]
+          reporter_id?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          target_id?: string
+          target_type?: Database["public"]["Enums"]["report_target"]
+          updated_at?: string
+        }
+        Relationships: []
       }
       saved_neighborhoods: {
         Row: {
@@ -391,6 +507,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_blocked_pair: { Args: { _a: string; _b: string }; Returns: boolean }
       is_thread_member: {
         Args: { _thread_id: string; _user_id: string }
         Returns: boolean
@@ -398,9 +515,18 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "member"
+      moderation_action: "dismiss" | "hide" | "remove" | "restore"
       participation_role: "going" | "volunteer" | "interested"
       post_status: "active" | "completed" | "expired" | "removed"
       post_type: "plan" | "marketplace" | "volunteer"
+      report_reason:
+        | "spam"
+        | "unsafe"
+        | "wrong_board"
+        | "not_neighborly"
+        | "other"
+      report_status: "open" | "dismissed" | "actioned"
+      report_target: "post" | "place" | "profile" | "thread"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -529,9 +655,19 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "member"],
+      moderation_action: ["dismiss", "hide", "remove", "restore"],
       participation_role: ["going", "volunteer", "interested"],
       post_status: ["active", "completed", "expired", "removed"],
       post_type: ["plan", "marketplace", "volunteer"],
+      report_reason: [
+        "spam",
+        "unsafe",
+        "wrong_board",
+        "not_neighborly",
+        "other",
+      ],
+      report_status: ["open", "dismissed", "actioned"],
+      report_target: ["post", "place", "profile", "thread"],
     },
   },
 } as const

@@ -7,6 +7,9 @@ const AVATAR_TTL_SECONDS = 60 * 60;
 const PROFILE_COLUMNS =
   "id, display_name, about, avatar_path, home_neighborhood_id, neighborhoods:home_neighborhood_id(slug, name, city)";
 
+/** `anon` is granted only these columns on profiles. */
+const PUBLIC_PROFILE_COLUMNS = "id, display_name, avatar_path";
+
 type ProfileRow = ProfileRecord & {
   neighborhoods: { slug: string; name: string; city: string } | null;
 };
@@ -44,19 +47,32 @@ export async function shapeProfile(client: SignedUrlClient, row: ProfileRow): Pr
   };
 }
 
-/** Public neighbor page read — runs as `anon` behind the public profiles policy. */
+/**
+ * Public neighbor read — runs as `anon`, which is granted only the
+ * display name and avatar columns. Bio and home neighborhood are
+ * sign-in-only and come from `getNeighborProfile`.
+ */
 export async function fetchPublicProfile(profileId: string): Promise<Profile | null> {
   const supabase = createPublicSupabaseClient();
   const { data, error } = await supabase
     .from("profiles")
-    .select(PROFILE_COLUMNS)
+    .select(PUBLIC_PROFILE_COLUMNS)
     .eq("id", profileId)
     .maybeSingle();
 
   if (error) throw error;
   if (!data) return null;
-  return shapeProfile(supabase, data as ProfileRow);
+
+  return {
+    id: data.id,
+    display_name: data.display_name,
+    about: null,
+    avatar_path: data.avatar_path,
+    home_neighborhood_id: null,
+    avatar_url: await signAvatarUrl(supabase, data.avatar_path),
+    home_neighborhood: null,
+  };
 }
 
-export { PROFILE_COLUMNS };
+export { PROFILE_COLUMNS, PUBLIC_PROFILE_COLUMNS };
 export type { ProfileRow, SavedNeighborhood };

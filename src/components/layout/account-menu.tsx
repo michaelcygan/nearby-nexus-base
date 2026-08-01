@@ -14,6 +14,7 @@ import {
 import { myProfileQuery } from "@/features/account/queries";
 import { initialsFor } from "@/features/account/types";
 import { myAdminStatusQuery } from "@/features/directory/queries";
+import { myModerationRoleQuery } from "@/features/moderation/queries";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -23,6 +24,7 @@ export function AccountMenu() {
   const navigate = useNavigate();
   const profile = useQuery({ ...myProfileQuery(), enabled: Boolean(session) });
   const admin = useQuery({ ...myAdminStatusQuery(), enabled: Boolean(session) });
+  const moderation = useQuery({ ...myModerationRoleQuery(), enabled: Boolean(session) });
 
   if (loading) {
     return <span className="h-8 w-16" aria-hidden />;
@@ -80,6 +82,16 @@ export function AccountMenu() {
         {admin.data?.isAdmin ? (
           <DropdownMenuItem asChild>
             <Link to="/admin/directory">Directory listings</Link>
+          </DropdownMenuItem>
+        ) : null}
+        {moderation.data?.canModerate ? (
+          <DropdownMenuItem asChild>
+            <Link to="/admin/moderation">Moderation queue</Link>
+          </DropdownMenuItem>
+        ) : null}
+        {moderation.data?.isAdmin ? (
+          <DropdownMenuItem asChild>
+            <Link to="/admin/members">Members and roles</Link>
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuSeparator />
