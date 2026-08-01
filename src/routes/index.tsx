@@ -1,12 +1,20 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Suspense } from "react";
 
+import { EmptyState } from "@/components/common/empty-state";
+import { PostListSkeleton } from "@/components/common/post-list-skeleton";
 import { AppShell, PageContainer } from "@/components/layout/app-shell";
+import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
 
 const title = "Neighborhood Today — the noticeboard for your block";
 const description =
   "Plans, marketplace listings, volunteer needs, a local directory, and neighborhood merch — one quiet page per neighborhood, no account needed to read it.";
 
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(neighborhoodsQuery());
+  },
   head: () => ({
     meta: [
       { title },
@@ -17,6 +25,7 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
+
 
 const modules = [
   {
