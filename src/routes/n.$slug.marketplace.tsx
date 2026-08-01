@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { canonicalUrl } from "@/lib/seo";
+
 import { ErrorState } from "@/components/common/error-state";
 import { PostFeed } from "@/components/neighborhood/post-feed";
 import { neighborhoodPostsQuery } from "@/features/neighborhoods/queries";
@@ -8,7 +10,8 @@ export const Route = createFileRoute("/n/$slug/marketplace")({
   loader: ({ params, context }) => {
     context.queryClient.ensureQueryData(neighborhoodPostsQuery(params.slug, "marketplace"));
   },
-  head: () => ({
+  head: ({ params }) => ({
+    links: [{ rel: "canonical", href: canonicalUrl(`/n/${params.slug}/marketplace`) }],
     meta: [
       { title: "Marketplace — Neighborhood Today" },
       {
@@ -20,6 +23,7 @@ export const Route = createFileRoute("/n/$slug/marketplace")({
         property: "og:description",
         content: "Things for sale, lent, or given away by neighbors a few doors down.",
       },
+      { property: "og:url", content: canonicalUrl(`/n/${params.slug}/marketplace`) },
     ],
   }),
   component: Marketplace,

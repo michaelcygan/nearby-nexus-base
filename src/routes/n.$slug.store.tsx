@@ -13,7 +13,8 @@ export const Route = createFileRoute("/n/$slug/store")({
   loader: ({ params, context }) => {
     context.queryClient.ensureQueryData(storeListingsQuery(params.slug));
   },
-  head: () => ({
+  head: ({ params }) => ({
+    links: [{ rel: "canonical", href: canonicalUrl(`/n/${params.slug}/store`) }],
     meta: [
       { title: "Neighborhood Store — Neighborhood Today" },
       {
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/n/$slug/store")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: canonicalUrl(`/n/${params.slug}/store`) },
     ],
   }),
   component: StoreBoard,

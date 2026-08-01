@@ -12,7 +12,8 @@ export const Route = createFileRoute("/n/$slug/directory")({
   loader: ({ params, context }) => {
     context.queryClient.ensureQueryData(neighborhoodPlacesQuery(params.slug));
   },
-  head: () => ({
+  head: ({ params }) => ({
+    links: [{ rel: "canonical", href: canonicalUrl(`/n/${params.slug}/directory`) }],
     meta: [
       { title: "Directory — Neighborhood Today" },
       {
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/n/$slug/directory")({
         property: "og:description",
         content: "The shops, parks and services that are actually here, kept honest by neighbors.",
       },
+      { property: "og:url", content: canonicalUrl(`/n/${params.slug}/directory`) },
     ],
   }),
   component: Directory,
