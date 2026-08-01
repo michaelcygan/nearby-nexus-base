@@ -115,3 +115,45 @@ function Index() {
     </AppShell>
   );
 }
+
+function NeighborhoodList() {
+  const { data: neighborhoods } = useSuspenseQuery(neighborhoodsQuery());
+
+  if (neighborhoods.length === 0) {
+    return (
+      <div className="mt-5">
+        <EmptyState
+          title="No neighborhoods yet"
+          description="Neighborhood boards will appear here as they open."
+        />
+      </div>
+    );
+  }
+
+  return (
+    <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+      {neighborhoods.map((n) => (
+        <li
+          key={n.id}
+          className="rounded-md border border-border bg-card transition-colors hover:border-primary/50"
+        >
+          <Link
+            to="/n/$slug"
+            params={{ slug: n.slug }}
+            className="block rounded-md p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <h3 className="font-display text-lg font-semibold">{n.name}</h3>
+            <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              {n.city}
+              {n.state ? `, ${n.state}` : ""}
+            </p>
+            {n.tagline ? (
+              <p className="mt-2 text-sm text-muted-foreground">{n.tagline}</p>
+            ) : null}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
