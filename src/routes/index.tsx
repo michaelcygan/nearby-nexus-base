@@ -145,8 +145,8 @@ function NeighborhoodList() {
             <h3 className="font-display text-lg font-semibold">{n.name}</h3>
             <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
               {n.city}
-              {n.state ? `, ${n.state}` : ""}
             </p>
+
             {n.tagline ? (
               <p className="mt-2 text-sm text-muted-foreground">{n.tagline}</p>
             ) : null}
