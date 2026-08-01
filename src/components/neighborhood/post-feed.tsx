@@ -1,12 +1,14 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 
 import { EmptyState } from "@/components/common/empty-state";
 import { PostListSkeleton } from "@/components/common/post-list-skeleton";
 import { PostCard } from "@/components/neighborhood/post-card";
 import { PostCta } from "@/components/posts/post-cta";
+import { myBlockedIdsQuery } from "@/features/moderation/queries";
 import { neighborhoodPostsQuery } from "@/features/neighborhoods/queries";
 import type { PostType } from "@/features/neighborhoods/types";
+import { useSession } from "@/hooks/use-session";
 
 export function PostFeed({
   slug,
@@ -61,7 +63,15 @@ function FeedList({
   emptyTitle: string;
   emptyDescription: string;
 }) {
-  const { data: posts } = useSuspenseQuery(neighborhoodPostsQuery(slug, type));
+  const { data: allPosts } = useSuspenseQuery(neighborhoodPostsQuery(slug, type));
+  const { session } = useSession();
+  // Blocking is private: the blocked neighbor's posts are muted here for the
+  // blocker only, and nobody is told.
+  const blocked = useQuery({ ...myBlockedIdsQuery(), enabled: Boolean(session) });
+  const blockedIds = blocked.data?.blockedIds ?? [];
+  const posts = blockedIds.length
+    ? allPosts.filter((post) => !post.author_id || !blockedIds.includes(post.author_id))
+    : allPosts;
 
   if (posts.length === 0) {
     return (
