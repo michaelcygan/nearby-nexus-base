@@ -15,6 +15,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
 import { Route as NSlugIndexRouteImport } from './routes/n.$slug.index'
+import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketplace'
 import { Route as NSlugPlansRouteImport } from './routes/n.$slug.plans'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const NSlugIndexRoute = NSlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => NSlugRoute,
 } as any)
+const NSlugMarketplaceRoute = NSlugMarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => NSlugRoute,
+} as any)
 const NSlugPlansRoute = NSlugPlansRouteImport.update({
   id: '/plans',
   path: '/plans',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/n/$slug': typeof NSlugRouteWithChildren
+  '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/': typeof NSlugIndexRoute
 }
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug': typeof NSlugIndexRoute
 }
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/n/$slug': typeof NSlugRouteWithChildren
+  '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/': typeof NSlugIndexRoute
 }
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/n/$slug'
+    | '/n/$slug/marketplace'
     | '/n/$slug/plans'
     | '/n/$slug/'
   fileRoutesByTo: FileRoutesByTo
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/community-guidelines'
     | '/privacy'
     | '/terms'
+    | '/n/$slug/marketplace'
     | '/n/$slug/plans'
     | '/n/$slug'
   id:
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/n/$slug'
+    | '/n/$slug/marketplace'
     | '/n/$slug/plans'
     | '/n/$slug/'
   fileRoutesById: FileRoutesById
@@ -161,6 +173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugIndexRouteImport
       parentRoute: typeof NSlugRoute
     }
+    '/n/$slug/marketplace': {
+      id: '/n/$slug/marketplace'
+      path: '/marketplace'
+      fullPath: '/n/$slug/marketplace'
+      preLoaderRoute: typeof NSlugMarketplaceRouteImport
+      parentRoute: typeof NSlugRoute
+    }
     '/n/$slug/plans': {
       id: '/n/$slug/plans'
       path: '/plans'
@@ -172,11 +191,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface NSlugRouteChildren {
+  NSlugMarketplaceRoute: typeof NSlugMarketplaceRoute
   NSlugPlansRoute: typeof NSlugPlansRoute
   NSlugIndexRoute: typeof NSlugIndexRoute
 }
 
 const NSlugRouteChildren: NSlugRouteChildren = {
+  NSlugMarketplaceRoute: NSlugMarketplaceRoute,
   NSlugPlansRoute: NSlugPlansRoute,
   NSlugIndexRoute: NSlugIndexRoute,
 }
