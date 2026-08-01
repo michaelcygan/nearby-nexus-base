@@ -77,6 +77,7 @@ export type ModerationQueueItem = MyReport & {
     removed: boolean;
     link: { slug: string; postId: string } | null;
     placeLink: { slug: string; placeId: string } | null;
+    storeLink?: { slug: string; listingId: string } | null;
     profileId: string | null;
   };
 };
