@@ -2,6 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/common/empty-state";
+import { ParticipationBlock } from "@/components/posts/participation-block";
 import { ErrorState } from "@/components/common/error-state";
 import { postQuery } from "@/features/neighborhoods/queries";
 import {
@@ -111,6 +112,8 @@ function PostDetailPage() {
       <div className="mt-6 whitespace-pre-line text-base leading-relaxed text-foreground/90">
         {post.body}
       </div>
+
+      <ParticipationBlock post={post} />
 
       <p className="mt-8 text-sm">
         <Link

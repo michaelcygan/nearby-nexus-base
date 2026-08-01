@@ -10,14 +10,30 @@ import {
 
 function metaFor(post: PostSummary) {
   if (post.type === "plan") {
-    return [formatDateTime(post.starts_at), post.location, post.capacity ? `${post.capacity} spots` : null];
+    return [
+      formatDateTime(post.starts_at),
+      post.location,
+      post.capacity
+        ? `${post.going_count} of ${post.capacity} spots taken`
+        : post.going_count > 0
+          ? `${post.going_count} going`
+          : null,
+    ];
   }
   if (post.type === "marketplace") {
-    return [formatPrice(post.price_cents, post.is_free), post.condition];
+    return [
+      formatPrice(post.price_cents, post.is_free),
+      post.condition,
+      post.interested_count > 0 ? `${post.interested_count} interested` : null,
+    ];
   }
   return [
     post.needed_by ? `Needed by ${formatDate(post.needed_by)}` : null,
-    post.slots ? `${post.slots} ${post.slots === 1 ? "person" : "people"} needed` : null,
+    post.slots
+      ? `${post.volunteer_count} of ${post.slots} helpers`
+      : post.volunteer_count > 0
+        ? `${post.volunteer_count} helping`
+        : null,
   ];
 }
 
