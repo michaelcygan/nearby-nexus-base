@@ -1,3 +1,4 @@
+import { attachImageUrls, signPostImages } from "@/features/posts/data.server";
 import { createPublicSupabaseClient } from "@/lib/supabase-public.server";
 import type {
   Neighborhood,
@@ -10,7 +11,7 @@ import type {
 
 const NEIGHBORHOOD_COLUMNS = "id, slug, name, city, tagline, about";
 const POST_COLUMNS =
-  "id, type, status, title, body, created_at, starts_at, location, capacity, price_cents, is_free, condition, needed_by, slots";
+  "id, type, status, title, body, created_at, starts_at, location, capacity, price_cents, is_free, condition, needed_by, slots, image_paths";
 const PLACE_COLUMNS = "id, name, category, address, description, website, phone, hours";
 
 export async function fetchNeighborhoods(): Promise<Neighborhood[]> {
@@ -53,7 +54,12 @@ export async function fetchNeighborhoodPosts(
 
   const { data, error } = await query.order("created_at", { ascending: false }).limit(limit);
   if (error) throw new Error(error.message);
-  return (data ?? []) as PostSummary[];
+  const rows = data ?? [];
+  const urls = await signPostImages(
+    supabase as never,
+    rows.flatMap((row) => row.image_paths ?? []),
+  );
+  return attachImageUrls(rows, urls) as unknown as PostSummary[];
 }
 
 export async function fetchNeighborhoodPlaces(slug: string): Promise<Place[]> {
@@ -83,7 +89,9 @@ export async function fetchPostById(postId: string): Promise<PostDetail | null> 
   const { neighborhoods, ...post } = data as unknown as PostSummary & {
     neighborhoods: { slug: string; name: string; city: string };
   };
-  return { ...post, neighborhood: neighborhoods };
+  const urls = await signPostImages(supabase as never, post.image_paths ?? []);
+  const [withImages] = attachImageUrls([post], urls);
+  return { ...(withImages as PostSummary), neighborhood: neighborhoods };
 }
 
 export async function fetchPlaceById(placeId: string): Promise<PlaceDetail | null> {
