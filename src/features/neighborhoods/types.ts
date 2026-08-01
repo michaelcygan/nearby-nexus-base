@@ -25,6 +25,8 @@ export type PostSummary = {
   condition: string | null;
   needed_by: string | null;
   slots: number | null;
+  image_paths: string[];
+  image_urls: string[];
 };
 
 export type PostDetail = PostSummary & {
