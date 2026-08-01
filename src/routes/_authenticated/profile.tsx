@@ -444,7 +444,7 @@ function MyReports() {
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
                 {reportStatusLabels[report.status]} ·{" "}
-                {new Date(report.created_at).toLocaleDateString()}
+                {formatTimestamp(report.created_at)}
               </p>
             </li>
           ))}
