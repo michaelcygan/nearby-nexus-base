@@ -21,6 +21,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as NSlugRouteImport } from './routes/n.$slug'
 import { Route as UProfileIdRouteImport } from './routes/u.$profileId'
 import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin.directory'
+import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin.moderation'
 import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authenticated/messages.index'
 import { Route as AuthenticatedMessagesThreadIdRouteImport } from './routes/_authenticated/messages.$threadId'
 import { Route as AuthenticatedPostNewRouteImport } from './routes/_authenticated/post.new'
@@ -91,6 +92,12 @@ const AuthenticatedAdminDirectoryRoute =
   AuthenticatedAdminDirectoryRouteImport.update({
     id: '/admin/directory',
     path: '/admin/directory',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminModerationRoute =
+  AuthenticatedAdminModerationRouteImport.update({
+    id: '/admin/moderation',
+    path: '/admin/moderation',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedMessagesIndexRoute =
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/n/$slug': typeof NSlugRouteWithChildren
   '/u/$profileId': typeof UProfileIdRoute
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
+  '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/messages/$threadId': typeof AuthenticatedMessagesThreadIdRoute
   '/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/u/$profileId': typeof UProfileIdRoute
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
+  '/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/messages/$threadId': typeof AuthenticatedMessagesThreadIdRoute
   '/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
@@ -213,6 +222,7 @@ export interface FileRoutesById {
   '/n/$slug': typeof NSlugRouteWithChildren
   '/u/$profileId': typeof UProfileIdRoute
   '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
+  '/_authenticated/admin/moderation': typeof AuthenticatedAdminModerationRoute
   '/_authenticated/messages/$threadId': typeof AuthenticatedMessagesThreadIdRoute
   '/_authenticated/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/n/$slug'
     | '/u/$profileId'
     | '/admin/directory'
+    | '/admin/moderation'
     | '/messages/$threadId'
     | '/post/new'
     | '/n/$slug/directory'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/u/$profileId'
     | '/admin/directory'
+    | '/admin/moderation'
     | '/messages/$threadId'
     | '/post/new'
     | '/n/$slug/directory'
@@ -287,6 +299,7 @@ export interface FileRouteTypes {
     | '/n/$slug'
     | '/u/$profileId'
     | '/_authenticated/admin/directory'
+    | '/_authenticated/admin/moderation'
     | '/_authenticated/messages/$threadId'
     | '/_authenticated/post/new'
     | '/n/$slug/directory'
@@ -398,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDirectoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/moderation': {
+      id: '/_authenticated/admin/moderation'
+      path: '/admin/moderation'
+      fullPath: '/admin/moderation'
+      preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/messages/': {
       id: '/_authenticated/messages/'
       path: '/messages'
@@ -482,6 +502,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPostsRoute: typeof AuthenticatedPostsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
+  AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
   AuthenticatedMessagesThreadIdRoute: typeof AuthenticatedMessagesThreadIdRoute
   AuthenticatedPostNewRoute: typeof AuthenticatedPostNewRoute
   AuthenticatedMessagesIndexRoute: typeof AuthenticatedMessagesIndexRoute
@@ -492,6 +513,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPostsRoute: AuthenticatedPostsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedAdminDirectoryRoute: AuthenticatedAdminDirectoryRoute,
+  AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
   AuthenticatedMessagesThreadIdRoute: AuthenticatedMessagesThreadIdRoute,
   AuthenticatedPostNewRoute: AuthenticatedPostNewRoute,
   AuthenticatedMessagesIndexRoute: AuthenticatedMessagesIndexRoute,
