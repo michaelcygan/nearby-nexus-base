@@ -115,7 +115,12 @@ function PostDetailPage() {
 
       <ParticipationBlock post={post} />
 
-      <p className="mt-8 text-sm">
+      <div className="mt-8 flex flex-wrap items-center gap-2">
+        <ReportButton targetType="post" targetId={post.id} />
+        {post.author_id ? <BlockButton neighborId={post.author_id} /> : null}
+      </div>
+
+      <p className="mt-6 text-sm">
         <Link
           to="/n/$slug"
           params={{ slug }}
