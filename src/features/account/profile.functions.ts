@@ -126,3 +126,25 @@ export const unsaveNeighborhood = createServerFn({ method: "POST" })
     if (error) throw error;
     return { saved: false };
   });
+
+/**
+ * Signed-in read of another neighbor: bio and home neighborhood are only
+ * granted to authenticated roles, so visitors get the public shape instead.
+ */
+export const getNeighborProfile = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { profileId: string }) =>
+    z.object({ profileId: z.string().uuid() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: row, error } = await supabase
+      .from("profiles")
+      .select(PROFILE_COLUMNS)
+      .eq("id", data.profileId)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!row) return null;
+    return shapeProfile(supabase, row as ProfileRow);
+  });
