@@ -97,6 +97,41 @@ export type Database = {
           },
         ]
       }
+      post_participants: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          post_id: string
+          role: Database["public"]["Enums"]["participation_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          post_id: string
+          role: Database["public"]["Enums"]["participation_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          post_id?: string
+          role?: Database["public"]["Enums"]["participation_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_participants_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author_id: string | null
@@ -238,6 +273,82 @@ export type Database = {
           },
         ]
       }
+      thread_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          sender_id: string
+          thread_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          sender_id: string
+          thread_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thread_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      threads: {
+        Row: {
+          author_id: string
+          author_last_read_at: string | null
+          created_at: string
+          id: string
+          initiator_id: string
+          initiator_last_read_at: string | null
+          last_message_at: string
+          post_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          author_last_read_at?: string | null
+          created_at?: string
+          id?: string
+          initiator_id: string
+          initiator_last_read_at?: string | null
+          last_message_at?: string
+          post_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          author_last_read_at?: string | null
+          created_at?: string
+          id?: string
+          initiator_id?: string
+          initiator_last_read_at?: string | null
+          last_message_at?: string
+          post_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threads_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -261,7 +372,23 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      post_participation_counts: {
+        Row: {
+          going_count: number | null
+          interested_count: number | null
+          post_id: string | null
+          volunteer_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_participants_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {
@@ -271,9 +398,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_thread_member: {
+        Args: { _thread_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "member"
+      participation_role: "going" | "volunteer" | "interested"
       post_status: "active" | "completed" | "expired" | "removed"
       post_type: "plan" | "marketplace" | "volunteer"
     }
@@ -404,6 +536,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "member"],
+      participation_role: ["going", "volunteer", "interested"],
       post_status: ["active", "completed", "expired", "removed"],
       post_type: ["plan", "marketplace", "volunteer"],
     },
