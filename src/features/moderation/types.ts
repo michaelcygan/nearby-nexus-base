@@ -21,6 +21,7 @@ export const reportTargetLabels: Record<ReportTarget, string> = {
   place: "Directory listing",
   profile: "Neighbor",
   thread: "Conversation",
+  store_listing: "Store item",
 };
 
 export const reportStatusLabels: Record<ReportStatus, string> = {
