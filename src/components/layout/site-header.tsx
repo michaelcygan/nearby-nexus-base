@@ -15,18 +15,22 @@ export function SiteHeader() {
             Neighborhood Today
           </span>
         </Link>
-        <nav aria-label="Main" className="flex items-center gap-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="rounded-sm px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              activeProps={{ className: "text-foreground font-medium" }}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex items-center gap-2">
+          <nav aria-label="Main" className="flex items-center gap-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="rounded-sm px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                activeProps={{ className: "text-foreground font-medium" }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <AccountMenu />
+        </div>
+
       </div>
     </header>
   );
