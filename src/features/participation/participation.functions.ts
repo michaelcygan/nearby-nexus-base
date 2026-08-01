@@ -81,7 +81,7 @@ export const listMyParticipation = createServerFn({ method: "GET" })
         | {
             id: string;
             title: string;
-            type: MyParticipation["role"] extends never ? never : string;
+            type: string;
             starts_at: string | null;
             needed_by: string | null;
             neighborhoods: { slug: string; name: string } | null;
