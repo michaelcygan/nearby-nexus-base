@@ -7,7 +7,7 @@ import { attachImageUrls, POST_IMAGE_BUCKET, signPostImages } from "./data.serve
 import { postInputSchema, toPostRow } from "./schemas";
 
 const MY_POST_COLUMNS =
-  "id, type, status, title, body, created_at, starts_at, location, capacity, price_cents, is_free, condition, needed_by, slots, image_paths, neighborhood_id, neighborhoods:neighborhood_id(slug, name, city)";
+  "id, type, status, title, body, created_at, starts_at, location, capacity, price_cents, is_free, condition, needed_by, slots, image_paths, going_count, volunteer_count, interested_count, neighborhood_id, neighborhoods:neighborhood_id(slug, name, city)";
 
 function assertOwnedPaths(paths: string[], userId: string) {
   for (const path of paths) {

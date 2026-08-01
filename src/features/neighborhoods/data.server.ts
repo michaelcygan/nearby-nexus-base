@@ -11,7 +11,7 @@ import type {
 
 const NEIGHBORHOOD_COLUMNS = "id, slug, name, city, tagline, about";
 const POST_COLUMNS =
-  "id, type, status, title, body, created_at, starts_at, location, capacity, price_cents, is_free, condition, needed_by, slots, image_paths";
+  "id, type, status, title, body, created_at, starts_at, location, capacity, price_cents, is_free, condition, needed_by, slots, image_paths, author_id, going_count, volunteer_count, interested_count";
 const PLACE_COLUMNS = "id, name, category, address, description, website, phone, hours";
 
 export async function fetchNeighborhoods(): Promise<Neighborhood[]> {

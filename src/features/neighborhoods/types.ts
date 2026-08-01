@@ -27,6 +27,10 @@ export type PostSummary = {
   slots: number | null;
   image_paths: string[];
   image_urls: string[];
+  author_id: string | null;
+  going_count: number;
+  volunteer_count: number;
+  interested_count: number;
 };
 
 export type PostDetail = PostSummary & {
