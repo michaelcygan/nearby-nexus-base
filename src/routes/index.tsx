@@ -65,6 +65,23 @@ function Index() {
         </section>
 
         <section className="py-10">
+          <h2 className="text-xl">Neighborhoods</h2>
+          <p className="mt-2 max-w-prose text-sm text-muted-foreground">
+            Pick a neighborhood to see what's on its board today.
+          </p>
+          <Suspense
+            fallback={
+              <div className="mt-5">
+                <PostListSkeleton count={3} />
+              </div>
+            }
+          >
+            <NeighborhoodList />
+          </Suspense>
+        </section>
+
+
+        <section className="py-10">
           <h2 className="text-xl">Five things per neighborhood</h2>
           <ul className="mt-5 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
             {modules.map((m) => (
