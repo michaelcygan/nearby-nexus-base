@@ -7,6 +7,9 @@ const AVATAR_TTL_SECONDS = 60 * 60;
 const PROFILE_COLUMNS =
   "id, display_name, about, avatar_path, home_neighborhood_id, neighborhoods:home_neighborhood_id(slug, name, city)";
 
+/** `anon` is granted only these columns on profiles. */
+const PUBLIC_PROFILE_COLUMNS = "id, display_name, avatar_path";
+
 type ProfileRow = ProfileRecord & {
   neighborhoods: { slug: string; name: string; city: string } | null;
 };
