@@ -67,6 +67,9 @@ export function AccountMenu() {
         <DropdownMenuItem asChild>
           <Link to="/posts">Your posts</Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/messages">Messages</Link>
+        </DropdownMenuItem>
         {profile.data ? (
           <DropdownMenuItem asChild>
             <Link to="/u/$profileId" params={{ profileId: profile.data.id }}>

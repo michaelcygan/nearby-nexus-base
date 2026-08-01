@@ -19,6 +19,8 @@ import {
 } from "@/features/account/profile.functions";
 import { initialsFor, profileSchema } from "@/features/account/types";
 import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
+import { myParticipationQuery } from "@/features/participation/queries";
+import { roleLabels } from "@/features/participation/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -50,6 +52,7 @@ function ProfilePage() {
   const profile = useQuery(myProfileQuery());
   const saved = useQuery(mySavedNeighborhoodsQuery());
   const neighborhoods = useQuery(neighborhoodsQuery());
+  const joined = useQuery(myParticipationQuery());
 
   const [displayName, setDisplayName] = useState("");
   const [about, setAbout] = useState("");
@@ -304,6 +307,45 @@ function ProfilePage() {
                       >
                         Remove
                       </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            <section className="mt-12">
+              <h2 className="font-display text-xl">Things you joined</h2>
+              <div className="rule-print my-4" />
+              {joined.isPending ? (
+                <Skeleton className="h-16 w-full max-w-md" />
+              ) : (joined.data ?? []).length === 0 ? (
+                <p className="max-w-prose text-sm text-muted-foreground">
+                  Nothing yet. When you join a plan or claim a volunteer slot, it shows up here.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {(joined.data ?? []).map((row) => (
+                    <li
+                      key={row.id}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-card p-4"
+                    >
+                      <div>
+                        {row.post ? (
+                          <Link
+                            to="/n/$slug/p/$postId"
+                            params={{ slug: row.post.neighborhood_slug, postId: row.post.id }}
+                            className="font-display text-base underline-offset-4 hover:underline"
+                          >
+                            {row.post.title}
+                          </Link>
+                        ) : (
+                          <span className="font-display text-base">Post removed</span>
+                        )}
+                        <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                          {roleLabels[row.role]}
+                          {row.post?.neighborhood_name ? ` · ${row.post.neighborhood_name}` : ""}
+                        </p>
+                      </div>
                     </li>
                   ))}
                 </ul>
