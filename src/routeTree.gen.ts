@@ -15,6 +15,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
 import { Route as NSlugIndexRouteImport } from './routes/n.$slug.index'
+import { Route as NSlugDirectoryRouteImport } from './routes/n.$slug.directory'
 import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketplace'
 import { Route as NSlugPlansRouteImport } from './routes/n.$slug.plans'
 import { Route as NSlugVolunteerRouteImport } from './routes/n.$slug.volunteer'
@@ -49,6 +50,11 @@ const NSlugIndexRoute = NSlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => NSlugRoute,
 } as any)
+const NSlugDirectoryRoute = NSlugDirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
+  getParentRoute: () => NSlugRoute,
+} as any)
 const NSlugMarketplaceRoute = NSlugMarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/n/$slug': typeof NSlugRouteWithChildren
+  '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/n/$slug': typeof NSlugRouteWithChildren
+  '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/n/$slug'
+    | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
     | '/n/$slug/volunteer'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/community-guidelines'
     | '/privacy'
     | '/terms'
+    | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
     | '/n/$slug/volunteer'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/n/$slug'
+    | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
     | '/n/$slug/volunteer'
@@ -185,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugIndexRouteImport
       parentRoute: typeof NSlugRoute
     }
+    '/n/$slug/directory': {
+      id: '/n/$slug/directory'
+      path: '/directory'
+      fullPath: '/n/$slug/directory'
+      preLoaderRoute: typeof NSlugDirectoryRouteImport
+      parentRoute: typeof NSlugRoute
+    }
     '/n/$slug/marketplace': {
       id: '/n/$slug/marketplace'
       path: '/marketplace'
@@ -210,6 +229,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface NSlugRouteChildren {
+  NSlugDirectoryRoute: typeof NSlugDirectoryRoute
   NSlugMarketplaceRoute: typeof NSlugMarketplaceRoute
   NSlugPlansRoute: typeof NSlugPlansRoute
   NSlugVolunteerRoute: typeof NSlugVolunteerRoute
@@ -217,6 +237,7 @@ interface NSlugRouteChildren {
 }
 
 const NSlugRouteChildren: NSlugRouteChildren = {
+  NSlugDirectoryRoute: NSlugDirectoryRoute,
   NSlugMarketplaceRoute: NSlugMarketplaceRoute,
   NSlugPlansRoute: NSlugPlansRoute,
   NSlugVolunteerRoute: NSlugVolunteerRoute,
