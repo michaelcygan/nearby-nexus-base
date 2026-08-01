@@ -9,6 +9,7 @@ import { ReportButton } from "@/components/moderation/report-button";
 import { neighborProfileQuery, publicProfileQuery } from "@/features/account/queries";
 import { initialsFor } from "@/features/account/types";
 import { useSession } from "@/hooks/use-session";
+import { canonicalUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/u/$profileId")({
   loader: async ({ params, context }) => {
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/u/$profileId")({
     if (!profile) throw notFound();
     return { profile };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     if (!loaderData) {
       return {
         meta: [{ title: "Neighbor not found" }, { name: "robots", content: "noindex" }],
@@ -32,8 +33,10 @@ export const Route = createFileRoute("/u/$profileId")({
         profile.home_neighborhood ? `, around ${profile.home_neighborhood.name}` : ""
       }.`;
     return {
+      links: [{ rel: "canonical", href: canonicalUrl(`/u/${params.profileId}`) }],
       meta: [
         { title },
+        { property: "og:url", content: canonicalUrl(`/u/${params.profileId}`) },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },

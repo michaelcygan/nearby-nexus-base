@@ -12,6 +12,7 @@ import { storeListingQuery } from "@/features/store/queries";
 import { formatMoney, storeListingStatusLabels } from "@/features/store/types";
 import { useSession } from "@/hooks/use-session";
 import { isPaymentsConfigured } from "@/lib/stripe";
+import { canonicalUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/n/$slug/item/$listingId")({
   loader: async ({ params, context }) => {
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/n/$slug/item/$listingId")({
     if (!listing) throw notFound();
     return { listing };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     if (!loaderData) {
       return { meta: [{ title: "Item unavailable" }, { name: "robots", content: "noindex" }] };
     }
@@ -28,8 +29,10 @@ export const Route = createFileRoute("/n/$slug/item/$listingId")({
     const description = listing.description.slice(0, 155);
     const image = listing.image_urls[0];
     return {
+      links: [{ rel: "canonical", href: canonicalUrl(`/n/${params.slug}/item/${params.listingId}`) }],
       meta: [
         { title },
+        { property: "og:url", content: canonicalUrl(`/n/${params.slug}/item/${params.listingId}`) },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },

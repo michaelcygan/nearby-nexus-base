@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import { PostListSkeleton } from "@/components/common/post-list-skeleton";
 import { AppShell, PageContainer } from "@/components/layout/app-shell";
 import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
+import { canonicalUrl } from "@/lib/seo";
 
 const title = "Neighborhood Today — the noticeboard for your block";
 const description =
@@ -16,8 +17,10 @@ export const Route = createFileRoute("/")({
     context.queryClient.ensureQueryData(neighborhoodsQuery());
   },
   head: () => ({
+    links: [{ rel: "canonical", href: canonicalUrl("/") }],
     meta: [
       { title },
+      { property: "og:url", content: canonicalUrl("/") },
       { name: "description", content: description },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
