@@ -1,33 +1,39 @@
-## Wave 3 — Post creation
+Nothing is broken or half-finished from Waves 1–3 — the one open item is that I still can't sign in from my sandbox, so signed-in publishing is verified by code paths only. If you sign in once in the preview, I'll re-verify the live flow at the start of this wave.
 
-Signed-in neighbors can publish Plans, Marketplace listings and Volunteer asks to a neighborhood board, with compressed photos. Directory listings stay admin-only for now (you'll sell vetted listings later).
+Wave 4 is the participation layer: right now a post is a broadcast. After this, neighbors can actually join a plan, claim a volunteer slot, and talk to the author privately about a listing.
 
-### Database (one migration)
-- `posts`: add author write access — INSERT policy for `authenticated` where `author_id = auth.uid()`, UPDATE/DELETE policies for the author on their own rows, and grants for `authenticated`. Make `author_id` NOT NULL going forward for new rows via trigger default (`auth.uid()`), keeping seeded rows intact.
-- Add owner-side SELECT policy so authors can read their own non-active (completed/removed) posts — otherwise their own edits/manage views come back empty.
-- Validation trigger per type: plans require `starts_at`; marketplace requires either `is_free` or `price_cents`; volunteer requires `needed_by` or `slots`. Enforced server-side too.
-- `places`: INSERT/UPDATE/DELETE policies restricted to `has_role(auth.uid(), 'admin')`.
-- New private storage bucket `post-images` with policies: authenticated users write only inside their own `{user_id}/…` folder; reads via signed URLs.
+## Database (one migration)
 
-### Photos (kept cheap)
-- Compression happens in the browser before upload: canvas resize to max 1600px on the long edge, JPEG quality ~0.72, hard cap of ~400KB per image and 4 images per post. Files above the cap after compression are rejected with a clear message.
-- Only compressed derivatives are stored — no originals — so storage and egress stay small. Detail pages request signed URLs at a display size and lazy-load them.
+- `post_participants` — one row per person per post: post reference, participant, role (`going` / `volunteer` / `interested`), optional note, created timestamp. Unique on (post, participant) so joining twice is impossible.
+  - Read: the post's author sees everyone on their post; a participant sees their own row.
+  - Write: a signed-in user may only create/remove their own row.
+- `threads` — one private conversation per (post, other party), owned jointly by the post author and the initiator.
+- `thread_messages` — body, sender, created timestamp; read/write only for the two thread participants.
+- Counting: a `post_participation_counts` view (or security-definer function) returning going/volunteer counts per post, readable publicly, so boards can show "12 of 30 spots" without exposing who joined.
+- Capacity guard: a validation trigger rejects a join when the plan's `capacity` or the volunteer ask's `slots` is already full, and when the post is not `active`.
 
-### Server layer
-- `src/features/posts/schemas.ts` — Zod schemas per post type (shared base + type-specific fields), reused by form and server.
-- `src/features/posts/post.functions.ts` — `createPost`, `updateMyPost`, `deleteMyPost`, `listMyPosts`, `setPostImagePaths`, each with `requireSupabaseAuth`; `author_id` always derived from the verified session, never from request data.
-- `src/features/posts/data.server.ts` — signed-URL helper for image paths; extend neighborhood fetchers to return image URLs on cards and detail pages.
-- `src/features/directory/place.functions.ts` — admin-gated `createPlace` / `updatePlace` / `deletePlace` that verify the admin role through the user's own client before writing.
+## Server layer
 
-### UI
-- `src/components/posts/post-form.tsx` — one shared form; a type switch reveals only that module's fields (Plan: date/time, location, capacity; Marketplace: price or free, condition; Volunteer: needed-by, slots). Includes the image dropzone with compression progress.
-- New routes: `/_authenticated/n/$slug/new` (type chosen via search param, so `?type=plan` deep-links from a board), `/_authenticated/posts` (my posts: edit, mark completed, delete), `/_authenticated/posts/$postId/edit`.
-- Boards gain a "Post to this board" action; signed-out visitors see an inline "Sign in to post" CTA instead of a redirect.
-- Admin-only Directory management at `/_authenticated/admin/directory` (add/edit/remove places), hidden for non-admins.
-- Post cards and detail pages render the first photo with the rest in a simple gallery.
+- `src/features/participation/participation.functions.ts` — `joinPost`, `leavePost`, `listMyParticipation`, `listPostParticipants` (author only), all behind `requireSupabaseAuth` with the participant derived from the verified session.
+- `src/features/messages/thread.functions.ts` — `startThread` (post + first message), `sendMessage`, `listMyThreads`, `getThread`. Author and initiator resolved server-side; no client-supplied identities.
+- Public post fetchers extend to include participation counts so signed-out visitors still see spots remaining.
 
-### Verification
-Typecheck, then a browser pass: publish one post of each type, confirm it appears on the right tab and detail page, confirm image compression stays under the cap, confirm a non-admin cannot reach directory management, and confirm signed-out users see the CTA rather than a broken form.
+## UI
 
-### Technical notes
-Ownership is always taken from the validated bearer token in the handler; client-supplied author fields are ignored. Route protection uses the existing `_authenticated` gate. Admin checks run against the user's RLS-scoped client via `has_role`, never the service-role client.
+- Post detail page gains a participation block:
+  - Plans: "I'm going" / "Can't make it" with spots remaining, plus the guest list for the author only.
+  - Volunteer: "Claim a slot" with slots remaining.
+  - Marketplace: "Message the seller" opening a private thread.
+  - Signed-out visitors see an inline "Sign in to join" CTA — never a redirect, never a dead button.
+- Post cards show a quiet "12 going" / "3 of 8 slots" line where relevant.
+- `/messages` — a signed-in inbox listing threads with the post title, other neighbor, last message and unread marker; `/messages/$threadId` for the conversation itself.
+- `/profile` gains "Things you joined", and the account menu gains a Messages link.
+- Authors see who joined on their own post detail and in `/posts`.
+
+## Verification
+
+Typecheck, then a browser pass: join a plan and confirm the count moves on the board and the detail page, confirm joining past capacity is refused, confirm a second account can't read someone else's thread, confirm signed-out users see CTAs instead of broken controls, and confirm no console errors on mobile width.
+
+## Technical notes
+
+All identity comes from the validated bearer token inside the handler. Participation and thread reads are RLS-scoped so the public board can show aggregate counts while names stay private to the author. Capacity is enforced by a database trigger, not only in the client, so concurrent joins can't oversubscribe a plan. Moderation of participation and messages (reports, blocks) stays in Wave 5 as planned.
