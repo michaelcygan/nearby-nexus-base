@@ -4,6 +4,8 @@ import { Outlet, createFileRoute, notFound } from "@tanstack/react-router";
 import { ErrorState } from "@/components/common/error-state";
 import { AppShell, PageContainer } from "@/components/layout/app-shell";
 import { NeighborhoodTabs } from "@/components/neighborhood/neighborhood-tabs";
+import { SaveNeighborhoodButton } from "@/components/neighborhood/save-neighborhood-button";
+
 import { neighborhoodQuery } from "@/features/neighborhoods/queries";
 
 export const Route = createFileRoute("/n/$slug")({
@@ -61,17 +63,21 @@ function NeighborhoodLayout() {
   return (
     <AppShell>
       <PageContainer>
-        <header>
-          <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            {neighborhood?.city}
-          </p>
-          <h1 className="mt-2 text-3xl sm:text-4xl">{neighborhood?.name}</h1>
-          {neighborhood?.tagline ? (
-            <p className="mt-3 max-w-prose text-base text-muted-foreground">
-              {neighborhood.tagline}
+        <header className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              {neighborhood?.city}
             </p>
-          ) : null}
+            <h1 className="mt-2 text-3xl sm:text-4xl">{neighborhood?.name}</h1>
+            {neighborhood?.tagline ? (
+              <p className="mt-3 max-w-prose text-base text-muted-foreground">
+                {neighborhood.tagline}
+              </p>
+            ) : null}
+          </div>
+          {neighborhood ? <SaveNeighborhoodButton neighborhoodId={neighborhood.id} /> : null}
         </header>
+
         <div className="mt-6">
           <NeighborhoodTabs slug={slug} />
         </div>
