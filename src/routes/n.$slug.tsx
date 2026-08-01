@@ -4,6 +4,8 @@ import { Outlet, createFileRoute, notFound } from "@tanstack/react-router";
 import { ErrorState } from "@/components/common/error-state";
 import { AppShell, PageContainer } from "@/components/layout/app-shell";
 import { NeighborhoodTabs } from "@/components/neighborhood/neighborhood-tabs";
+import { SaveNeighborhoodButton } from "@/components/neighborhood/save-neighborhood-button";
+
 import { neighborhoodQuery } from "@/features/neighborhoods/queries";
 
 export const Route = createFileRoute("/n/$slug")({
