@@ -32,6 +32,7 @@ import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketpla
 import { Route as NSlugPlansRouteImport } from './routes/n.$slug.plans'
 import { Route as NSlugVolunteerRouteImport } from './routes/n.$slug.volunteer'
 import { Route as AuthenticatedPostPostIdEditRouteImport } from './routes/_authenticated/post.$postId.edit'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as NSlugPPostIdRouteImport } from './routes/n.$slug.p.$postId'
 import { Route as NSlugPlacePlaceIdRouteImport } from './routes/n.$slug.place.$placeId'
 
@@ -155,6 +156,12 @@ const AuthenticatedPostPostIdEditRoute =
     path: '/post/$postId/edit',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const NSlugPPostIdRoute = NSlugPPostIdRouteImport.update({
   id: '/p/$postId',
   path: '/p/$postId',
@@ -189,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/messages/': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug/': typeof NSlugIndexRoute
   '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -214,6 +222,7 @@ export interface FileRoutesByTo {
   '/messages': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug': typeof NSlugIndexRoute
   '/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -242,6 +251,7 @@ export interface FileRoutesById {
   '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
   '/n/$slug/': typeof NSlugIndexRoute
   '/_authenticated/post/$postId/edit': typeof AuthenticatedPostPostIdEditRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
   '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
@@ -270,6 +280,7 @@ export interface FileRouteTypes {
     | '/messages/'
     | '/n/$slug/'
     | '/post/$postId/edit'
+    | '/api/public/payments/webhook'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   fileRoutesByTo: FileRoutesByTo
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/n/$slug'
     | '/post/$postId/edit'
+    | '/api/public/payments/webhook'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   id:
@@ -322,6 +334,7 @@ export interface FileRouteTypes {
     | '/_authenticated/messages/'
     | '/n/$slug/'
     | '/_authenticated/post/$postId/edit'
+    | '/api/public/payments/webhook'
     | '/n/$slug/p/$postId'
     | '/n/$slug/place/$placeId'
   fileRoutesById: FileRoutesById
@@ -336,6 +349,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   NSlugRoute: typeof NSlugRouteWithChildren
   UProfileIdRoute: typeof UProfileIdRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -501,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPostPostIdEditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/n/$slug/p/$postId': {
       id: '/n/$slug/p/$postId'
       path: '/p/$postId'
@@ -577,6 +598,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   NSlugRoute: NSlugRouteWithChildren,
   UProfileIdRoute: UProfileIdRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
