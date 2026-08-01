@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
 
+import { AccountMenu } from "./account-menu";
+
 const navItems = [{ to: "/community-guidelines", label: "Guidelines" }] as const;
+
 
 export function SiteHeader() {
   return (
