@@ -1,12 +1,20 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Suspense } from "react";
 
+import { EmptyState } from "@/components/common/empty-state";
+import { PostListSkeleton } from "@/components/common/post-list-skeleton";
 import { AppShell, PageContainer } from "@/components/layout/app-shell";
+import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
 
 const title = "Neighborhood Today — the noticeboard for your block";
 const description =
   "Plans, marketplace listings, volunteer needs, a local directory, and neighborhood merch — one quiet page per neighborhood, no account needed to read it.";
 
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(neighborhoodsQuery());
+  },
   head: () => ({
     meta: [
       { title },
@@ -17,6 +25,7 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
+
 
 const modules = [
   {
@@ -56,6 +65,23 @@ function Index() {
         </section>
 
         <section className="py-10">
+          <h2 className="text-xl">Neighborhoods</h2>
+          <p className="mt-2 max-w-prose text-sm text-muted-foreground">
+            Pick a neighborhood to see what's on its board today.
+          </p>
+          <Suspense
+            fallback={
+              <div className="mt-5">
+                <PostListSkeleton count={3} />
+              </div>
+            }
+          >
+            <NeighborhoodList />
+          </Suspense>
+        </section>
+
+
+        <section className="py-10">
           <h2 className="text-xl">Five things per neighborhood</h2>
           <ul className="mt-5 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
             {modules.map((m) => (
@@ -89,3 +115,45 @@ function Index() {
     </AppShell>
   );
 }
+
+function NeighborhoodList() {
+  const { data: neighborhoods } = useSuspenseQuery(neighborhoodsQuery());
+
+  if (neighborhoods.length === 0) {
+    return (
+      <div className="mt-5">
+        <EmptyState
+          title="No neighborhoods yet"
+          description="Neighborhood boards will appear here as they open."
+        />
+      </div>
+    );
+  }
+
+  return (
+    <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+      {neighborhoods.map((n) => (
+        <li
+          key={n.id}
+          className="rounded-md border border-border bg-card transition-colors hover:border-primary/50"
+        >
+          <Link
+            to="/n/$slug"
+            params={{ slug: n.slug }}
+            className="block rounded-md p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <h3 className="font-display text-lg font-semibold">{n.name}</h3>
+            <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              {n.city}
+            </p>
+
+            {n.tagline ? (
+              <p className="mt-2 text-sm text-muted-foreground">{n.tagline}</p>
+            ) : null}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+

@@ -13,6 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as NSlugRouteImport } from './routes/n.$slug'
+import { Route as NSlugIndexRouteImport } from './routes/n.$slug.index'
+import { Route as NSlugDirectoryRouteImport } from './routes/n.$slug.directory'
+import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketplace'
+import { Route as NSlugPlansRouteImport } from './routes/n.$slug.plans'
+import { Route as NSlugVolunteerRouteImport } from './routes/n.$slug.volunteer'
+import { Route as NSlugPPostIdRouteImport } from './routes/n.$slug.p.$postId'
+import { Route as NSlugPlacePlaceIdRouteImport } from './routes/n.$slug.place.$placeId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +42,73 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NSlugRoute = NSlugRouteImport.update({
+  id: '/n/$slug',
+  path: '/n/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NSlugIndexRoute = NSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NSlugRoute,
+} as any)
+const NSlugDirectoryRoute = NSlugDirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
+  getParentRoute: () => NSlugRoute,
+} as any)
+const NSlugMarketplaceRoute = NSlugMarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => NSlugRoute,
+} as any)
+const NSlugPlansRoute = NSlugPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => NSlugRoute,
+} as any)
+const NSlugVolunteerRoute = NSlugVolunteerRouteImport.update({
+  id: '/volunteer',
+  path: '/volunteer',
+  getParentRoute: () => NSlugRoute,
+} as any)
+const NSlugPPostIdRoute = NSlugPPostIdRouteImport.update({
+  id: '/p/$postId',
+  path: '/p/$postId',
+  getParentRoute: () => NSlugRoute,
+} as any)
+const NSlugPlacePlaceIdRoute = NSlugPlacePlaceIdRouteImport.update({
+  id: '/place/$placeId',
+  path: '/place/$placeId',
+  getParentRoute: () => NSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/n/$slug': typeof NSlugRouteWithChildren
+  '/n/$slug/directory': typeof NSlugDirectoryRoute
+  '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
+  '/n/$slug/plans': typeof NSlugPlansRoute
+  '/n/$slug/volunteer': typeof NSlugVolunteerRoute
+  '/n/$slug/': typeof NSlugIndexRoute
+  '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
+  '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/n/$slug/directory': typeof NSlugDirectoryRoute
+  '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
+  '/n/$slug/plans': typeof NSlugPlansRoute
+  '/n/$slug/volunteer': typeof NSlugVolunteerRoute
+  '/n/$slug': typeof NSlugIndexRoute
+  '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
+  '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +116,57 @@ export interface FileRoutesById {
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/n/$slug': typeof NSlugRouteWithChildren
+  '/n/$slug/directory': typeof NSlugDirectoryRoute
+  '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
+  '/n/$slug/plans': typeof NSlugPlansRoute
+  '/n/$slug/volunteer': typeof NSlugVolunteerRoute
+  '/n/$slug/': typeof NSlugIndexRoute
+  '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
+  '/n/$slug/place/$placeId': typeof NSlugPlacePlaceIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/community-guidelines' | '/privacy' | '/terms'
+  fullPaths:
+    | '/'
+    | '/community-guidelines'
+    | '/privacy'
+    | '/terms'
+    | '/n/$slug'
+    | '/n/$slug/directory'
+    | '/n/$slug/marketplace'
+    | '/n/$slug/plans'
+    | '/n/$slug/volunteer'
+    | '/n/$slug/'
+    | '/n/$slug/p/$postId'
+    | '/n/$slug/place/$placeId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/community-guidelines' | '/privacy' | '/terms'
-  id: '__root__' | '/' | '/community-guidelines' | '/privacy' | '/terms'
+  to:
+    | '/'
+    | '/community-guidelines'
+    | '/privacy'
+    | '/terms'
+    | '/n/$slug/directory'
+    | '/n/$slug/marketplace'
+    | '/n/$slug/plans'
+    | '/n/$slug/volunteer'
+    | '/n/$slug'
+    | '/n/$slug/p/$postId'
+    | '/n/$slug/place/$placeId'
+  id:
+    | '__root__'
+    | '/'
+    | '/community-guidelines'
+    | '/privacy'
+    | '/terms'
+    | '/n/$slug'
+    | '/n/$slug/directory'
+    | '/n/$slug/marketplace'
+    | '/n/$slug/plans'
+    | '/n/$slug/volunteer'
+    | '/n/$slug/'
+    | '/n/$slug/p/$postId'
+    | '/n/$slug/place/$placeId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +174,7 @@ export interface RootRouteChildren {
   CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  NSlugRoute: typeof NSlugRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -99,14 +207,93 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/n/$slug': {
+      id: '/n/$slug'
+      path: '/n/$slug'
+      fullPath: '/n/$slug'
+      preLoaderRoute: typeof NSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/n/$slug/': {
+      id: '/n/$slug/'
+      path: '/'
+      fullPath: '/n/$slug/'
+      preLoaderRoute: typeof NSlugIndexRouteImport
+      parentRoute: typeof NSlugRoute
+    }
+    '/n/$slug/directory': {
+      id: '/n/$slug/directory'
+      path: '/directory'
+      fullPath: '/n/$slug/directory'
+      preLoaderRoute: typeof NSlugDirectoryRouteImport
+      parentRoute: typeof NSlugRoute
+    }
+    '/n/$slug/marketplace': {
+      id: '/n/$slug/marketplace'
+      path: '/marketplace'
+      fullPath: '/n/$slug/marketplace'
+      preLoaderRoute: typeof NSlugMarketplaceRouteImport
+      parentRoute: typeof NSlugRoute
+    }
+    '/n/$slug/plans': {
+      id: '/n/$slug/plans'
+      path: '/plans'
+      fullPath: '/n/$slug/plans'
+      preLoaderRoute: typeof NSlugPlansRouteImport
+      parentRoute: typeof NSlugRoute
+    }
+    '/n/$slug/volunteer': {
+      id: '/n/$slug/volunteer'
+      path: '/volunteer'
+      fullPath: '/n/$slug/volunteer'
+      preLoaderRoute: typeof NSlugVolunteerRouteImport
+      parentRoute: typeof NSlugRoute
+    }
+    '/n/$slug/p/$postId': {
+      id: '/n/$slug/p/$postId'
+      path: '/p/$postId'
+      fullPath: '/n/$slug/p/$postId'
+      preLoaderRoute: typeof NSlugPPostIdRouteImport
+      parentRoute: typeof NSlugRoute
+    }
+    '/n/$slug/place/$placeId': {
+      id: '/n/$slug/place/$placeId'
+      path: '/place/$placeId'
+      fullPath: '/n/$slug/place/$placeId'
+      preLoaderRoute: typeof NSlugPlacePlaceIdRouteImport
+      parentRoute: typeof NSlugRoute
+    }
   }
 }
+
+interface NSlugRouteChildren {
+  NSlugDirectoryRoute: typeof NSlugDirectoryRoute
+  NSlugMarketplaceRoute: typeof NSlugMarketplaceRoute
+  NSlugPlansRoute: typeof NSlugPlansRoute
+  NSlugVolunteerRoute: typeof NSlugVolunteerRoute
+  NSlugIndexRoute: typeof NSlugIndexRoute
+  NSlugPPostIdRoute: typeof NSlugPPostIdRoute
+  NSlugPlacePlaceIdRoute: typeof NSlugPlacePlaceIdRoute
+}
+
+const NSlugRouteChildren: NSlugRouteChildren = {
+  NSlugDirectoryRoute: NSlugDirectoryRoute,
+  NSlugMarketplaceRoute: NSlugMarketplaceRoute,
+  NSlugPlansRoute: NSlugPlansRoute,
+  NSlugVolunteerRoute: NSlugVolunteerRoute,
+  NSlugIndexRoute: NSlugIndexRoute,
+  NSlugPPostIdRoute: NSlugPPostIdRoute,
+  NSlugPlacePlaceIdRoute: NSlugPlacePlaceIdRoute,
+}
+
+const NSlugRouteWithChildren = NSlugRoute._addFileChildren(NSlugRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  NSlugRoute: NSlugRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
