@@ -14,6 +14,7 @@ import { Route as CommunityGuidelinesRouteImport } from './routes/community-guid
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
+import { Route as NSlugIndexRouteImport } from './routes/n.$slug.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,20 +41,26 @@ const NSlugRoute = NSlugRouteImport.update({
   path: '/n/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NSlugIndexRoute = NSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/n/$slug': typeof NSlugRoute
+  '/n/$slug': typeof NSlugRouteWithChildren
+  '/n/$slug/': typeof NSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/n/$slug': typeof NSlugRoute
+  '/n/$slug': typeof NSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,11 +68,18 @@ export interface FileRoutesById {
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/n/$slug': typeof NSlugRoute
+  '/n/$slug': typeof NSlugRouteWithChildren
+  '/n/$slug/': typeof NSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/community-guidelines' | '/privacy' | '/terms' | '/n/$slug'
+  fullPaths:
+    | '/'
+    | '/community-guidelines'
+    | '/privacy'
+    | '/terms'
+    | '/n/$slug'
+    | '/n/$slug/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/community-guidelines' | '/privacy' | '/terms' | '/n/$slug'
   id:
@@ -75,6 +89,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/n/$slug'
+    | '/n/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -82,7 +97,7 @@ export interface RootRouteChildren {
   CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
-  NSlugRoute: typeof NSlugRoute
+  NSlugRoute: typeof NSlugRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -122,15 +137,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/n/$slug/': {
+      id: '/n/$slug/'
+      path: '/'
+      fullPath: '/n/$slug/'
+      preLoaderRoute: typeof NSlugIndexRouteImport
+      parentRoute: typeof NSlugRoute
+    }
   }
 }
+
+interface NSlugRouteChildren {
+  NSlugIndexRoute: typeof NSlugIndexRoute
+}
+
+const NSlugRouteChildren: NSlugRouteChildren = {
+  NSlugIndexRoute: NSlugIndexRoute,
+}
+
+const NSlugRouteWithChildren = NSlugRoute._addFileChildren(NSlugRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
-  NSlugRoute: NSlugRoute,
+  NSlugRoute: NSlugRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
