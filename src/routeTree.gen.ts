@@ -19,6 +19,7 @@ import { Route as NSlugDirectoryRouteImport } from './routes/n.$slug.directory'
 import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketplace'
 import { Route as NSlugPlansRouteImport } from './routes/n.$slug.plans'
 import { Route as NSlugVolunteerRouteImport } from './routes/n.$slug.volunteer'
+import { Route as NSlugPPostIdRouteImport } from './routes/n.$slug.p.$postId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +71,11 @@ const NSlugVolunteerRoute = NSlugVolunteerRouteImport.update({
   path: '/volunteer',
   getParentRoute: () => NSlugRoute,
 } as any)
+const NSlugPPostIdRoute = NSlugPPostIdRouteImport.update({
+  id: '/p/$postId',
+  path: '/p/$postId',
+  getParentRoute: () => NSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
   '/n/$slug/': typeof NSlugIndexRoute
+  '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
   '/n/$slug': typeof NSlugIndexRoute
+  '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/n/$slug/plans': typeof NSlugPlansRoute
   '/n/$slug/volunteer': typeof NSlugVolunteerRoute
   '/n/$slug/': typeof NSlugIndexRoute
+  '/n/$slug/p/$postId': typeof NSlugPPostIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/n/$slug/plans'
     | '/n/$slug/volunteer'
     | '/n/$slug/'
+    | '/n/$slug/p/$postId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/n/$slug/plans'
     | '/n/$slug/volunteer'
     | '/n/$slug'
+    | '/n/$slug/p/$postId'
   id:
     | '__root__'
     | '/'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/n/$slug/plans'
     | '/n/$slug/volunteer'
     | '/n/$slug/'
+    | '/n/$slug/p/$postId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -225,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NSlugVolunteerRouteImport
       parentRoute: typeof NSlugRoute
     }
+    '/n/$slug/p/$postId': {
+      id: '/n/$slug/p/$postId'
+      path: '/p/$postId'
+      fullPath: '/n/$slug/p/$postId'
+      preLoaderRoute: typeof NSlugPPostIdRouteImport
+      parentRoute: typeof NSlugRoute
+    }
   }
 }
 
@@ -234,6 +253,7 @@ interface NSlugRouteChildren {
   NSlugPlansRoute: typeof NSlugPlansRoute
   NSlugVolunteerRoute: typeof NSlugVolunteerRoute
   NSlugIndexRoute: typeof NSlugIndexRoute
+  NSlugPPostIdRoute: typeof NSlugPPostIdRoute
 }
 
 const NSlugRouteChildren: NSlugRouteChildren = {
@@ -242,6 +262,7 @@ const NSlugRouteChildren: NSlugRouteChildren = {
   NSlugPlansRoute: NSlugPlansRoute,
   NSlugVolunteerRoute: NSlugVolunteerRoute,
   NSlugIndexRoute: NSlugIndexRoute,
+  NSlugPPostIdRoute: NSlugPPostIdRoute,
 }
 
 const NSlugRouteWithChildren = NSlugRoute._addFileChildren(NSlugRouteChildren)
