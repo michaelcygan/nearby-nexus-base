@@ -19,6 +19,8 @@ import {
 } from "@/features/account/profile.functions";
 import { initialsFor, profileSchema } from "@/features/account/types";
 import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
+import { formatTimestamp } from "@/features/neighborhoods/types";
+
 import { myParticipationQuery } from "@/features/participation/queries";
 import { roleLabels } from "@/features/participation/types";
 import { unblockNeighbor } from "@/features/moderation/block.functions";
@@ -444,7 +446,7 @@ function MyReports() {
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
                 {reportStatusLabels[report.status]} ·{" "}
-                {new Date(report.created_at).toLocaleDateString()}
+                {formatTimestamp(report.created_at)}
               </p>
             </li>
           ))}

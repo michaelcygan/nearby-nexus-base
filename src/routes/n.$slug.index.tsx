@@ -11,16 +11,22 @@ import {
   neighborhoodPostsQuery,
   neighborhoodQuery,
 } from "@/features/neighborhoods/queries";
+import { canonicalUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/n/$slug/")({
   loader: ({ params, context }) => {
     context.queryClient.ensureQueryData(neighborhoodPostsQuery(params.slug, null, 6));
     context.queryClient.ensureQueryData(neighborhoodCountsQuery(params.slug));
   },
+  head: ({ params }) => ({
+    links: [{ rel: "canonical", href: canonicalUrl(`/n/${params.slug}`) }],
+    meta: [{ property: "og:url", content: canonicalUrl(`/n/${params.slug}`) }],
+  }),
   component: Overview,
   errorComponent: () => <ErrorState title="The overview didn't load" />,
   notFoundComponent: () => <EmptyState title="Nothing here yet" />,
 });
+
 
 function Overview() {
   const { slug } = Route.useParams();

@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { canonicalUrl } from "@/lib/seo";
+
 import { ErrorState } from "@/components/common/error-state";
 import { PostFeed } from "@/components/neighborhood/post-feed";
 import { neighborhoodPostsQuery } from "@/features/neighborhoods/queries";
@@ -8,7 +10,8 @@ export const Route = createFileRoute("/n/$slug/volunteer")({
   loader: ({ params, context }) => {
     context.queryClient.ensureQueryData(neighborhoodPostsQuery(params.slug, "volunteer"));
   },
-  head: () => ({
+  head: ({ params }) => ({
+    links: [{ rel: "canonical", href: canonicalUrl(`/n/${params.slug}/volunteer`) }],
     meta: [
       { title: "Volunteer — Neighborhood Today" },
       {
@@ -20,6 +23,7 @@ export const Route = createFileRoute("/n/$slug/volunteer")({
         property: "og:description",
         content: "Small asks that need a hand, and neighbors willing to give one.",
       },
+      { property: "og:url", content: canonicalUrl(`/n/${params.slug}/volunteer`) },
     ],
   }),
   component: Volunteer,

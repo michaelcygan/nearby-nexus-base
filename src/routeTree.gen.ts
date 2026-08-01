@@ -21,6 +21,7 @@ import { Route as AuthenticatedPostsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
 import { Route as UProfileIdRouteImport } from './routes/u.$profileId'
+import { Route as AuthenticatedAdminAccessPointsRouteImport } from './routes/_authenticated/admin.access-points'
 import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin.directory'
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin.moderation'
@@ -100,6 +101,12 @@ const UProfileIdRoute = UProfileIdRouteImport.update({
   path: '/u/$profileId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminAccessPointsRoute =
+  AuthenticatedAdminAccessPointsRouteImport.update({
+    id: '/admin/access-points',
+    path: '/admin/access-points',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminDirectoryRoute =
   AuthenticatedAdminDirectoryRouteImport.update({
     id: '/admin/directory',
@@ -215,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/n/$slug': typeof NSlugRouteWithChildren
   '/u/$profileId': typeof UProfileIdRoute
+  '/admin/access-points': typeof AuthenticatedAdminAccessPointsRoute
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/admin/moderation': typeof AuthenticatedAdminModerationRoute
@@ -246,6 +254,7 @@ export interface FileRoutesByTo {
   '/posts': typeof AuthenticatedPostsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/u/$profileId': typeof UProfileIdRoute
+  '/admin/access-points': typeof AuthenticatedAdminAccessPointsRoute
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/admin/moderation': typeof AuthenticatedAdminModerationRoute
@@ -280,6 +289,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/n/$slug': typeof NSlugRouteWithChildren
   '/u/$profileId': typeof UProfileIdRoute
+  '/_authenticated/admin/access-points': typeof AuthenticatedAdminAccessPointsRoute
   '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
   '/_authenticated/admin/moderation': typeof AuthenticatedAdminModerationRoute
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/n/$slug'
     | '/u/$profileId'
+    | '/admin/access-points'
     | '/admin/directory'
     | '/admin/members'
     | '/admin/moderation'
@@ -345,6 +356,7 @@ export interface FileRouteTypes {
     | '/posts'
     | '/profile'
     | '/u/$profileId'
+    | '/admin/access-points'
     | '/admin/directory'
     | '/admin/members'
     | '/admin/moderation'
@@ -378,6 +390,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/n/$slug'
     | '/u/$profileId'
+    | '/_authenticated/admin/access-points'
     | '/_authenticated/admin/directory'
     | '/_authenticated/admin/members'
     | '/_authenticated/admin/moderation'
@@ -498,6 +511,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/u/$profileId'
       preLoaderRoute: typeof UProfileIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/access-points': {
+      id: '/_authenticated/admin/access-points'
+      path: '/admin/access-points'
+      fullPath: '/admin/access-points'
+      preLoaderRoute: typeof AuthenticatedAdminAccessPointsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/directory': {
       id: '/_authenticated/admin/directory'
@@ -639,6 +659,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedPostsRoute: typeof AuthenticatedPostsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedAdminAccessPointsRoute: typeof AuthenticatedAdminAccessPointsRoute
   AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
   AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
@@ -653,6 +674,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedPostsRoute: AuthenticatedPostsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedAdminAccessPointsRoute: AuthenticatedAdminAccessPointsRoute,
   AuthenticatedAdminDirectoryRoute: AuthenticatedAdminDirectoryRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
   AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,

@@ -9,6 +9,7 @@ import { AppShell, PageContainer } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { actOnReport } from "@/features/moderation/moderation.functions";
+import { formatTimestamp } from "@/features/neighborhoods/types";
 import {
   moderationLogQuery,
   myModerationRoleQuery,
@@ -162,7 +163,7 @@ function ReportQueue({ status }: { status: ReportStatus }) {
               {reportTargetLabels[report.target_type]} · {reportReasonLabels[report.reason]}
             </p>
             <p className="text-xs text-muted-foreground">
-              {new Date(report.created_at).toLocaleString()}
+              {formatTimestamp(report.created_at)}
             </p>
           </div>
 
@@ -296,7 +297,7 @@ function ModerationLog() {
                 {reportTargetLabels[entry.target_type].toLowerCase()}
               </span>
               <span>by {entry.actor_name}</span>
-              <span>· {new Date(entry.created_at).toLocaleString()}</span>
+              <span>· {formatTimestamp(entry.created_at)}</span>
               {entry.reason ? <span>· {entry.reason}</span> : null}
             </li>
           ))}

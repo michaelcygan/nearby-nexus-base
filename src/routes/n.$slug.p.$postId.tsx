@@ -13,6 +13,8 @@ import {
   formatPrice,
   postTypeLabels,
 } from "@/features/neighborhoods/types";
+import { canonicalUrl } from "@/lib/seo";
+
 
 export const Route = createFileRoute("/n/$slug/p/$postId")({
   loader: async ({ params, context }) => {
@@ -20,7 +22,7 @@ export const Route = createFileRoute("/n/$slug/p/$postId")({
     if (!post) throw notFound();
     return { post };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     if (!loaderData) {
       return { meta: [{ title: "Post unavailable" }, { name: "robots", content: "noindex" }] };
     }
@@ -28,8 +30,10 @@ export const Route = createFileRoute("/n/$slug/p/$postId")({
     const title = `${post.title} — ${post.neighborhood.name}`;
     const description = post.body.slice(0, 155);
     return {
+      links: [{ rel: "canonical", href: canonicalUrl(`/n/${params.slug}/p/${params.postId}`) }],
       meta: [
         { title },
+        { property: "og:url", content: canonicalUrl(`/n/${params.slug}/p/${params.postId}`) },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },

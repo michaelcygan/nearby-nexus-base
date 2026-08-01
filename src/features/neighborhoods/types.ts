@@ -70,22 +70,49 @@ export function formatPrice(priceCents: number | null, isFree: boolean | null) {
   return `$${(priceCents / 100).toFixed(priceCents % 100 === 0 ? 0 : 2)}`;
 }
 
+// Neighborhood Today is a local-first board: every date is shown in the
+// neighborhood's own time zone, with a fixed locale, so the server and the
+// browser always render the exact same string (no hydration mismatch).
+export const NEIGHBORHOOD_TIME_ZONE = "America/New_York";
+const DISPLAY_LOCALE = "en-US";
+
+const dateFormatter = new Intl.DateTimeFormat(DISPLAY_LOCALE, {
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+  timeZone: NEIGHBORHOOD_TIME_ZONE,
+});
+
+const dateTimeFormatter = new Intl.DateTimeFormat(DISPLAY_LOCALE, {
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  timeZone: NEIGHBORHOOD_TIME_ZONE,
+});
+
+const timestampFormatter = new Intl.DateTimeFormat(DISPLAY_LOCALE, {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  timeZone: NEIGHBORHOOD_TIME_ZONE,
+});
+
 export function formatDate(value: string | null) {
   if (!value) return null;
-  return new Date(value).toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
+  return dateFormatter.format(new Date(value));
 }
 
 export function formatDateTime(value: string | null) {
   if (!value) return null;
-  return new Date(value).toLocaleString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return dateTimeFormatter.format(new Date(value));
 }
+
+export function formatTimestamp(value: string | null) {
+  if (!value) return null;
+  return timestampFormatter.format(new Date(value));
+}
+

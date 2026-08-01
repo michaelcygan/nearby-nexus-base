@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { threadQuery } from "@/features/messages/queries";
+import { formatTimestamp } from "@/features/neighborhoods/types";
+
 import { markThreadRead, sendMessage } from "@/features/messages/thread.functions";
 
 export const Route = createFileRoute("/_authenticated/messages/$threadId")({
@@ -125,12 +127,8 @@ function ThreadPage() {
                 <p className="whitespace-pre-line">{message.body}</p>
                 <p className="mt-2 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
                   {mine ? "You" : detail.other_name} ·{" "}
-                  {new Date(message.created_at).toLocaleString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
+                  {formatTimestamp(message.created_at)}
+
                 </p>
               </li>
             );

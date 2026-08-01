@@ -5,6 +5,7 @@ import { ReportButton } from "@/components/moderation/report-button";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { placeQuery } from "@/features/neighborhoods/queries";
+import { canonicalUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/n/$slug/place/$placeId")({
   loader: async ({ params, context }) => {
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/n/$slug/place/$placeId")({
     if (!place) throw notFound();
     return { place };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     if (!loaderData) {
       return { meta: [{ title: "Place unavailable" }, { name: "robots", content: "noindex" }] };
     }
@@ -21,8 +22,10 @@ export const Route = createFileRoute("/n/$slug/place/$placeId")({
     const description =
       place.description ?? `${place.category} in ${place.neighborhood.name}, ${place.neighborhood.city}.`;
     return {
+      links: [{ rel: "canonical", href: canonicalUrl(`/n/${params.slug}/place/${params.placeId}`) }],
       meta: [
         { title },
+        { property: "og:url", content: canonicalUrl(`/n/${params.slug}/place/${params.placeId}`) },
         { name: "description", content: description.slice(0, 155) },
         { property: "og:title", content: title },
         { property: "og:description", content: description.slice(0, 155) },

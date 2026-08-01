@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { AppShell, PageContainer } from "@/components/layout/app-shell";
+import { canonicalUrl } from "@/lib/seo";
 
 const title = "Privacy — Neighborhood Today";
 const description =
@@ -8,8 +9,10 @@ const description =
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
+    links: [{ rel: "canonical", href: canonicalUrl("/privacy") }],
     meta: [
       { title },
+      { property: "og:url", content: canonicalUrl("/privacy") },
       { name: "description", content: description },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
