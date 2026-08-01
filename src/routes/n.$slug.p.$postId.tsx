@@ -2,6 +2,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/common/empty-state";
+import { BlockButton } from "@/components/moderation/block-button";
+import { ReportButton } from "@/components/moderation/report-button";
 import { ParticipationBlock } from "@/components/posts/participation-block";
 import { ErrorState } from "@/components/common/error-state";
 import { postQuery } from "@/features/neighborhoods/queries";
