@@ -1,11 +1,14 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { ErrorState } from "@/components/common/error-state";
 import { AppShell, PageContainer } from "@/components/layout/app-shell";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { publicProfileQuery } from "@/features/account/queries";
+import { BlockButton } from "@/components/moderation/block-button";
+import { ReportButton } from "@/components/moderation/report-button";
+import { neighborProfileQuery, publicProfileQuery } from "@/features/account/queries";
 import { initialsFor } from "@/features/account/types";
+import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/u/$profileId")({
   loader: async ({ params, context }) => {
@@ -59,9 +62,17 @@ export const Route = createFileRoute("/u/$profileId")({
 
 function NeighborProfilePage() {
   const { profileId } = Route.useParams();
-  const { data: profile } = useSuspenseQuery(publicProfileQuery(profileId));
+  const { data: publicProfile } = useSuspenseQuery(publicProfileQuery(profileId));
+  const { session } = useSession();
+  // Bios and home neighborhoods are sign-in-only, so signed-in visitors get a
+  // fuller read of the same neighbor.
+  const detailed = useQuery({
+    ...neighborProfileQuery(profileId),
+    enabled: Boolean(session),
+  });
 
-  if (!profile) return null;
+  if (!publicProfile) return null;
+  const profile = detailed.data ?? publicProfile;
 
   return (
     <AppShell>
@@ -94,7 +105,19 @@ function NeighborProfilePage() {
             <div className="rule-print my-6" />
             <p className="max-w-prose text-base leading-relaxed">{profile.about}</p>
           </>
+        ) : !session ? (
+          <p className="mt-6 max-w-prose text-sm text-muted-foreground">
+            <Link to="/auth" className="underline underline-offset-4">
+              Sign in
+            </Link>{" "}
+            to see what neighbors write about themselves.
+          </p>
         ) : null}
+
+        <div className="mt-8 flex flex-wrap items-center gap-2">
+          <ReportButton targetType="profile" targetId={profileId} label="Report neighbor" />
+          <BlockButton neighborId={profileId} />
+        </div>
       </PageContainer>
     </AppShell>
   );
