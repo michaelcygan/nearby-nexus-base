@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-export type ReportTarget = "post" | "place" | "profile" | "thread";
+export type ReportTarget = "post" | "place" | "profile" | "thread" | "store_listing";
 export type ReportReason = "spam" | "unsafe" | "wrong_board" | "not_neighborly" | "other";
 export type ReportStatus = "open" | "dismissed" | "actioned";
 export type ModerationActionKind = "dismiss" | "hide" | "remove" | "restore";
 
-export const reportTargets = ["post", "place", "profile", "thread"] as const;
+export const reportTargets = ["post", "place", "profile", "thread", "store_listing"] as const;
 export const reportReasons = ["spam", "unsafe", "wrong_board", "not_neighborly", "other"] as const;
 
 export const reportReasonLabels: Record<ReportReason, string> = {
