@@ -3,6 +3,8 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { BlockButton } from "@/components/moderation/block-button";
+import { ReportButton } from "@/components/moderation/report-button";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { AppShell, PageContainer } from "@/components/layout/app-shell";
@@ -86,7 +88,13 @@ function ThreadPage() {
             Messages
           </Link>
         </p>
-        <h1 className="mt-2 text-2xl sm:text-3xl">{detail.other_name}</h1>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+          <h1 className="text-2xl sm:text-3xl">{detail.other_name}</h1>
+          <div className="flex items-center gap-1">
+            <ReportButton targetType="thread" targetId={detail.id} />
+            <BlockButton neighborId={detail.other_id} />
+          </div>
+        </div>
         <p className="mt-1 text-sm text-muted-foreground">
           About{" "}
           {detail.neighborhood_slug ? (
