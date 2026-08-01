@@ -7,6 +7,7 @@ import { ErrorState } from "@/components/common/error-state";
 import { PostListSkeleton } from "@/components/common/post-list-skeleton";
 import { neighborhoodPlacesQuery } from "@/features/neighborhoods/queries";
 import type { Place } from "@/features/neighborhoods/types";
+import { canonicalUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/n/$slug/directory")({
   loader: ({ params, context }) => {
