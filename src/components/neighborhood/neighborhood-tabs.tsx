@@ -5,6 +5,7 @@ const tabs = [
   { to: "/n/$slug/plans", label: "Plans", exact: false },
   { to: "/n/$slug/marketplace", label: "Marketplace", exact: false },
   { to: "/n/$slug/volunteer", label: "Volunteer", exact: false },
+  { to: "/n/$slug/store", label: "Store", exact: false },
   { to: "/n/$slug/directory", label: "Directory", exact: false },
 ] as const;
 
