@@ -14,11 +14,12 @@ export function SaveNeighborhoodButton({ neighborhoodId }: { neighborhoodId: str
 
   const isSaved = (saved.data ?? []).some((row) => row.neighborhood.id === neighborhoodId);
 
-  const toggle = useMutation({
-    mutationFn: () =>
+  const toggle = useMutation<{ saved: boolean }, Error>({
+    mutationFn: async () =>
       isSaved
         ? unsaveNeighborhood({ data: { neighborhoodId } })
         : saveNeighborhood({ data: { neighborhoodId } }),
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["my-saved-neighborhoods"] });
     },
