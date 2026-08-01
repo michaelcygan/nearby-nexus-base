@@ -19,6 +19,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as NSlugRouteImport } from './routes/n.$slug'
 import { Route as UProfileIdRouteImport } from './routes/u.$profileId'
+import { Route as AuthenticatedPostNewRouteImport } from './routes/_authenticated/post.new'
 import { Route as NSlugIndexRouteImport } from './routes/n.$slug.index'
 import { Route as NSlugDirectoryRouteImport } from './routes/n.$slug.directory'
 import { Route as NSlugMarketplaceRouteImport } from './routes/n.$slug.marketplace'
@@ -76,6 +77,11 @@ const UProfileIdRoute = UProfileIdRouteImport.update({
   path: '/u/$profileId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPostNewRoute = AuthenticatedPostNewRouteImport.update({
+  id: '/post/new',
+  path: '/post/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const NSlugIndexRoute = NSlugIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/n/$slug': typeof NSlugRouteWithChildren
   '/u/$profileId': typeof UProfileIdRoute
+  '/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/u/$profileId': typeof UProfileIdRoute
+  '/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/n/$slug': typeof NSlugRouteWithChildren
   '/u/$profileId': typeof UProfileIdRoute
+  '/_authenticated/post/new': typeof AuthenticatedPostNewRoute
   '/n/$slug/directory': typeof NSlugDirectoryRoute
   '/n/$slug/marketplace': typeof NSlugMarketplaceRoute
   '/n/$slug/plans': typeof NSlugPlansRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/n/$slug'
     | '/u/$profileId'
+    | '/post/new'
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/profile'
     | '/u/$profileId'
+    | '/post/new'
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/n/$slug'
     | '/u/$profileId'
+    | '/_authenticated/post/new'
     | '/n/$slug/directory'
     | '/n/$slug/marketplace'
     | '/n/$slug/plans'
@@ -308,6 +320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UProfileIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/post/new': {
+      id: '/_authenticated/post/new'
+      path: '/post/new'
+      fullPath: '/post/new'
+      preLoaderRoute: typeof AuthenticatedPostNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/n/$slug/': {
       id: '/n/$slug/'
       path: '/'
@@ -362,10 +381,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedPostNewRoute: typeof AuthenticatedPostNewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedPostNewRoute: AuthenticatedPostNewRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
