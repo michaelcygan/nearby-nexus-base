@@ -82,6 +82,11 @@ function CommunityLayout() {
             <p className="mt-2 text-sm uppercase tracking-[0.16em] text-muted-foreground">
               {placeLine(community)}
             </p>
+            {communitySubareaLine(community.slug) ? (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {communitySubareaLine(community.slug)}
+              </p>
+            ) : null}
             {community.tagline ? (
               <p className="mt-3 max-w-prose text-base text-muted-foreground">
                 {community.tagline}
