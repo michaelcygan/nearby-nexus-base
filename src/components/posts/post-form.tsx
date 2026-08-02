@@ -33,7 +33,10 @@ export type PostFormValues = {
   images: UploadedImage[];
 };
 
-export const emptyPostForm = (neighborhoodId = "", type: PostType = "bulletin"): PostFormValues => ({
+export const emptyPostForm = (
+  neighborhoodId = "",
+  type: PostType = "bulletin",
+): PostFormValues => ({
   neighborhood_id: neighborhoodId,
   type,
   title: "",
