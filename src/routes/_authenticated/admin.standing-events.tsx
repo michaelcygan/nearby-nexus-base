@@ -229,6 +229,29 @@ function AdminStandingEventsPage() {
     onError: () => toast.error("That event couldn't be marked verified."),
   });
 
+  const verifyImage = useMutation({
+    mutationFn: (eventId: string) => verifyStandingEventImage({ data: { eventId } }),
+    onSuccess: () => {
+      refresh();
+      toast.success("Image approved.");
+    },
+    onError: () => toast.error("That image couldn't be approved."),
+  });
+
+  const discover = useMutation({
+    mutationFn: (sourceUrl: string) => discoverStandingEventImages({ data: { sourceUrl } }),
+    onSuccess: (result) => {
+      setDiscoveredImages(result.candidates);
+      toast.success(
+        result.candidates.length
+          ? `Found ${result.candidates.length} image${result.candidates.length === 1 ? "" : "s"}.`
+          : "No images found on that page.",
+      );
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Image discovery failed."),
+  });
+
   const remove = useMutation({
     mutationFn: (eventId: string) => deleteStandingEvent({ data: { eventId } }),
     onSuccess: () => {
@@ -238,6 +261,17 @@ function AdminStandingEventsPage() {
     },
     onError: () => toast.error("That event couldn't be removed."),
   });
+
+  const handleDiscoverImages = async (sourceUrl: string) => {
+    if (!sourceUrl) return;
+    setDiscovering(true);
+    setDiscoveredImages(null);
+    try {
+      await discover.mutateAsync(sourceUrl);
+    } finally {
+      setDiscovering(false);
+    }
+  };
 
   if (admin.isLoading) {
     return (
