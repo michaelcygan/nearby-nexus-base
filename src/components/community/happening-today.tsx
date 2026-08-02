@@ -44,8 +44,15 @@ export function HappeningToday({ community }: { community: Neighborhood }) {
   const { start, end } = todayRange(now, community.timezone);
   const occurrences = getStandingEventOccurrences(series, start, end, community.timezone, now);
 
-  const local = occurrences.filter((occurrence) => !occurrence.isNearby);
-  const nearby = occurrences.filter((occurrence) => occurrence.isNearby);
+  // A brunch that ended hours ago isn't "happening today", so drop anything
+  // already finished. Without an end time, assume a two-hour night.
+  const stillOn = occurrences.filter((occurrence) => {
+    const end = occurrence.endsAt ?? new Date(occurrence.startsAt.getTime() + 2 * 60 * 60 * 1000);
+    return end.getTime() > now.getTime();
+  });
+
+  const local = stillOn.filter((occurrence) => !occurrence.isNearby);
+  const nearby = stillOn.filter((occurrence) => occurrence.isNearby);
   // Neighbors only fill space the community itself isn't using.
   const room = Math.max(0, LOCAL_TARGET - local.length);
   const shown = [...local, ...nearby.slice(0, room)].slice(0, MAX_SHOWN);
