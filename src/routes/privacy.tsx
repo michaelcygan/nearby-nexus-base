@@ -53,10 +53,12 @@ function Privacy() {
           <section>
             <h2 className="text-lg">NFC and QR access points</h2>
             <p className="mt-1 max-w-prose text-sm text-muted-foreground">
-              Physical stickers and signs point to a short link. When one is opened we increment a
-              daily count for that sticker so we know which ones are worth keeping. We do not store
-              your IP address, device identifier, or account against a scan, so scan counts can
-              never be traced back to a person.
+              Physical NFC chips and printed QR codes point to a short link such as
+              neighborhood.today/a/EW-001. Opening one adds 1 to that access point's total count,
+              records the time of the most recent scan, and sends you straight to the community
+              board. Nothing about you is stored: no IP address, no device fingerprint, no precise
+              location, and no account. The counts are aggregate only and can never be traced back
+              to a person.
             </p>
           </section>
           <section>
