@@ -7,6 +7,7 @@ import { AppShell, PageContainer } from "@/components/layout/app-shell";
 import { neighborhoodQuery } from "@/features/neighborhoods/queries";
 import { placeLine } from "@/features/neighborhoods/types";
 import { isReservedSlug } from "@/lib/reserved-slugs";
+import { communityKeywordsMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/$slug")({
   loader: async ({ params, context }) => {
