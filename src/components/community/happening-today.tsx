@@ -2,10 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { SectionHeading } from "@/components/community/section-heading";
 import { SectionPlaceholder } from "@/components/community/section-placeholder";
-import {
-  StandingEventList,
-  StandingEventRow,
-} from "@/components/community/standing-event-card";
+import { StandingEventList, StandingEventRow } from "@/components/community/standing-event-card";
 import { DEFAULT_RADIUS_MILES } from "@/features/discovery/types";
 import type { Neighborhood } from "@/features/neighborhoods/types";
 import { standingEventsQuery } from "@/features/standing-events/queries";

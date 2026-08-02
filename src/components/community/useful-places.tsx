@@ -20,7 +20,6 @@ export function UsefulPlaces({
   if (places.length === 0) return null;
   const preview = places.slice(0, PREVIEW_LIMIT);
 
-
   return (
     <section className="border-t border-border pt-6">
       <SectionHeading>Useful places</SectionHeading>

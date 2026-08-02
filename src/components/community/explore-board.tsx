@@ -4,7 +4,6 @@ import { SectionHeading } from "@/components/community/section-heading";
 import { PlaceholderBar } from "@/components/community/section-placeholder";
 import { boardViewLabels, type BoardView } from "@/features/neighborhoods/types";
 
-
 const ENTRIES: Array<{ view: Exclude<BoardView, "today">; countKey: CountKey; blurb: string }> = [
   { view: "plans", countKey: "plan", blurb: "Things happening you can turn up to" },
   { view: "marketplace", countKey: "marketplace", blurb: "Sold, lent, and given away nearby" },
@@ -48,7 +47,6 @@ export function ExploreBoard({ slug, counts }: { slug: string; counts: Counts | 
                   // Space is reserved so the row never reflows when counts land.
                   <PlaceholderBar className="h-3 w-4 shrink-0" />
                 )}
-
               </Link>
             </li>
           );
