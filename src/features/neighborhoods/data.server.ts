@@ -264,7 +264,7 @@ export async function fetchNeighborhoodCounts(
 ): Promise<{ plan: number; marketplace: number; volunteer: number; places: number }> {
   const supabase = createPublicSupabaseClient();
   const neighborhood = await fetchNeighborhoodBySlug(slug);
-  const empty = { plan: 0, marketplace: 0, volunteer: 0, places: 0 };
+  const empty = { bulletin: 0, plan: 0, marketplace: 0, volunteer: 0, places: 0 };
   if (!neighborhood) return empty;
 
   const postsQuery = visibleNow(
