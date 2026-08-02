@@ -105,7 +105,7 @@ export const verifyStandingEventImage = createServerFn({ method: "POST" })
     const today = new Date().toISOString().slice(0, 10);
     const { error } = await context.supabase
       .from("standing_events")
-      .update({ image_verified_at: today })
+      .update({ image_verified_at: today, verified_by: context.userId })
       .eq("id", data.eventId);
     if (error) throw new Error(error.message);
     return { image_verified_at: today };
