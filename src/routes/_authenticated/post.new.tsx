@@ -71,7 +71,7 @@ function NewPostPage() {
       queryClient.invalidateQueries({ queryKey: ["my-posts"] });
       toast.success("Posted to the board.");
       if (result.slug) {
-        navigate({ to: "/n/$slug/p/$postId", params: { slug: result.slug, postId: result.id } });
+        navigate({ to: "/$slug/p/$postId", params: { slug: result.slug, postId: result.id } });
       } else {
         navigate({ to: "/posts" });
       }
