@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { standingEventCategories } from "./types";
+import { standingEventCategories, type StandingEventCategory } from "./types";
 
 /** Wall-clock time as typed in the admin form: "19:30". */
 const wallClock = z
