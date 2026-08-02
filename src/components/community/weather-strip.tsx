@@ -31,9 +31,7 @@ export function WeatherStrip({
     );
   }
 
-
   if (!weather) return null;
-
 
   const temperature = weather.observedTemperatureF ?? weather.forecastTemperatureF;
   const parts: string[] = [];

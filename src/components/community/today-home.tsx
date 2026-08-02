@@ -4,6 +4,7 @@ import { AboutCommunity } from "@/components/community/about-community";
 import { AroundCommunity } from "@/components/community/around-community";
 import { CityPulse } from "@/components/community/city-pulse";
 import { ExploreBoard } from "@/components/community/explore-board";
+import { HappeningToday } from "@/components/community/happening-today";
 import { NearbyToday, PostGrid, useVisibleLocalPosts } from "@/components/community/board-posts";
 
 import { QuietBoardEmpty } from "@/components/community/quiet-board-empty";
@@ -64,6 +65,8 @@ export function TodayHome({ community }: { community: Neighborhood }) {
         {shown.length < TODAY_POST_LIMIT ? (
           <NearbyToday community={community} localVisibleCount={shown.length} />
         ) : null}
+
+        <HappeningToday community={community} />
 
         <ExploreBoard slug={community.slug} counts={counts.data} />
 

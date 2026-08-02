@@ -8,6 +8,7 @@ import { PostListSkeleton } from "@/components/common/post-list-skeleton";
 import { PostToCommunity } from "@/components/community/post-to-community";
 import { ScopeControl } from "@/components/community/scope-control";
 import { SectionHeading } from "@/components/community/section-heading";
+import { StandingEventsList } from "@/components/community/standing-events-list";
 import { TodayHome } from "@/components/community/today-home";
 import { type DiscoveryScope, type RadiusMiles } from "@/features/discovery/types";
 import { neighborhoodPlacesQuery, scopedPostsQuery } from "@/features/neighborhoods/queries";
@@ -132,6 +133,13 @@ function ScopedPostList({
           ) : null}
         </div>
       )}
+
+      {/* Venue-run recurring nights: below neighbor plans, and always separated. */}
+      {view === "plans" ? (
+        <div className="mt-8">
+          <StandingEventsList community={community} />
+        </div>
+      ) : null}
     </div>
   );
 }
