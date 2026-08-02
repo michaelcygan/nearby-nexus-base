@@ -15,7 +15,9 @@ import {
 import { roleForPostType, roleLabels } from "@/features/participation/types";
 import { useSession } from "@/hooks/use-session";
 
+/** Bulletin posts have no sign-up, so they show no participation count. */
 function spotsLine(post: PostDetail) {
+  if (post.type === "bulletin") return null;
   if (post.type === "plan") {
     if (post.capacity) return `${post.going_count} of ${post.capacity} spots taken`;
     return post.going_count === 1 ? "1 neighbor going" : `${post.going_count} neighbors going`;
@@ -45,9 +47,19 @@ export function ParticipationBlock({ post }: { post: PostDetail }) {
   return (
     <section className="mt-8 rounded-md border border-border bg-card p-5">
       <h3 className="font-display text-base font-semibold">
-        {post.type === "marketplace" ? "Interested?" : "Join in"}
+        {post.type === "bulletin"
+          ? "Reach out"
+          : post.type === "marketplace"
+            ? "Interested?"
+            : "Join in"}
       </h3>
-      <p className="mt-1 text-sm text-muted-foreground">{spotsLine(post)}</p>
+      {spotsLine(post) ? (
+        <p className="mt-1 text-sm text-muted-foreground">{spotsLine(post)}</p>
+      ) : (
+        <p className="mt-1 text-sm text-muted-foreground">
+          Send the author a private message about this post.
+        </p>
+      )}
 
       {loading ? (
         <div className="mt-4 h-9" aria-hidden />
@@ -55,13 +67,15 @@ export function ParticipationBlock({ post }: { post: PostDetail }) {
         <div className="mt-4">
           <Button asChild size="sm" variant="outline">
             <Link to="/auth">
-              {post.type === "marketplace" ? "Sign in to message" : "Sign in to join"}
+              {post.type === "marketplace" || post.type === "bulletin"
+                ? "Sign in to message"
+                : "Sign in to join"}
             </Link>
           </Button>
         </div>
       ) : isAuthor ? (
         <AuthorParticipants postId={post.id} />
-      ) : post.type === "marketplace" ? (
+      ) : post.type === "marketplace" || post.type === "bulletin" ? (
         <MessageAuthorForm post={post} />
       ) : (
         <JoinControls post={post} />
@@ -164,11 +178,19 @@ function MessageAuthorForm({ post }: { post: PostDetail }) {
         onChange={(event) => setBody(event.target.value)}
         rows={3}
         maxLength={2000}
-        placeholder="Is this still available? I could pick it up this weekend."
-        aria-label="Message to the seller"
+        placeholder={
+          post.type === "marketplace"
+            ? "Is this still available? I could pick it up this weekend."
+            : "Say hello, or ask the author a question."
+        }
+        aria-label="Private message to the author"
       />
       <Button type="submit" size="sm" disabled={start.isPending}>
-        {start.isPending ? "Sending…" : "Message the seller"}
+        {start.isPending
+          ? "Sending…"
+          : post.type === "marketplace"
+            ? "Message the seller"
+            : "Reach out"}
       </Button>
     </form>
   );
