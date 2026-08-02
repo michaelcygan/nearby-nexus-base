@@ -44,6 +44,12 @@ function isoDaysFromNow(days: number) {
   return new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 19);
 }
 
+/** Socrata "URL" columns arrive as `{ url, description }`, not a bare string. */
+const linkSchema = z
+  .union([z.string(), z.object({ url: z.string().optional() })])
+  .nullish()
+  .transform((value) => (typeof value === "string" ? value : (value?.url ?? undefined)));
+
 const librarySchema = z
   .array(
     z.object({
@@ -51,7 +57,7 @@ const librarySchema = z
       title: z.string().optional(),
       event_types: z.string().optional(),
       event_audiences: z.string().optional(),
-      event_page: z.string().optional(),
+      event_page: linkSchema,
       location_name: z.string().optional(),
       start: z.string().optional(),
     }),
@@ -68,7 +74,7 @@ const parkSchema = z
       location_facility: z.string().optional(),
       age_range: z.string().optional(),
       fee: z.string().optional(),
-      information_link: z.string().optional(),
+      information_link: linkSchema,
     }),
   )
   .default([]);
@@ -92,7 +98,7 @@ export async function fetchLibraryEvents({
       `within_circle(location, ${lat}, ${lng}, ${RADIUS_METERS})`,
       `start > '${nowIso}'`,
       `start < '${isoDaysFromNow(LIBRARY_WINDOW_DAYS)}'`,
-      "(cancelled IS NULL OR upper(cancelled) != 'TRUE')",
+      "(cancelled IS NULL OR cancelled = false)",
     ].join(" AND "),
     $order: "start ASC",
     $limit: "6",
@@ -131,8 +137,11 @@ export async function fetchParkActivities({
   const url = endpoint(PARK_DATASET, {
     $select:
       "activity_id,title,start_date,date_notes,location_facility,age_range,fee,information_link",
-    $where: `within_circle(location, ${lat}, ${lng}, ${RADIUS_METERS})`,
-    $order: "start_date DESC",
+    $where: [
+      `within_circle(location, ${lat}, ${lng}, ${RADIUS_METERS})`,
+      `start_date > '${new Date().toISOString().slice(0, 19)}'`,
+    ].join(" AND "),
+    $order: "start_date ASC",
     $limit: "6",
   });
 

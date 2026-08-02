@@ -78,6 +78,7 @@ export function plainText(value: unknown, maxLength = 240): string {
 /** Only ever allow the two official hosts we integrate with. */
 const ALLOWED_LINK_HOSTS = new Set([
   "chipublib.org",
+  "chipublib.bibliocommons.com",
   "www.chipublib.org",
   "chicagoparkdistrict.com",
   "www.chicagoparkdistrict.com",
