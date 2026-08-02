@@ -15,7 +15,7 @@ import type { StandingEvent, StandingEventSeries } from "./types";
  */
 
 const PUBLIC_COLUMNS =
-  "id, source_key, neighborhood_id, place_id, venue_name, venue_address, title, description, category, days_of_week, start_time, end_time, end_day_offset, timezone, source_url, image_url, image_attribution, exception_note, starts_on, ends_on, excluded_dates, status, last_verified_at";
+  "id, source_key, neighborhood_id, place_id, venue_name, venue_address, title, description, category, days_of_week, start_time, end_time, end_day_offset, timezone, source_url, image_url, image_attribution, exception_note, starts_on, ends_on, excluded_dates, status, last_verified_at, image_verified_at";
 
 function normalizeRow(row: unknown): StandingEvent {
   const event = row as StandingEvent;

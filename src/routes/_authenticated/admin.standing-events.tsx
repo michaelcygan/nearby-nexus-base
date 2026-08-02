@@ -21,9 +21,11 @@ import { myAdminStatusQuery } from "@/features/directory/queries";
 import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
 import {
   deleteStandingEvent,
+  discoverStandingEventImages,
   saveStandingEvent,
   setStandingEventStatus,
   verifyStandingEvent,
+  verifyStandingEventImage,
 } from "@/features/standing-events/admin.functions";
 import { adminStandingEventsQuery } from "@/features/standing-events/queries";
 import { standingEventInputSchema } from "@/features/standing-events/schemas";
@@ -166,9 +168,12 @@ function AdminStandingEventsPage() {
   const admin = useQuery(myAdminStatusQuery());
   const { data: neighborhoods } = useSuspenseQuery(neighborhoodsQuery());
   const [boardValue, setBoardValue] = useState(neighborhoods[0]?.id ?? UNASSIGNED);
+  const [verifiedFilter, setVerifiedFilter] = useState<"all" | "verified" | "stale">("all");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [values, setValues] = useState<FormValues>(emptyEvent);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [discoveredImages, setDiscoveredImages] = useState<string[] | null>(null);
+  const [discovering, setDiscovering] = useState(false);
 
   const neighborhoodId = boardValue === UNASSIGNED ? null : boardValue;
 
@@ -224,6 +229,29 @@ function AdminStandingEventsPage() {
     onError: () => toast.error("That event couldn't be marked verified."),
   });
 
+  const verifyImage = useMutation({
+    mutationFn: (eventId: string) => verifyStandingEventImage({ data: { eventId } }),
+    onSuccess: () => {
+      refresh();
+      toast.success("Image approved.");
+    },
+    onError: () => toast.error("That image couldn't be approved."),
+  });
+
+  const discover = useMutation({
+    mutationFn: (sourceUrl: string) => discoverStandingEventImages({ data: { sourceUrl } }),
+    onSuccess: (result) => {
+      setDiscoveredImages(result.candidates);
+      toast.success(
+        result.candidates.length
+          ? `Found ${result.candidates.length} image${result.candidates.length === 1 ? "" : "s"}.`
+          : "No images found on that page.",
+      );
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "Image discovery failed."),
+  });
+
   const remove = useMutation({
     mutationFn: (eventId: string) => deleteStandingEvent({ data: { eventId } }),
     onSuccess: () => {
@@ -233,6 +261,17 @@ function AdminStandingEventsPage() {
     },
     onError: () => toast.error("That event couldn't be removed."),
   });
+
+  const handleDiscoverImages = async (sourceUrl: string) => {
+    if (!sourceUrl) return;
+    setDiscovering(true);
+    setDiscoveredImages(null);
+    try {
+      await discover.mutateAsync(sourceUrl);
+    } finally {
+      setDiscovering(false);
+    }
+  };
 
   if (admin.isLoading) {
     return (
@@ -295,27 +334,45 @@ function AdminStandingEventsPage() {
           current.
         </p>
 
-        <div className="mt-6 max-w-xs">
-          <Label htmlFor="board">Board</Label>
-          <Select
-            value={boardValue}
-            onValueChange={(value) => {
-              setBoardValue(value);
-              reset();
-            }}
-          >
-            <SelectTrigger id="board" className="mt-1.5">
-              <SelectValue placeholder="Pick a board" />
-            </SelectTrigger>
-            <SelectContent>
-              {neighborhoods.map((neighborhood) => (
-                <SelectItem key={neighborhood.id} value={neighborhood.id}>
-                  {neighborhood.name}
-                </SelectItem>
-              ))}
-              <SelectItem value={UNASSIGNED}>Unassigned (held drafts)</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 sm:items-end">
+          <div>
+            <Label htmlFor="board">Board</Label>
+            <Select
+              value={boardValue}
+              onValueChange={(value) => {
+                setBoardValue(value);
+                reset();
+              }}
+            >
+              <SelectTrigger id="board" className="mt-1.5">
+                <SelectValue placeholder="Pick a board" />
+              </SelectTrigger>
+              <SelectContent>
+                {neighborhoods.map((neighborhood) => (
+                  <SelectItem key={neighborhood.id} value={neighborhood.id}>
+                    {neighborhood.name}
+                  </SelectItem>
+                ))}
+                <SelectItem value={UNASSIGNED}>Unassigned (held drafts)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="verified-filter">Verification</Label>
+            <Select
+              value={verifiedFilter}
+              onValueChange={(value) => setVerifiedFilter(value as typeof verifiedFilter)}
+            >
+              <SelectTrigger id="verified-filter" className="mt-1.5">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All events</SelectItem>
+                <SelectItem value="verified">Verified within 30 days</SelectItem>
+                <SelectItem value="stale">Needs a re-check</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <form onSubmit={submit} className="mt-8 max-w-2xl space-y-4">
@@ -473,16 +530,53 @@ function AdminStandingEventsPage() {
               />
               {fieldError("timezone")}
             </div>
-            <div>
+            <div className="relative">
               <Label htmlFor="image_url">Image URL (optional)</Label>
-              <Input
-                id="image_url"
-                className="mt-1.5"
-                placeholder="https://"
-                value={values.image_url}
-                onChange={(event) => setValues({ ...values, image_url: event.target.value })}
-              />
+              <div className="mt-1.5 flex gap-2">
+                <Input
+                  id="image_url"
+                  className="flex-1"
+                  placeholder="https://"
+                  value={values.image_url}
+                  onChange={(event) => setValues({ ...values, image_url: event.target.value })}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => handleDiscoverImages(values.source_url)}
+                  disabled={discovering || !values.source_url}
+                >
+                  {discovering ? "Looking…" : "Discover"}
+                </Button>
+              </div>
               {fieldError("image_url")}
+              {discoveredImages && (
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {discoveredImages.map((url) => (
+                    <button
+                      key={url}
+                      type="button"
+                      onClick={() => setValues({ ...values, image_url: url })}
+                      className="group relative overflow-hidden rounded border border-border text-left"
+                    >
+                      <img
+                        src={url}
+                        alt="Discovered image"
+                        className="h-24 w-full object-cover"
+                        loading="lazy"
+                      />
+                      <span className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                        Use this image
+                      </span>
+                    </button>
+                  ))}
+                  {discoveredImages.length === 0 && (
+                    <p className="col-span-3 text-sm text-muted-foreground">
+                      No images found on that page.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <Label htmlFor="image_attribution">Image credit (optional)</Label>
@@ -579,82 +673,103 @@ function AdminStandingEventsPage() {
             <p className="mt-4 text-muted-foreground">Nothing curated here yet.</p>
           ) : (
             <ul className="mt-4 divide-y divide-border">
-              {(events.data ?? []).map((event) => {
-                const stale = isStaleVerification(event.last_verified_at);
-                return (
-                  <li key={event.id} className="py-4">
-                    <div className="flex flex-wrap items-baseline gap-x-2">
-                      <h3 className="text-base">{event.title}</h3>
-                      <span className="text-sm text-muted-foreground">{event.venue_name}</span>
-                      <span className="text-xs uppercase tracking-wide text-muted-foreground">
-                        {event.status}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {cadenceLabelFor({
-                        ...event,
-                        origin: { slug: "", name: "", isNearby: false },
-                      })}
-                      {" · "}
-                      {standingEventCategoryLabels[event.category]}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {event.last_verified_at
-                        ? `Verified ${event.last_verified_at}`
-                        : "Never verified"}
-                      {stale ? " — needs a re-check" : ""}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-3 text-sm">
-                      <button
-                        type="button"
-                        className="underline underline-offset-4"
-                        onClick={() => {
-                          setEditingId(event.id);
-                          setValues(toForm(event));
-                          setErrors({});
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        className="underline underline-offset-4"
-                        onClick={() => verify.mutate(event.id)}
-                      >
-                        Mark verified
-                      </button>
-                      <button
-                        type="button"
-                        className="underline underline-offset-4"
-                        onClick={() =>
-                          changeStatus.mutate({
-                            eventId: event.id,
-                            status: event.status === "active" ? "paused" : "active",
-                          })
-                        }
-                      >
-                        {event.status === "active" ? "Pause" : "Make active"}
-                      </button>
-                      <a
-                        href={event.source_url}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="underline underline-offset-4"
-                      >
-                        Open source
-                      </a>
-                      <button
-                        type="button"
-                        className="text-destructive underline underline-offset-4"
-                        onClick={() => remove.mutate(event.id)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
+              {(events.data ?? [])
+                .filter((event) => {
+                  if (verifiedFilter === "all") return true;
+                  const stale = isStaleVerification(event.last_verified_at);
+                  if (verifiedFilter === "stale") return stale;
+                  return !stale;
+                })
+                .map((event) => {
+                  const stale = isStaleVerification(event.last_verified_at);
+                  const imageStale = isStaleVerification(event.image_verified_at);
+                  return (
+                    <li key={event.id} className="py-4">
+                      <div className="flex flex-wrap items-baseline gap-x-2">
+                        <h3 className="text-base">{event.title}</h3>
+                        <span className="text-sm text-muted-foreground">{event.venue_name}</span>
+                        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                          {event.status}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {cadenceLabelFor({
+                          ...event,
+                          origin: { slug: "", name: "", isNearby: false },
+                        })}
+                        {" · "}
+                        {standingEventCategoryLabels[event.category]}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {event.last_verified_at
+                          ? `Verified ${event.last_verified_at}`
+                          : "Never verified"}
+                        {stale ? " — needs a re-check" : ""}
+                        {event.image_url
+                          ? ` · Image ${event.image_verified_at ? event.image_verified_at : "unapproved"}`
+                          : ""}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-3 text-sm">
+                        <button
+                          type="button"
+                          className="underline underline-offset-4"
+                          onClick={() => {
+                            setEditingId(event.id);
+                            setValues(toForm(event));
+                            setErrors({});
+                            setDiscoveredImages(null);
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="underline underline-offset-4"
+                          onClick={() => verify.mutate(event.id)}
+                        >
+                          Mark verified
+                        </button>
+                        {event.image_url && imageStale ? (
+                          <button
+                            type="button"
+                            className="underline underline-offset-4"
+                            onClick={() => verifyImage.mutate(event.id)}
+                          >
+                            Approve image
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          className="underline underline-offset-4"
+                          onClick={() =>
+                            changeStatus.mutate({
+                              eventId: event.id,
+                              status: event.status === "active" ? "paused" : "active",
+                            })
+                          }
+                        >
+                          {event.status === "active" ? "Pause" : "Make active"}
+                        </button>
+                        <a
+                          href={event.source_url}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="underline underline-offset-4"
+                        >
+                          Open source
+                        </a>
+                        <button
+                          type="button"
+                          className="text-destructive underline underline-offset-4"
+                          onClick={() => remove.mutate(event.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
             </ul>
           )}
         </section>

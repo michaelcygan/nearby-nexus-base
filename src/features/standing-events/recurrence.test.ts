@@ -32,6 +32,7 @@ const base: StandingEventSeries = {
   excluded_dates: [],
   status: "active",
   last_verified_at: "2026-08-01",
+  image_verified_at: null,
   origin: { slug: "edgewater", name: "Edgewater", isNearby: false },
 };
 

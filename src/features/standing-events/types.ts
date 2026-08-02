@@ -40,6 +40,7 @@ export type StandingEvent = {
   excluded_dates: string[];
   status: StandingEventStatus;
   last_verified_at: string | null;
+  image_verified_at: string | null;
 };
 
 /** Where a series sits relative to the board being viewed. */
