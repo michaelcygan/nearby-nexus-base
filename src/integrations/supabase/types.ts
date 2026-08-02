@@ -484,6 +484,7 @@ export type Database = {
           id: string
           image_attribution: string | null
           image_url: string | null
+          image_verified_at: string | null
           last_verified_at: string | null
           neighborhood_id: string | null
           origin: string
@@ -514,6 +515,7 @@ export type Database = {
           id?: string
           image_attribution?: string | null
           image_url?: string | null
+          image_verified_at?: string | null
           last_verified_at?: string | null
           neighborhood_id?: string | null
           origin?: string
@@ -544,6 +546,7 @@ export type Database = {
           id?: string
           image_attribution?: string | null
           image_url?: string | null
+          image_verified_at?: string | null
           last_verified_at?: string | null
           neighborhood_id?: string | null
           origin?: string
