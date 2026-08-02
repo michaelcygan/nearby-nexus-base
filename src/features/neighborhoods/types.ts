@@ -23,7 +23,6 @@ export type Neighborhood = {
   civic_area_codes: string[];
 };
 
-
 /** The smallest shape a component needs to render a community's content. */
 export type CommunityRef = {
   slug: string;

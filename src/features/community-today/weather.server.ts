@@ -114,7 +114,9 @@ async function loadPoint(lat: number, lng: number) {
     let stationId: string | null = null;
     if (stationsUrl) {
       try {
-        const stations = stationsSchema.parse(await fetchJson({ url: stationsUrl, headers: HEADERS }));
+        const stations = stationsSchema.parse(
+          await fetchJson({ url: stationsUrl, headers: HEADERS }),
+        );
         stationId = stations.features[0]?.properties.stationIdentifier ?? null;
       } catch {
         stationId = null;
@@ -177,7 +179,8 @@ export async function fetchCommunityWeather({
     loadAlerts(lat, lng),
   ]);
 
-  const periods = forecastResult.status === "fulfilled" ? forecastResult.value.properties.periods : [];
+  const periods =
+    forecastResult.status === "fulfilled" ? forecastResult.value.properties.periods : [];
   const current = periods[0];
   const upcoming = periods.slice(0, 2);
   const daytime = upcoming.find((period) => period.isDaytime === true);

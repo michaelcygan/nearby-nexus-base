@@ -39,9 +39,7 @@ export function AroundCommunity({
                 {item.title}
               </a>
               {when ? <p className="mt-1 text-sm text-muted-foreground">{when}</p> : null}
-              {details ? (
-                <p className="mt-0.5 text-sm text-muted-foreground">{details}</p>
-              ) : null}
+              {details ? <p className="mt-0.5 text-sm text-muted-foreground">{details}</p> : null}
               <p className="mt-1 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
                 {item.source}
               </p>

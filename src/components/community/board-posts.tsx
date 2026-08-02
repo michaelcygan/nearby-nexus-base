@@ -2,10 +2,7 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { SectionHeading } from "@/components/community/section-heading";
 import { PostCard } from "@/components/neighborhood/post-card";
-import {
-  DEFAULT_RADIUS_MILES,
-  type ScopedPost,
-} from "@/features/discovery/types";
+import { DEFAULT_RADIUS_MILES, type ScopedPost } from "@/features/discovery/types";
 import { myBlockedIdsQuery } from "@/features/moderation/queries";
 import { scopedPostsQuery } from "@/features/neighborhoods/queries";
 import type { Neighborhood, PostType } from "@/features/neighborhoods/types";

@@ -11,10 +11,7 @@ import { SectionHeading } from "@/components/community/section-heading";
 import { UsefulPlaces } from "@/components/community/useful-places";
 import { WeatherStrip } from "@/components/community/weather-strip";
 import { communityTodayQuery } from "@/features/community-today/queries";
-import {
-  neighborhoodCountsQuery,
-  neighborhoodPlacesQuery,
-} from "@/features/neighborhoods/queries";
+import { neighborhoodCountsQuery, neighborhoodPlacesQuery } from "@/features/neighborhoods/queries";
 import type { Neighborhood } from "@/features/neighborhoods/types";
 
 /** Today shows a taste of the board; the Plans/Marketplace/Help tabs show all. */
