@@ -21,9 +21,11 @@ import { myAdminStatusQuery } from "@/features/directory/queries";
 import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
 import {
   deleteStandingEvent,
+  discoverStandingEventImages,
   saveStandingEvent,
   setStandingEventStatus,
   verifyStandingEvent,
+  verifyStandingEventImage,
 } from "@/features/standing-events/admin.functions";
 import { adminStandingEventsQuery } from "@/features/standing-events/queries";
 import { standingEventInputSchema } from "@/features/standing-events/schemas";
