@@ -7,14 +7,7 @@
  */
 
 export type StandingEventCategory =
-  | "trivia"
-  | "karaoke"
-  | "bingo"
-  | "games"
-  | "drag"
-  | "live_music"
-  | "show_tunes"
-  | "nightlife";
+  "trivia" | "karaoke" | "bingo" | "games" | "drag" | "live_music" | "show_tunes" | "nightlife";
 
 export type StandingEventStatus = "draft" | "active" | "paused";
 

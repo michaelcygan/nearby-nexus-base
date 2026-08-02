@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { cadenceLabelFor, getStandingEventOccurrences, todayRange, upcomingRange } from "./recurrence";
+import {
+  cadenceLabelFor,
+  getStandingEventOccurrences,
+  todayRange,
+  upcomingRange,
+} from "./recurrence";
 import type { StandingEventSeries } from "./types";
 
 const base: StandingEventSeries = {
@@ -128,7 +133,13 @@ describe("getStandingEventOccurrences", () => {
     const { start, end } = upcomingRange(now, CHICAGO, 7);
 
     expect(
-      getStandingEventOccurrences([series({ excluded_dates: ["2026-08-04"] })], start, end, CHICAGO, now),
+      getStandingEventOccurrences(
+        [series({ excluded_dates: ["2026-08-04"] })],
+        start,
+        end,
+        CHICAGO,
+        now,
+      ),
     ).toHaveLength(0);
     expect(
       getStandingEventOccurrences([series({ starts_on: "2026-08-05" })], start, end, CHICAGO, now),

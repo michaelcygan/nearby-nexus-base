@@ -3,9 +3,7 @@ import { z } from "zod";
 import { standingEventCategories, type StandingEventCategory } from "./types";
 
 /** Wall-clock time as typed in the admin form: "19:30". */
-const wallClock = z
-  .string()
-  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use a 24-hour time like 19:30.");
+const wallClock = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use a 24-hour time like 19:30.");
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use a date like 2026-08-01.");
 
@@ -36,9 +34,7 @@ export const standingEventInputSchema = z.object({
   venue_address: optionalText(160),
   title: z.string().trim().min(2).max(140),
   description: optionalText(600),
-  category: z.enum(
-    standingEventCategories as [StandingEventCategory, ...StandingEventCategory[]],
-  ),
+  category: z.enum(standingEventCategories as [StandingEventCategory, ...StandingEventCategory[]]),
   days_of_week: z.array(z.number().int().min(0).max(6)).min(1).max(7),
   start_time: wallClock,
   end_time: wallClock.nullable().optional().default(null),

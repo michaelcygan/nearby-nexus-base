@@ -1,11 +1,6 @@
 import { TZDate } from "@date-fns/tz";
 
-import {
-  weekdayNames,
-  weekdayShortNames,
-  type StandingEventSeries,
-  type Weekday,
-} from "./types";
+import { weekdayNames, weekdayShortNames, type StandingEventSeries, type Weekday } from "./types";
 
 /**
  * The single recurrence primitive.
