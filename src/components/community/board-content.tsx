@@ -201,14 +201,11 @@ function TodayBoard({ community }: { community: Neighborhood }) {
   return (
     <div>
       {local.length === 0 ? (
-        <div className="mt-6">
-          <EmptyState
-            title={`The ${community.name} board is ready. Be the first neighbor to post.`}
-            action={<PostToCommunity slug={community.slug} name={community.name} size="sm" />}
-          />
+        <div className="mt-5">
+          <QuietBoardEmpty slug={community.slug} />
         </div>
       ) : (
-        <div className="mt-6">
+        <div className="mt-5">
           <PostGrid posts={local} timeZone={community.timezone} />
         </div>
       )}
