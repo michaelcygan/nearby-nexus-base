@@ -83,8 +83,9 @@ export function StandingEventsList({
       </p>
 
       <div className="mt-4 space-y-5">
-        {cappedDays.map((day) => (
-          <div key={day.label}>
+        {cappedDays.map((day, index) => (
+          <div key={`${day.label}-${index}`}>
+
             <h3 className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               {day.label}
             </h3>
