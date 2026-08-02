@@ -101,8 +101,8 @@ function PostGrid({
   showOrigin,
 }: {
   posts: ScopedPost[];
-  timeZone?: string;
-  showOrigin?: boolean;
+  timeZone?: string | undefined;
+  showOrigin?: boolean | undefined;
 }) {
   return (
     <ul className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -153,11 +153,12 @@ function ScopedPostList({
                 ? `Nothing posted within reach of ${community.name} yet.`
                 : `Nothing here yet on the ${community.name} board.`
             }
-            description={
-              broader && !data.nearbyAvailable
-                ? "We don't have enough information about neighboring communities yet, so this is showing the local board."
-                : undefined
-            }
+            {...(broader && !data.nearbyAvailable
+              ? {
+                  description:
+                    "We don't have enough information about neighboring communities yet, so this is showing the local board.",
+                }
+              : {})}
             action={<PostToCommunity slug={community.slug} name={community.name} size="sm" />}
           />
         </div>

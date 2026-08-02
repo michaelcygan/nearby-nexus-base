@@ -49,8 +49,8 @@ export function PostCard({
   showOrigin = false,
 }: {
   post: ScopedPost;
-  timeZone?: string;
-  showOrigin?: boolean;
+  timeZone?: string | undefined;
+  showOrigin?: boolean | undefined;
 }) {
   const zone = timeZone ?? post.origin.timezone;
   const meta = metaFor(post, zone).filter(Boolean) as string[];
