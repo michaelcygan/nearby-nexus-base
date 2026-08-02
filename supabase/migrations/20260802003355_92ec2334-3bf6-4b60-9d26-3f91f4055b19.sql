@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.is_published_community(uuid) TO anon, authenticated;
