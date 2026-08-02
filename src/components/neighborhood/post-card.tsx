@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
+import { formatMiles } from "@/features/discovery/distance";
+import type { ScopedPost } from "@/features/discovery/types";
 import {
   formatDate,
   formatDateTime,
@@ -37,22 +39,35 @@ function metaFor(post: PostSummary, timeZone: string) {
   ];
 }
 
+/**
+ * A card always links to the community the post actually belongs to. When a
+ * card is shown outside its own community it says so, quietly.
+ */
 export function PostCard({
   post,
-  slug,
   timeZone,
+  showOrigin = false,
 }: {
-  post: PostSummary;
-  slug: string;
-  timeZone: string;
+  post: ScopedPost;
+  timeZone?: string;
+  showOrigin?: boolean;
 }) {
-  const meta = metaFor(post, timeZone).filter(Boolean) as string[];
+  const zone = timeZone ?? post.origin.timezone;
+  const meta = metaFor(post, zone).filter(Boolean) as string[];
+  const originLine = showOrigin
+    ? [
+        `From ${post.origin.name}`,
+        post.distance_miles === null ? null : `${formatMiles(post.distance_miles)} mi`,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : null;
 
   return (
     <li className="rounded-md border border-border bg-card transition-colors hover:border-primary/50">
       <Link
         to="/$slug/p/$postId"
-        params={{ slug, postId: post.id }}
+        params={{ slug: post.origin.slug, postId: post.id }}
         className="block rounded-md p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <p className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-primary">
@@ -68,6 +83,9 @@ export function PostCard({
         ) : null}
         <h3 className="mt-2 font-display text-lg font-semibold leading-snug">{post.title}</h3>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.body}</p>
+        {originLine ? (
+          <p className="mt-2 text-xs font-medium text-muted-foreground">{originLine}</p>
+        ) : null}
         <p className="mt-2 text-xs text-muted-foreground">
           Posted by {post.author_name ?? "a neighbor"}
         </p>
