@@ -7,7 +7,11 @@ import { AppShell, PageContainer } from "@/components/layout/app-shell";
 import { neighborhoodQuery } from "@/features/neighborhoods/queries";
 import { placeLine } from "@/features/neighborhoods/types";
 import { isReservedSlug } from "@/lib/reserved-slugs";
-import { communityKeywordsMeta } from "@/lib/seo";
+import {
+  communityDescription,
+  communityKeywordsMeta,
+  communitySubareaLine,
+} from "@/lib/seo";
 
 export const Route = createFileRoute("/$slug")({
   loader: async ({ params, context }) => {
@@ -26,7 +30,7 @@ export const Route = createFileRoute("/$slug")({
     }
     const { community } = loaderData;
     const title = `${community.name} Today — Neighborhood Today`;
-    const description = `The free public bulletin board for ${community.name}, ${community.city}. Find neighborhood plans, marketplace posts, requests for help, and useful local places.`;
+    const description = communityDescription(community.slug, community.name, community.city);
     return {
       meta: [
         { title },
@@ -78,6 +82,11 @@ function CommunityLayout() {
             <p className="mt-2 text-sm uppercase tracking-[0.16em] text-muted-foreground">
               {placeLine(community)}
             </p>
+            {communitySubareaLine(community.slug) ? (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {communitySubareaLine(community.slug)}
+              </p>
+            ) : null}
             {community.tagline ? (
               <p className="mt-3 max-w-prose text-base text-muted-foreground">
                 {community.tagline}

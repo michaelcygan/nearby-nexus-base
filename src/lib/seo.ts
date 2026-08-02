@@ -26,9 +26,46 @@ const communityKeywords: Record<string, string[]> = {
     "Armitage",
     "Lincoln Avenue Chicago",
   ],
+  lakeview: [
+    "Lakeview",
+    "Lake View",
+    "Lakeview Chicago",
+    "Lakeview East",
+    "East Lakeview",
+    "Northalsted",
+    "Wrigleyville",
+    "Wrigley",
+  ],
 };
 
 export function communityKeywordsMeta(slug: string, name: string, city: string) {
   const terms = communityKeywords[slug] ?? [name, `${name} ${city}`];
   return { name: "keywords", content: terms.join(", ") };
 }
+
+/**
+ * Quiet secondary context printed under the community name for boards that
+ * cover several familiar sub-areas. Not navigation — one line of plain text.
+ */
+const communitySubareas: Record<string, string[]> = {
+  lakeview: ["Lakeview East", "Northalsted", "Wrigleyville"],
+};
+
+export function communitySubareaLine(slug: string) {
+  const areas = communitySubareas[slug];
+  return areas?.length ? areas.join(" · ") : null;
+}
+
+/** Per-community description override; otherwise the shared wording. */
+const communityDescriptions: Record<string, string> = {
+  lakeview:
+    "The free public bulletin board for Lakeview, including Lakeview East, Northalsted, and Wrigleyville. Find plans, marketplace posts, requests for help, and useful neighborhood places.",
+};
+
+export function communityDescription(slug: string, name: string, city: string) {
+  return (
+    communityDescriptions[slug] ??
+    `The free public bulletin board for ${name}, ${city}. Find neighborhood plans, marketplace posts, requests for help, and useful local places.`
+  );
+}
+

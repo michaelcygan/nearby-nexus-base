@@ -1,55 +1,52 @@
+## What's already in place
 
-# Lincoln Park, Chicago — next production community
+I checked the database and code: published communities today are **Edgewater** and **Lincoln Park** (Pittsburgh's Lawrenceville, Bloomfield, Polish Hill remain drafts). There is no Lakeview record yet. The shared architecture you asked me to reuse already exists and needs no rebuilding:
 
-## One correction before we start
-
-I checked the database and the codebase: the only published community today is **Edgewater** (plus three Pittsburgh drafts: Lawrenceville, Bloomfield, Polish Hill). **There is no Lakeview community record and no Lakeview code anywhere in the project.** So this pass adds Lincoln Park as the *second* published community, and "leave Lakeview unchanged" is automatically satisfied — there is nothing to leave alone. Everything else in your brief lines up with what already exists.
-
-The shared architecture you asked me to reuse is already in place and needs no rebuilding:
-- Root-level community route (`/$slug`) with the one-page board and `view` filters (Today / Plans / Marketplace / Help / Places)
-- Shared `BoardFilters`, `BoardContent`, post cards, empty states, participation flows, directory rendering
-- "Post to {Community}" composer with sign-in return-path and intended-action preservation
-- Directory detail pages that already print "Check the official website for current hours" instead of stored hours
-- Admin access-point generator, anonymous aggregate scan counting, `/a/{code}` redirects
+- Root-level community route `/$slug` with the one-page board and `view` filters (Today / Plans / Marketplace / Help / Places)
+- Shared `BoardFilters`, `BoardContent`, post cards, empty state, participation, directory rendering
+- "Post to {Community}" composer with sign-in return path and preserved intended action
+- Directory detail pages that print "Check the official website for current hours" instead of stored hours
+- Admin access-point generator listing every published community, anonymous aggregate scan counts, `/a/{code}` redirects
 - Cross-community 404 guards on post and place detail routes
 
 ## 1. Database seed (one migration, idempotent)
 
-- Upsert the `lincoln-park` community on the unique `slug`: name Lincoln Park, city Chicago, state IL, location type neighborhood, timezone America/Chicago, status published, with your exact tagline and about text.
-- Insert the seven directory records, guarded so re-running produces no duplicates (matched on community + name). Categories, addresses, phones, websites and descriptions exactly as you listed; the `hours` column is left null so the UI shows "Check the official website for current hours".
-- No posts, no participation, no users, no NFC codes are seeded.
-- No writes touch Edgewater or the Pittsburgh drafts.
+- Upsert the `lakeview` community on the unique `slug`: name Lakeview, city Chicago, state IL, location type neighborhood, timezone America/Chicago, status published, with your exact tagline and about text.
+- Insert the seven directory records guarded on (community + name) so re-running creates no duplicates. Categories, addresses, phones, websites and descriptions exactly as listed; `hours` left null so the UI shows the official-website line.
+- No posts, participation, users, or NFC codes are seeded.
+- No writes touch Edgewater, Lincoln Park, or the Pittsburgh drafts.
 
-## 2. Empty board
+## 2. Subarea context line
 
-Already handled by the shared component: with no active posts it renders "The Lincoln Park board is ready. Be the first neighbor to post." above the shared "Post to Lincoln Park" button. Nothing to build; I'll verify it renders for the new slug.
+Lakeview needs quiet secondary context under the community name: `Lakeview East · Northalsted · Wrigleyville`. I'll add this as a small shared per-community lookup (same file as the existing keyword lookup), rendered by the shared `/$slug` header directly under the city/state line in muted small type. Communities without subareas render nothing, so Edgewater and Lincoln Park are visually unchanged. No new nav, no links, no filters.
 
 ## 3. Metadata
 
-Your requested title is "Lincoln Park Today — Neighborhood Today", while the shared community title today is "{Name}, {City} — Neighborhood Today". I'll change the shared pattern to `{Name} Today — Neighborhood Today` and the shared description to the "free public bulletin board for {Name}, {City}…" wording you specified, so every community — Edgewater included — gets consistent titling. Edgewater's URL, directory, data and published status are untouched; only its title/description text becomes consistent with the new pattern. Say the word if you'd rather Edgewater keep its current title.
-
-Also:
-- Canonical and og:url already resolve to `https://neighborhood.today/lincoln-park` via the existing SEO helper — verify, no change expected.
-- Add a small shared keyword-meta helper so a community page can carry its search terms (Lincoln Park, Lincoln Park Chicago, DePaul neighborhood, Lincoln Park lakefront, Armitage, Lincoln Avenue Chicago) on the single canonical page. No extra routes, no duplicate SEO pages, no sub-neighborhood pages.
+- Title comes out of the existing shared pattern as "Lakeview Today — Neighborhood Today" — no change needed.
+- Your Lakeview description mentions the subareas, which the current shared description template can't express. I'll allow a per-community description override in the same lookup, falling back to today's shared wording for every other community. Edgewater and Lincoln Park keep their current descriptions.
+- Search terms for the single canonical page: Lakeview, Lake View, Lakeview Chicago, Lakeview East, East Lakeview, Northalsted, Wrigleyville, Wrigley — added to the existing community keyword map. No duplicate pages, no subarea routes.
+- Canonical and og:url already resolve to `https://neighborhood.today/lakeview` via the existing SEO helper; I'll verify rather than change.
 
 ## 4. NFC access points
 
-No code changes needed: the admin generator lists every published community, so Lincoln Park appears automatically once seeded, and generated codes redirect to `/lincoln-park`. I'll confirm in the running app that Lincoln Park is selectable, that a generated code produces a `/lincoln-park` destination, and that labels stay private admin metadata. Suggested labels (DePaul / Armitage / lakefront / general / unassigned) are entered by you at generation time, not seeded.
+No code changes. The generator lists published communities, so Lakeview appears once seeded and generated codes point at `/lakeview`. Your suggested labels (Northalsted / Wrigleyville / Lakeview East / general) are typed in at generation time, stay private admin metadata, and don't affect the destination. I'll confirm selection and destination in the running app.
 
 ## 5. Verification pass
 
 Against the running app and a production build:
-- `/lincoln-park` returns 200 while logged out; Lincoln Park listed on the homepage next to Edgewater
-- Edgewater board, directory and URLs still work
-- Exactly one Lincoln Park record; exactly seven directory rows, each once
-- Board empty with the intended message and shared composer; no invented activity
-- Sign-in from the board returns to `/lincoln-park` with the intended posting action preserved
-- An Edgewater post and place URL under `/lincoln-park/...` 404s
+
+- `/lakeview` returns 200 while logged out; Lakeview listed on the homepage beside Edgewater and Lincoln Park
+- Subarea line visible near the community name
+- Edgewater board, directory, URLs and published status unchanged
+- Exactly one Lakeview record; exactly seven directory rows, each once; no posts
+- Board empty with "The Lakeview board is ready. Be the first neighbor to post." plus the shared "Post to Lakeview" button
+- Sign-in from the board returns to `/lakeview` with the intended posting action preserved
+- An Edgewater post/place URL under `/lakeview/...` 404s
 - 320px viewport with no horizontal overflow
 - `tsgo --noEmit` and the production build pass
 
 ## Technical notes
 
-- Files expected to change: one new migration; `src/routes/$slug.tsx` (title/description pattern); `src/lib/seo.ts` (keyword meta helper). No new Lincoln Park-specific components, routes, or data arrays.
-- All community and directory data comes from the existing database-backed server functions — no mock arrays.
-- Nothing added from the excluded list (stories, reviews, news, imported events, weather, maps, likes, DMs, payments/store nav, restaurant recs, sub-neighborhood pages, page builders).
+- Files expected to change: one new migration; `src/lib/seo.ts` (keywords, description override, subarea list); `src/routes/$slug.tsx` (render subarea line, use description override). No Lakeview-specific components, routes, or mock data arrays.
+- All community and directory data comes from the existing database-backed server functions.
+- Nothing added from the excluded list (stories, reviews, news, event APIs, maps, likes/followers, DMs, payments, store nav, subarea pages, subarea moderation or membership).
