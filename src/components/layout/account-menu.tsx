@@ -86,11 +86,7 @@ export function AccountMenu() {
             <Link to="/admin/directory">Directory listings</Link>
           </DropdownMenuItem>
         ) : null}
-        {admin.data?.isAdmin ? (
-          <DropdownMenuItem asChild>
-            <Link to="/admin/store">Store listings</Link>
-          </DropdownMenuItem>
-        ) : null}
+        {null}
         {admin.data?.isAdmin ? (
           <DropdownMenuItem asChild>
             <Link to="/admin/access-points">Access points</Link>
