@@ -1,3 +1,10 @@
+import { resolveCommunityScope, type ScopedCommunity } from "@/features/discovery/scope.server";
+import type {
+  DiscoveryScope,
+  RadiusMiles,
+  ScopedPost,
+  ScopedPostsResult,
+} from "@/features/discovery/types";
 import { attachImageUrls, signPostImages } from "@/features/posts/data.server";
 import { createPublicSupabaseClient } from "@/lib/supabase-public.server";
 import type {
@@ -11,13 +18,26 @@ import type {
 } from "./types";
 
 const NEIGHBORHOOD_COLUMNS =
-  "id, slug, name, city, state_code, location_type, timezone, status, tagline, about";
+  "id, slug, name, city, state_code, location_type, timezone, status, tagline, about, center_lat, center_lng";
 const COMMUNITY_REF_COLUMNS = "slug, name, city, state_code, timezone";
 const POST_COLUMNS =
-  "id, type, status, title, body, created_at, starts_at, location, capacity, price_cents, is_free, condition, needed_by, slots, image_paths, author_id, going_count, volunteer_count, interested_count";
+  "id, type, status, title, body, created_at, expires_at, starts_at, location, capacity, price_cents, is_free, condition, needed_by, slots, image_paths, author_id, neighborhood_id, going_count, volunteer_count, interested_count";
 const PLACE_COLUMNS = "id, name, category, address, description, website, phone";
 
 type PublicClient = ReturnType<typeof createPublicSupabaseClient>;
+
+/**
+ * A post is publicly visible only while it is active *and* unexpired. RLS
+ * already handles hidden/removed rows and unpublished communities; this adds
+ * the expiry half so an `active` row whose `expires_at` has passed never
+ * surfaces locally, nearby, or in counts.
+ */
+function visibleNow<T extends { eq: (c: string, v: unknown) => T; or: (f: string) => T }>(
+  query: T,
+): T {
+  const now = new Date().toISOString();
+  return query.eq("status", "active").or(`expires_at.is.null,expires_at.gt.${now}`);
+}
 
 /**
  * Public display names for post authors. Only `display_name` is ever selected —
@@ -77,26 +97,105 @@ export async function fetchNeighborhoodBySlug(slug: string): Promise<Neighborhoo
   return (data ?? null) as unknown as Neighborhood | null;
 }
 
-export async function fetchNeighborhoodPosts(
-  slug: string,
-  type: PostType | null,
+function communityRef(community: ScopedCommunity): CommunityRef {
+  return {
+    slug: community.slug,
+    name: community.name,
+    city: community.city,
+    state_code: community.state_code,
+    timezone: community.timezone,
+  };
+}
+
+async function fetchVisiblePostRows(
+  supabase: PublicClient,
+  neighborhoodIds: string[],
+  types: PostType[] | null,
   limit: number,
-): Promise<PostSummary[]> {
-  const supabase = createPublicSupabaseClient();
-  const neighborhood = await fetchNeighborhoodBySlug(slug);
-  if (!neighborhood) return [];
-
-  let query = supabase
-    .from("posts")
-    .select(POST_COLUMNS)
-    .eq("neighborhood_id", neighborhood.id)
-    .eq("status", "active");
-
-  if (type) query = query.eq("type", type);
+) {
+  let query = supabase.from("posts").select(POST_COLUMNS).in("neighborhood_id", neighborhoodIds);
+  query = visibleNow(query as never) as never;
+  if (types && types.length > 0) query = query.in("type", types);
 
   const { data, error } = await query.order("created_at", { ascending: false }).limit(limit);
   if (error) throw new Error(error.message);
-  return decoratePosts(supabase, data ?? []);
+  return (data ?? []) as unknown as Array<{ neighborhood_id: string }>;
+}
+
+/**
+ * The single scoped board query. `local` always comes first and is never
+ * displaced by broader content; `nearby` is the optional discovery layer.
+ * Posts are never duplicated — each row carries the community it belongs to,
+ * which is what its card links to.
+ */
+export async function fetchScopedPosts({
+  slug,
+  types,
+  scope,
+  radiusMiles,
+  limit,
+}: {
+  slug: string;
+  types: PostType[] | null;
+  scope: DiscoveryScope;
+  radiusMiles: RadiusMiles;
+  limit: number;
+}): Promise<ScopedPostsResult> {
+  const empty: ScopedPostsResult = { local: [], nearby: [], nearbyAvailable: false };
+  const supabase = createPublicSupabaseClient();
+  const community = await fetchNeighborhoodBySlug(slug);
+  if (!community) return empty;
+
+  const resolved = await resolveCommunityScope({
+    originCommunity: community,
+    scope,
+    radiusMiles,
+  });
+
+  const localRows = await fetchVisiblePostRows(supabase, [community.id], types, limit);
+  const remaining = Math.max(0, limit - localRows.length);
+
+  const byCommunity = new Map<string, ScopedCommunity>([[resolved.origin.id, resolved.origin]]);
+  for (const other of resolved.others) byCommunity.set(other.id, other);
+
+  let nearbyRows: Array<{ neighborhood_id: string }> = [];
+  if (scope !== "local" && resolved.others.length > 0 && remaining > 0) {
+    const rows = await fetchVisiblePostRows(
+      supabase,
+      resolved.others.map((other) => other.id),
+      types,
+      limit,
+    );
+    // Nearest community first; newer posts win at equivalent distance.
+    nearbyRows = rows
+      .slice()
+      .sort((a, b) => {
+        const da = byCommunity.get(a.neighborhood_id)?.distance_miles ?? Number.MAX_SAFE_INTEGER;
+        const db = byCommunity.get(b.neighborhood_id)?.distance_miles ?? Number.MAX_SAFE_INTEGER;
+        if (da !== db) return da - db;
+        const ca = (a as { created_at: string }).created_at;
+        const cb = (b as { created_at: string }).created_at;
+        return cb.localeCompare(ca);
+      })
+      .slice(0, remaining);
+  }
+
+  const decorated = await decoratePosts(supabase, [...localRows, ...nearbyRows]);
+  const attach = (post: PostSummary): ScopedPost => {
+    const origin = byCommunity.get((post as unknown as { neighborhood_id: string }).neighborhood_id);
+    return {
+      ...post,
+      origin: origin ? communityRef(origin) : communityRef(resolved.origin),
+      distance_miles:
+        origin && origin.id !== resolved.origin.id ? origin.distance_miles : null,
+    };
+  };
+
+  return {
+    local: decorated.slice(0, localRows.length).map(attach),
+    nearby: decorated.slice(localRows.length).map(attach),
+    nearbyAvailable: resolved.available,
+  };
 }
 
 export async function fetchNeighborhoodPlaces(slug: string): Promise<Place[]> {
@@ -166,12 +265,12 @@ export async function fetchNeighborhoodCounts(
   const empty = { plan: 0, marketplace: 0, volunteer: 0, places: 0 };
   if (!neighborhood) return empty;
 
+  const postsQuery = visibleNow(
+    supabase.from("posts").select("type").eq("neighborhood_id", neighborhood.id) as never,
+  ) as unknown as PromiseLike<{ data: Array<{ type: string }> | null; error: { message: string } | null }>;
+
   const [posts, places] = await Promise.all([
-    supabase
-      .from("posts")
-      .select("type")
-      .eq("neighborhood_id", neighborhood.id)
-      .eq("status", "active"),
+    postsQuery,
     supabase
       .from("places")
       .select("id", { count: "exact", head: true })
