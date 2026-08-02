@@ -13,6 +13,7 @@ import { WeatherStrip } from "@/components/community/weather-strip";
 import { communityTodayQuery } from "@/features/community-today/queries";
 import { neighborhoodCountsQuery, neighborhoodPlacesQuery } from "@/features/neighborhoods/queries";
 import type { Neighborhood } from "@/features/neighborhoods/types";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 /** Today shows a taste of the board; the Plans/Marketplace/Help tabs show all. */
 const TODAY_POST_LIMIT = 6;
@@ -23,19 +24,30 @@ const TODAY_POST_LIMIT = 6;
  * context are ambient, always-there material, while neighbor posts always come
  * first among content. Every non-post section is optional and silently absent
  * on failure.
+ *
+ * The ambient sections are client-fetched after hydration and hold reserved
+ * space while in flight, so the board never shifts under a reader and the
+ * server HTML always matches the first client render.
  */
 export function TodayHome({ community }: { community: Neighborhood }) {
   const local = useVisibleLocalPosts(community.slug);
   const shown = local.slice(0, TODAY_POST_LIMIT);
+  const hydrated = useHydrated();
 
   // Ambient sections are best-effort: never suspend, never error the board.
-  const context = useQuery(communityTodayQuery(community.slug));
-  const counts = useQuery(neighborhoodCountsQuery(community.slug));
-  const places = useQuery(neighborhoodPlacesQuery(community.slug));
+  const context = useQuery({ ...communityTodayQuery(community.slug), enabled: hydrated });
+  const counts = useQuery({ ...neighborhoodCountsQuery(community.slug), enabled: hydrated });
+  const places = useQuery({ ...neighborhoodPlacesQuery(community.slug), enabled: hydrated });
+
+  const contextPending = !hydrated || context.isPending;
 
   return (
     <div>
-      <WeatherStrip weather={context.data?.weather ?? null} timeZone={community.timezone} />
+      <WeatherStrip
+        weather={context.data?.weather ?? null}
+        timeZone={community.timezone}
+        pending={contextPending}
+      />
 
       <div className="space-y-8 pt-6">
         <section>
@@ -55,11 +67,19 @@ export function TodayHome({ community }: { community: Neighborhood }) {
 
         <ExploreBoard slug={community.slug} counts={counts.data} />
 
-        <AroundCommunity communityName={community.name} items={context.data?.official ?? []} />
+        <AroundCommunity
+          communityName={community.name}
+          items={context.data?.official ?? []}
+          pending={contextPending}
+        />
 
-        <CityPulse pulse={context.data?.servicePulse ?? null} />
+        <CityPulse pulse={context.data?.servicePulse ?? null} pending={contextPending} />
 
-        <UsefulPlaces slug={community.slug} places={places.data ?? []} />
+        <UsefulPlaces
+          slug={community.slug}
+          places={places.data ?? []}
+          pending={!hydrated || places.isPending}
+        />
 
         <AboutCommunity name={community.name} about={community.about} />
       </div>

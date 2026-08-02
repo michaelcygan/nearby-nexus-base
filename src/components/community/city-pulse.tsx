@@ -1,4 +1,5 @@
 import { SectionHeading } from "@/components/community/section-heading";
+import { SectionPlaceholder } from "@/components/community/section-placeholder";
 import type { CivicServicePulse } from "@/features/community-today/types";
 
 /**
@@ -7,7 +8,14 @@ import type { CivicServicePulse } from "@/features/community-today/types";
  * complaints, addresses, or callers. It reads as civic weather, not a
  * scoreboard of neighbors.
  */
-export function CityPulse({ pulse }: { pulse: CivicServicePulse | null }) {
+export function CityPulse({
+  pulse,
+  pending,
+}: {
+  pulse: CivicServicePulse | null;
+  pending?: boolean;
+}) {
+  if (pending) return <SectionPlaceholder label="From the city" rows={3} />;
   if (!pulse || pulse.entries.length === 0) return null;
 
   return (

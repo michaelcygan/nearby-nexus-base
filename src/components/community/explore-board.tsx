@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 
 import { SectionHeading } from "@/components/community/section-heading";
+import { PlaceholderBar } from "@/components/community/section-placeholder";
 import { boardViewLabels, type BoardView } from "@/features/neighborhoods/types";
+
 
 const ENTRIES: Array<{ view: Exclude<BoardView, "today">; countKey: CountKey; blurb: string }> = [
   { view: "plans", countKey: "plan", blurb: "Things happening you can turn up to" },
@@ -42,7 +44,11 @@ export function ExploreBoard({ slug, counts }: { slug: string; counts: Counts | 
                   <span className="shrink-0 font-sans text-xs tabular-nums text-muted-foreground">
                     {count}
                   </span>
-                ) : null}
+                ) : (
+                  // Space is reserved so the row never reflows when counts land.
+                  <PlaceholderBar className="h-3 w-4 shrink-0" />
+                )}
+
               </Link>
             </li>
           );

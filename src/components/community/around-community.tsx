@@ -1,3 +1,4 @@
+import { SectionPlaceholder } from "@/components/community/section-placeholder";
 import { SectionHeading } from "@/components/community/section-heading";
 import {
   formatOfficialDateTime,
@@ -13,10 +14,13 @@ import {
 export function AroundCommunity({
   communityName,
   items,
+  pending,
 }: {
   communityName: string;
   items: OfficialCommunityItem[];
+  pending?: boolean;
 }) {
+  if (pending) return <SectionPlaceholder label={`Around ${communityName}`} rows={3} />;
   if (items.length === 0) return null;
 
   return (

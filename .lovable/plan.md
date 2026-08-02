@@ -1,71 +1,43 @@
-## Today, rebuilt as the community homepage
+## What I checked
 
-Verified against the current repo before writing this:
+I crawled the running app (desktop 1280px) through `/`, `/edgewater`, `/lincoln-park`, `/lakeview`, every board tab (`today`, `plans`, `marketplace`, `help`, `places`), the scope lenses (`nearby&radius=3`, `city`), `/auth`, `/community-guidelines`, and a bogus slug, capturing console, page errors, HTTP failures and screenshots.
 
-- `src/routes/$slug.tsx` renders a large masthead (4xl/6xl H1, tagline, subarea line) plus a full `Post to {name}` button; `PageContainer` adds `py-8` and the child route adds `pt-6`.
-- `src/routes/$slug.index.tsx` prints the whole `community.about` paragraph directly under the tabs.
-- `BoardContent`'s `TodayBoard` is the generic post list with `types: null`, plus the existing density-aware `NearbyToday` (5 mi, plans+marketplace, max 4, 2 per community) — that logic is already correct and will be reused.
-- Empty Today renders the shared dashed `EmptyState` with a second `PostToCommunity` button.
-- `BoardFilters` is a non-sticky overflow row; `SiteHeader` is a 56px sticky bar with a "Guidelines" link.
-- `center_lat` / `center_lng` already exist and are backfilled for Edgewater (41.987, -87.66), Lakeview (41.94, -87.6539), Lincoln Park (41.9214, -87.6513). Pittsburgh demos are `draft` with null coords.
-- No civic-provider columns exist yet. `visibleNow()` in `data.server.ts` already enforces active + unexpired for both listings and counts, so no correction is needed there — I'll add regression coverage instead of changing it.
-- `lucide-react` and `zod` are already dependencies; no new runtime packages needed.
+**Working correctly:** all community routes 200; masthead (`CHICAGO, ILLINOIS` → H1 → tagline → Post trigger); sticky tabs; quiet empty state on the board; Explore the board with real local counts (0/0/0/4 for Edgewater); Places tab grouped by category; Around {community} and From the city rendering live Chicago data; About disclosure; unknown slug returns a real 404 with `noindex`.
 
-Governing rules from the nearby-discovery brief are unchanged: one canonical home community per post, local default, nearby as a lens, radius/city only for Plans and Marketplace, Help and Places local, nearby cards always linking to their true community URL.
+## Issues found
 
-### Wave 1 — Community page frame
+1. **Ambient sections pop in ~4.5s after paint, at the top of the page.** Weather, Around {community} and From the city are absent from the first render and appear together after the client-side server-function call resolves (measured: absent at 0–3s, present at 4.5s). Because the weather strip sits above everything, the whole page shifts down when it lands. No placeholder is reserved.
+2. **A hydration mismatch error fires on the community page.** Reproduced once as a `pageerror` ("server rendered HTML didn't match the client") on `/edgewater`; root cause not yet identified — needs isolation before it is called fixed.
+3. **Every board tab shares one title and description.** `/edgewater?view=plans`, `?view=marketplace`, `?view=help`, `?view=places` all render `Edgewater Today — Neighborhood Today` with the Today description. Only canonical/`og:url` vary by view.
+4. **One unexplained 404 network response** during the crawl; not yet attributed to a request.
+5. **Signed-in half of the experience is unverified.** Post creation, join/leave, threads, moderation and store flows were not exercised in this pass.
 
-- `SiteHeader`: hide the Guidelines link below `sm` (footer keeps it); tighten brand/Sign-in weight so they don't compete with the neighborhood name.
-- `$slug.tsx` masthead: uppercase `CHICAGO, ILLINOIS` eyebrow, H1 at `text-3xl sm:text-5xl`, tagline clamped to two lines, subarea line kept. Reduce `PageContainer`/child vertical padding.
-- `PostToCommunity` gains a compact label: trigger reads `Post` on mobile, `Post to {name}` from `sm` up. Menu items and the signed-out redirect/action stash are untouched.
-- `BoardFilters`: sticky at `top-14`, opaque-enough background, consistent edge padding, no clipped labels, visible selected state, keyboard focus rings.
-- Remove the `about` paragraph from under the tabs.
-- Replace the oversized Today empty state with a compact editorial one ("Nothing posted yet today.") and drop the duplicate large Post button.
-- Verify at 390px and desktop; lint + production build.
+## Plan
 
-### Wave 2 — Provider foundation
+**1. Fix the Today pop-in and shift**
+- Reserve stable space for the weather strip and the two civic sections so nothing above the board moves when data lands: render a low-key skeleton line for weather and hold section slots while `communityTodayQuery` is pending, and only collapse when the query settles empty.
+- Tighten the upstream budget so the wait is short: reduce per-provider timeouts, and cap the aggregate so one slow provider cannot hold the others.
+- Keep the "silently absent on failure" rule intact — a settled-empty provider still renders nothing.
 
-Forward-only migration (coords already exist, so only provider config is added):
+**2. Diagnose and fix the hydration mismatch**
+- Reproduce deterministically with repeated loads, then bisect by section (weather timestamps via `Intl` with `timeZone`, session-dependent blocked-ids read, relative date text) until the mismatching node is identified.
+- Fix at the source (hydration-safe formatting or gating the client-only read), not by suppressing the warning.
 
-- `neighborhoods.civic_provider text`, `neighborhoods.civic_area_codes text[] not null default '{}'`.
-- Trigger-based validation for lat/lng range and both-or-neither (constraints only where immutable).
-- Backfill: `chicago_socrata` + area `77` (Edgewater), `6` (Lakeview), `7` (Lincoln Park).
-- Grants/RLS unchanged; new columns are readable by the existing published-community select policy.
-- New `src/features/community-today/types.ts` with `CommunityWeather`, `WeatherAlert`, `OfficialCommunityItem`, `CivicServicePulse`; add the columns to `Neighborhood` and `NEIGHBORHOOD_COLUMNS`.
-- Unit coverage for defensive parsers with mocked payloads. Nothing user-visible yet.
+**3. Give each board view its own head metadata**
+- In `src/routes/$slug.index.tsx`, derive per-view `title`, `description`, `og:title`, `og:description` from the active view (Today / Plans / Marketplace / Help / Places) alongside the existing canonical and `og:url`.
+- Radius and scope variants stay non-canonical duplicates of their view, as today.
 
-### Wave 3 — Weather
+**4. Trace and resolve the 404 request**
+- Re-run the crawl with full response logging to attribute the 404 (likely an asset or icon reference) and remove or correct the reference.
 
-- `weather.server.ts`: server-only NWS provider behind one module interface. `/points/{lat},{lng}` → forecast + nearest station observation + active alerts, all Zod-parsed, with per-call timeouts and `Promise.allSettled`.
-- Headers: `User-Agent: neighborhood.today (https://neighborhood.today)`, `Accept: application/geo+json`. Allow-listed origin only; no following arbitrary upstream URLs beyond the documented point payload.
-- In-process TTL cache: points/station ~24h, forecast ~20m, observation ~10m, alerts ~5m. No DB cache — the Worker runtime supports module-scope memo plus React Query staleTime, which is the smallest sufficient primitive.
-- Normalize to `CommunityWeather`; forecast-only temps are labeled as forecast.
-- `WeatherStrip`: one printed utility line (temp, condition, high/low), optional secondary line (precip, wind), small Lucide icon, NWS attribution, accessible labels, community timezone. Separate compact alert block rendered only when an alert exists.
-- Weather failure renders a one-line unavailable note and never fails the route.
+**5. Audit the signed-in experience and report**
+- With a restored session, walk: create a plan → it appears on Today and Plans → join → message the author → report/block → admin moderation; plus a store listing checkout entry point and `/a/$code` NFC scan → community landing.
+- Fix defects found in that pass that are presentation or wiring bugs; report anything that would change agreed product rules rather than changing it unilaterally.
 
-### Wave 4 — Dedicated Today homepage
-
-- `TodayHome` replaces `TodayBoard`; `BoardContent` branches `today → TodayHome`, `places → PlaceList`, else `ScopedPostList` unchanged.
-- `neighborhoodTodayQuery(slug)` + server fn aggregating community identity, latest visible local posts (max 6), counts by type, Places preview (4). External modules stay independent queries so one failure can't cascade.
-- Mobile order: weather → **On the board** → **Nearby today** (existing rules, only when local < 6) → **Explore the board** → official activity → From the City → **Useful places** → **About {community}** (collapsed disclosure).
-- Explore the board: compact linked rows using local counts with zero-count fallback copy, linking through the existing `?view=` param. No new routes.
-- Desktop: ~7/5 grid inside `max-w-5xl` — board + nearby in the main column, the supporting modules in the rail; single column on mobile.
-- Route loader prefetches the internal Today query only.
-
-### Wave 5 — Chicago public data
-
-- `chicago.server.ts`: server-only Socrata adapter, optional `SOCRATA_APP_TOKEN` via `X-App-Token`, works anonymously, allow-listed host, timeouts, Zod parsing, 30–60m TTL cache.
-- Library events (`vsdy-d8k7`): non-cancelled, not ended, within 14 days, `within_circle` ~2 mi of the center, ordered by start, small cap.
-- Park activities (`tn7v-6rnw`): ~2 mi radius, display official `date_notes` — never a computed next occurrence.
-- 311 (`v6vf-nfxy`): SoQL aggregate by `sr_type` over 7 days for the configured `community_area`, excluding duplicates, `311 INFORMATION ONLY CALL`, and aircraft-noise types; max 3 categories, no addresses or caller data, labeled window, Chicago 311 attribution.
-- `Around {community}` shows max 3 items with per-source labels and `rel="noopener noreferrer"` external links; no RSVP/messaging on external records. Sections omit entirely when empty or when no provider is configured. Plain-text fields only — never `dangerouslySetInnerHTML`.
-
-### Wave 6 — Launch hardening
-
-Audit first-viewport usefulness, signed-out browsing with no interstitials, single Post CTA per viewport, sticky header/tab interaction, iOS safe areas, tab overflow, keyboard and screen-reader section labels, contrast, external-link safety, timeout/cache/rate-limit behavior, missing coords (Pittsburgh drafts, future towns), missing provider, empty vs dense boards, blocked-author and expired-post filtering, canonical URLs, and `/a/{code}` NFC destinations. Lint + production build; report files changed, schema impact, user-visible result, verification, and residual risks after each wave.
+**6. Re-verify**
+- Repeat the desktop and 390px mobile crawl: zero console/page errors, no layout shift at the top of Today, distinct titles per tab, all routes 200/404 as intended.
 
 ### Technical notes
-
-- No published migration is edited; Wave 2 adds a single forward-only migration.
-- All external calls are server-side; no browser geolocation, no maps, no client-visible upstream shapes.
-- Existing Plans/Marketplace/Help/Places renderers, post detail, auth, messaging, moderation, participation, store, and NFC routes are untouched apart from the shared masthead/tab styling.
+- Section slot handling is presentation-level in `today-home.tsx` plus the affected section components; no change to the aggregate contract in `data.server.ts` beyond timeout tuning.
+- Per-view metadata is added in the existing `head()` of `src/routes/$slug.index.tsx`; `$slug.tsx` keeps the community-level defaults.
+- No migrations; no changes to discovery scope rules, ranking, or the local-only governing rules.
