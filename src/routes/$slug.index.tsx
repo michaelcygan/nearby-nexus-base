@@ -98,9 +98,6 @@ function CommunityBoard() {
   return (
     <div>
       <BoardFilters slug={slug} active={view} />
-      {view === "today" && community.about ? (
-        <p className="mt-6 max-w-prose text-base text-muted-foreground">{community.about}</p>
-      ) : null}
       <BoardContent
         community={community}
         view={view}
