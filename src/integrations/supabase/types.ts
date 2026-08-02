@@ -129,6 +129,8 @@ export type Database = {
           center_lat: number | null
           center_lng: number | null
           city: string
+          civic_area_codes: string[]
+          civic_provider: string | null
           created_at: string
           id: string
           location_type: Database["public"]["Enums"]["location_type"]
@@ -145,6 +147,8 @@ export type Database = {
           center_lat?: number | null
           center_lng?: number | null
           city: string
+          civic_area_codes?: string[]
+          civic_provider?: string | null
           created_at?: string
           id?: string
           location_type?: Database["public"]["Enums"]["location_type"]
@@ -161,6 +165,8 @@ export type Database = {
           center_lat?: number | null
           center_lng?: number | null
           city?: string
+          civic_area_codes?: string[]
+          civic_provider?: string | null
           created_at?: string
           id?: string
           location_type?: Database["public"]["Enums"]["location_type"]
