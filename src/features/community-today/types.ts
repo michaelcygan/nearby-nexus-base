@@ -67,7 +67,9 @@ export function plainText(value: unknown, maxLength = 240): string {
     .replace(/<[^>]*>/g, " ")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
+    // eslint-disable-next-line no-control-regex -- stripping control chars is the point
     .replace(/[\u0000-\u001f\u007f]/g, " ")
+
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, maxLength);
