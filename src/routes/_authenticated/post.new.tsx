@@ -19,6 +19,10 @@ export const Route = createFileRoute("/_authenticated/post/new")({
     type: POST_TYPES.includes(search["type"] as PostType)
       ? (search["type"] as PostType)
       : ("plan" as PostType),
+    returnTo:
+      typeof search["returnTo"] === "string" && search["returnTo"].startsWith("/")
+        ? search["returnTo"]
+        : undefined,
   }),
   head: () => ({
     meta: [
