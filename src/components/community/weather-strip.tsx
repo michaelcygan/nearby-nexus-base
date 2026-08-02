@@ -25,10 +25,12 @@ export function WeatherStrip({
           <PlaceholderBar className="h-6 w-14" />
           <PlaceholderBar className="h-4 w-48" />
         </div>
-        <PlaceholderBar className="mt-2 h-3 w-40" />
+        <PlaceholderBar className="mt-2 h-4 w-56" />
+        <PlaceholderBar className="mt-2 h-3 w-44" />
       </section>
     );
   }
+
 
   if (!weather) return null;
 
