@@ -24,17 +24,15 @@ export const Route = createFileRoute("/$slug")({
       };
     }
     const { community } = loaderData;
-    const where = placeLine(community);
-    const title = `${community.name}, ${where} — Neighborhood Today`;
-    const description =
-      community.tagline ??
-      `What's happening, needed, offered, and shared in ${community.name} today.`;
+    const title = `${community.name} Today — Neighborhood Today`;
+    const description = `The free public bulletin board for ${community.name}, ${community.city}. Find neighborhood plans, marketplace posts, requests for help, and useful local places.`;
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
+        communityKeywordsMeta(community.slug, community.name, community.city),
       ],
     };
   },
