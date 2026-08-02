@@ -141,7 +141,7 @@ function NeighborhoodList() {
           className="rounded-md border border-border bg-card transition-colors hover:border-primary/50"
         >
           <Link
-            to="/n/$slug"
+            to="/$slug"
             params={{ slug: n.slug }}
             className="block rounded-md p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >

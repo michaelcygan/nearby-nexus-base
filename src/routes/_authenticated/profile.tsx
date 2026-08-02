@@ -298,7 +298,7 @@ function ProfilePage() {
                       className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-card p-4"
                     >
                       <Link
-                        to="/n/$slug"
+                        to="/$slug"
                         params={{ slug: row.neighborhood.slug }}
                         className="font-display text-base underline-offset-4 hover:underline"
                       >
@@ -337,7 +337,7 @@ function ProfilePage() {
                       <div>
                         {row.post ? (
                           <Link
-                            to="/n/$slug/p/$postId"
+                            to="/$slug/p/$postId"
                             params={{ slug: row.post.neighborhood_slug, postId: row.post.id }}
                             className="font-display text-base underline-offset-4 hover:underline"
                           >

@@ -184,7 +184,7 @@ function ReportQueue({ status }: { status: ReportStatus }) {
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
             {report.preview.link ? (
               <Link
-                to="/n/$slug/p/$postId"
+                to="/$slug/p/$postId"
                 params={{
                   slug: report.preview.link.slug,
                   postId: report.preview.link.postId,
@@ -196,7 +196,7 @@ function ReportQueue({ status }: { status: ReportStatus }) {
             ) : null}
             {report.preview.placeLink ? (
               <Link
-                to="/n/$slug/place/$placeId"
+                to="/$slug/place/$placeId"
                 params={{
                   slug: report.preview.placeLink.slug,
                   placeId: report.preview.placeLink.placeId,
