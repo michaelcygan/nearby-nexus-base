@@ -73,7 +73,14 @@ export const Route = createFileRoute("/$slug/")({
         radiusMiles: deps.radiusMiles,
       }),
     );
+    if (deps.view === "today") {
+      // Ambient context streams in — Today must render without waiting on it.
+      context.queryClient.prefetchQuery(communityTodayQuery(params.slug));
+      context.queryClient.prefetchQuery(neighborhoodCountsQuery(params.slug));
+      context.queryClient.prefetchQuery(neighborhoodPlacesQuery(params.slug));
+    }
   },
+
   head: ({ params, match }) => {
     // Radius-filtered views are the same page: one canonical per board view.
     const href = canonicalUrl(boardPath(params.slug, match.search.view ?? "today"));
