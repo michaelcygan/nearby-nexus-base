@@ -55,11 +55,7 @@ export function TodayHome({ community }: { community: Neighborhood }) {
 
         <ExploreBoard slug={community.slug} counts={counts.data} />
 
-        <AroundCommunity
-          communityName={community.name}
-          items={context.data?.official ?? []}
-          timeZone={community.timezone}
-        />
+        <AroundCommunity communityName={community.name} items={context.data?.official ?? []} />
 
         <CityPulse pulse={context.data?.servicePulse ?? null} />
 

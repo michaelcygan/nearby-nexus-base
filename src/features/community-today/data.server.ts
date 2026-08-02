@@ -49,9 +49,9 @@ export async function fetchCommunityTodayContext(slug: string): Promise<Communit
   // Library events carry real start times, so they lead; park programs follow
   // with their published schedule text.
   const official = [
-    ...settled<OfficialCommunityItem[]>(library, []),
-    ...settled<OfficialCommunityItem[]>(parks, []),
-  ].slice(0, 6);
+    ...settled<OfficialCommunityItem[]>(library, []).slice(0, 4),
+    ...settled<OfficialCommunityItem[]>(parks, []).slice(0, 2),
+  ];
 
   return {
     weather: settled<CommunityWeather | null>(weather, null),

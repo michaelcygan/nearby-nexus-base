@@ -44,6 +44,40 @@ export type OfficialCommunityItem = {
   url: string;
 };
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+/**
+ * City feeds publish local wall-clock timestamps with no zone marker. Parsing
+ * those with `new Date()` would silently shift them, so they are formatted from
+ * their own parts and never converted.
+ */
+export function formatOfficialDateTime(value: string | null): string | null {
+  if (!value) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(value);
+  if (!match) return null;
+  const [, y, mo, d, h, mi] = match.map(Number) as unknown as number[];
+  if (!y || !mo || !d) return null;
+  const weekday = WEEKDAYS[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
+  const hour24 = h ?? 0;
+  const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+  const suffix = hour24 < 12 ? "AM" : "PM";
+  const minutes = String(mi ?? 0).padStart(2, "0");
+  return `${weekday}, ${MONTHS[mo - 1]} ${d}, ${hour12}:${minutes} ${suffix}`;
+}
+
+/** "Adults | Kids (6 to 13)" collapses to the first, shortest useful label. */
+export function shortAudience(value: string | null): string | null {
+  if (!value) return null;
+  const first = value
+    .split("|")[0]
+    ?.replace(/\([^)]*\)/g, "")
+    .trim();
+  if (!first) return null;
+  const extra = value.includes("|") ? " + more" : "";
+  return `${first}${extra}`;
+}
+
 export type CivicServicePulseEntry = { label: string; count: number };
 
 export type CivicServicePulse = {
@@ -63,16 +97,18 @@ export type TodayBoardSummary = {
  */
 export function plainText(value: unknown, maxLength = 240): string {
   if (typeof value !== "string") return "";
-  return value
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    // eslint-disable-next-line no-control-regex -- stripping control chars is the point
-    .replace(/[\u0000-\u001f\u007f]/g, " ")
+  return (
+    value
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      // eslint-disable-next-line no-control-regex -- stripping control chars is the point
+      .replace(/[\u0000-\u001f\u007f]/g, " ")
 
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, maxLength);
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, maxLength)
+  );
 }
 
 /** Only ever allow the two official hosts we integrate with. */

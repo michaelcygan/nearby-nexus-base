@@ -1,6 +1,9 @@
 import { SectionHeading } from "@/components/community/section-heading";
-import type { OfficialCommunityItem } from "@/features/community-today/types";
-import { formatDateTime } from "@/features/neighborhoods/types";
+import {
+  formatOfficialDateTime,
+  shortAudience,
+  type OfficialCommunityItem,
+} from "@/features/community-today/types";
 
 /**
  * Official, publicly published happenings near the community — library events
@@ -10,11 +13,9 @@ import { formatDateTime } from "@/features/neighborhoods/types";
 export function AroundCommunity({
   communityName,
   items,
-  timeZone,
 }: {
   communityName: string;
   items: OfficialCommunityItem[];
-  timeZone: string;
 }) {
   if (items.length === 0) return null;
 
@@ -26,8 +27,10 @@ export function AroundCommunity({
       </p>
       <ul className="mt-3 divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
         {items.map((item) => {
-          const when = item.startsAt ? formatDateTime(item.startsAt, timeZone) : item.scheduleText;
-          const details = [item.locationName, item.audience, item.fee].filter(Boolean).join(" · ");
+          const when = item.startsAt ? formatOfficialDateTime(item.startsAt) : item.scheduleText;
+          const details = [item.locationName, shortAudience(item.audience), item.fee]
+            .filter(Boolean)
+            .join(" · ");
           return (
             <li key={item.id} className="p-4">
               <a
