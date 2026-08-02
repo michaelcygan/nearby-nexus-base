@@ -92,9 +92,10 @@ export async function resolveCommunityScope({
         if (normalize(row.city) !== normalize(origin.city)) continue;
         if (normalize(row.state_code) !== normalize(origin.state_code)) continue;
         const center = { lat: row.center_lat, lng: row.center_lng };
-        distance = isValidCoordinates(center) && isValidCoordinates(originCenter)
-          ? haversineMiles(originCenter, center)
-          : 0;
+        distance =
+          isValidCoordinates(center) && isValidCoordinates(originCenter)
+            ? haversineMiles(originCenter, center)
+            : 0;
       }
 
       others.push({

@@ -1,6 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import { DEFAULT_RADIUS_MILES, type DiscoveryScope, type RadiusMiles } from "@/features/discovery/types";
+import {
+  DEFAULT_RADIUS_MILES,
+  type DiscoveryScope,
+  type RadiusMiles,
+} from "@/features/discovery/types";
 import {
   getNeighborhood,
   getNeighborhoodCounts,
@@ -57,8 +61,7 @@ export const scopedPostsQuery = ({
       scope === "nearby" ? radiusMiles : null,
       limit,
     ],
-    queryFn: () =>
-      getScopedPosts({ data: { slug, types, scope, radius: radiusMiles, limit } }),
+    queryFn: () => getScopedPosts({ data: { slug, types, scope, radius: radiusMiles, limit } }),
   });
 
 export const neighborhoodPlacesQuery = (slug: string) =>

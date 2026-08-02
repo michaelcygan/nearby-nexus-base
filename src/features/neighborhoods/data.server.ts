@@ -182,12 +182,13 @@ export async function fetchScopedPosts({
 
   const decorated = await decoratePosts(supabase, [...localRows, ...nearbyRows]);
   const attach = (post: PostSummary): ScopedPost => {
-    const origin = byCommunity.get((post as unknown as { neighborhood_id: string }).neighborhood_id);
+    const origin = byCommunity.get(
+      (post as unknown as { neighborhood_id: string }).neighborhood_id,
+    );
     return {
       ...post,
       origin: origin ? communityRef(origin) : communityRef(resolved.origin),
-      distance_miles:
-        origin && origin.id !== resolved.origin.id ? origin.distance_miles : null,
+      distance_miles: origin && origin.id !== resolved.origin.id ? origin.distance_miles : null,
     };
   };
 
@@ -267,7 +268,10 @@ export async function fetchNeighborhoodCounts(
 
   const postsQuery = visibleNow(
     supabase.from("posts").select("type").eq("neighborhood_id", neighborhood.id) as never,
-  ) as unknown as PromiseLike<{ data: Array<{ type: string }> | null; error: { message: string } | null }>;
+  ) as unknown as PromiseLike<{
+    data: Array<{ type: string }> | null;
+    error: { message: string } | null;
+  }>;
 
   const [posts, places] = await Promise.all([
     postsQuery,

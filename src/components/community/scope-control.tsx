@@ -1,16 +1,13 @@
 import { Link } from "@tanstack/react-router";
 
-import {
-  radiusOptions,
-  type DiscoveryScope,
-  type RadiusMiles,
-} from "@/features/discovery/types";
+import { radiusOptions, type DiscoveryScope, type RadiusMiles } from "@/features/discovery/types";
 import type { BoardView } from "@/features/neighborhoods/types";
 
 const baseButton =
   "inline-flex min-h-9 items-center rounded-sm border px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 const selected = "border-primary bg-primary/10 font-medium text-foreground";
-const unselected = "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground";
+const unselected =
+  "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground";
 
 /**
  * "See things posted in this neighborhood, nearby neighborhoods, or across

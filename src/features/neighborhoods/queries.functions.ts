@@ -24,7 +24,10 @@ const POST_TYPES: PostType[] = ["plan", "marketplace", "volunteer"];
  * Never pass unchecked client values into geographic or database logic:
  * anything unsupported resolves to plain local behavior.
  */
-function sanitizeScope(scope: unknown, radius: unknown): { scope: DiscoveryScope; radiusMiles: RadiusMiles } {
+function sanitizeScope(
+  scope: unknown,
+  radius: unknown,
+): { scope: DiscoveryScope; radiusMiles: RadiusMiles } {
   if (!isDiscoveryScope(scope) || scope === "local") {
     return { scope: "local", radiusMiles: DEFAULT_RADIUS_MILES };
   }
@@ -37,9 +40,7 @@ function sanitizeScope(scope: unknown, radius: unknown): { scope: DiscoveryScope
 
 function sanitizeTypes(types: unknown): PostType[] | null {
   if (!Array.isArray(types)) return null;
-  const allowed = types.filter((type): type is PostType =>
-    POST_TYPES.includes(type as PostType),
-  );
+  const allowed = types.filter((type): type is PostType => POST_TYPES.includes(type as PostType));
   return allowed.length > 0 ? [...new Set(allowed)] : null;
 }
 

@@ -76,12 +76,7 @@ export function BoardContent({
       ) : view === "today" ? (
         <TodayBoard community={community} />
       ) : (
-        <ScopedPostList
-          community={community}
-          view={view}
-          scope={scope}
-          radiusMiles={radiusMiles}
-        />
+        <ScopedPostList community={community} view={view} scope={scope} radiusMiles={radiusMiles} />
       )}
     </Suspense>
   );
@@ -172,9 +167,7 @@ function ScopedPostList({
               <div className="mt-3">
                 <EmptyState
                   title={`Nothing here yet on the ${community.name} board.`}
-                  action={
-                    <PostToCommunity slug={community.slug} name={community.name} size="sm" />
-                  }
+                  action={<PostToCommunity slug={community.slug} name={community.name} size="sm" />}
                 />
               </div>
             )}
@@ -220,9 +213,7 @@ function TodayBoard({ community }: { community: Neighborhood }) {
         </div>
       )}
 
-      {needsFill ? (
-        <NearbyToday community={community} localVisibleCount={local.length} />
-      ) : null}
+      {needsFill ? <NearbyToday community={community} localVisibleCount={local.length} /> : null}
     </div>
   );
 }
