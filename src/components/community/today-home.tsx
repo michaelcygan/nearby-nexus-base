@@ -1,10 +1,11 @@
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { AboutCommunity } from "@/components/community/about-community";
 import { AroundCommunity } from "@/components/community/around-community";
 import { CityPulse } from "@/components/community/city-pulse";
 import { ExploreBoard } from "@/components/community/explore-board";
-import { PostGrid, useVisibleLocalPosts, NearbyToday } from "@/components/community/board-content";
+import { NearbyToday, PostGrid, useVisibleLocalPosts } from "@/components/community/board-posts";
+
 import { QuietBoardEmpty } from "@/components/community/quiet-board-empty";
 import { SectionHeading } from "@/components/community/section-heading";
 import { UsefulPlaces } from "@/components/community/useful-places";
