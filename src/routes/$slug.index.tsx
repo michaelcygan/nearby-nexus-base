@@ -39,7 +39,6 @@ const boardViewDescriptions: Record<Exclude<BoardView, "today">, (name: string) 
   places: (name) => `A neighbor-kept directory of useful local places in ${name}.`,
 };
 
-
 type BoardSearch = { view?: BoardView; scope?: DiscoveryScope; radius?: RadiusMiles };
 
 /**

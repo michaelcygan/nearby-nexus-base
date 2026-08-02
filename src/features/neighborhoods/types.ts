@@ -1,4 +1,4 @@
-export type PostType = "plan" | "marketplace" | "volunteer";
+export type PostType = "bulletin" | "plan" | "marketplace" | "volunteer";
 export type PostStatus = "active" | "completed" | "expired" | "removed";
 export type LocationType = "neighborhood" | "town" | "village" | "city";
 export type CommunityStatus = "draft" | "published";
@@ -75,13 +75,23 @@ export type PlaceDetail = Place & {
 };
 
 export const postTypeLabels: Record<PostType, string> = {
+  bulletin: "Post",
   plan: "Plan",
-  marketplace: "For sale",
-  volunteer: "Help wanted",
+  marketplace: "Marketplace",
+  volunteer: "Help",
 };
+
+/**
+ * A plain bulletin post is the native form of the board, so it carries no badge.
+ * Structured modes keep theirs.
+ */
+export function postTypeBadge(type: PostType): string | null {
+  return type === "bulletin" ? null : postTypeLabels[type];
+}
 
 /** Plain-language composer actions, mapped to the three existing post types. */
 export const composerActions = [
+  { type: "bulletin", label: "Write a post" },
   { type: "plan", label: "Make a plan" },
   { type: "marketplace", label: "Sell or give something away" },
   { type: "volunteer", label: "Ask for help" },

@@ -6,7 +6,7 @@ import {
   formatDate,
   formatDateTime,
   formatPrice,
-  postTypeLabels,
+  postTypeBadge,
   type PostSummary,
 } from "@/features/neighborhoods/types";
 
@@ -70,9 +70,11 @@ export function PostCard({
         params={{ slug: post.origin.slug, postId: post.id }}
         className="block rounded-md p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <p className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-          {postTypeLabels[post.type]}
-        </p>
+        {postTypeBadge(post.type) ? (
+          <p className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+            {postTypeBadge(post.type)}
+          </p>
+        ) : null}
         {post.image_urls?.[0] ? (
           <img
             src={post.image_urls[0]}

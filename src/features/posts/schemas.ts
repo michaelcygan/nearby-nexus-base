@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const POST_TYPES = ["plan", "marketplace", "volunteer"] as const;
+export const POST_TYPES = ["bulletin", "plan", "marketplace", "volunteer"] as const;
 export const MAX_POST_IMAGES = 4;
 
 const optionalText = (max: number) =>
@@ -102,7 +102,8 @@ export function toPostRow(input: PostInput) {
     body: input.body,
     image_paths: input.image_paths,
     starts_at: input.type === "plan" ? input.starts_at : null,
-    location: input.type === "plan" ? input.location : null,
+    // Location and Place are universal: they are not cleared when the mode changes.
+    location: input.location,
     capacity: input.type === "plan" ? input.capacity : null,
     price_cents: priceCents,
     is_free: isMarketplace ? input.is_free : null,

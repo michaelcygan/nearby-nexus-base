@@ -85,13 +85,17 @@ export function StandingEventsList({
       <div className="mt-4 space-y-5">
         {cappedDays.map((day, index) => (
           <div key={`${day.label}-${index}`}>
-
             <h3 className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               {day.label}
             </h3>
             <StandingEventList>
               {day.items.map((occurrence) => (
-                <StandingEventRow key={occurrence.key} occurrence={occurrence} showWhen={false} showOrigin={occurrence.isNearby} />
+                <StandingEventRow
+                  key={occurrence.key}
+                  occurrence={occurrence}
+                  showWhen={false}
+                  showOrigin={occurrence.isNearby}
+                />
               ))}
             </StandingEventList>
           </div>

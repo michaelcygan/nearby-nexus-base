@@ -11,7 +11,7 @@ import {
   formatDate,
   formatDateTime,
   formatPrice,
-  postTypeLabels,
+  postTypeBadge,
 } from "@/features/neighborhoods/types";
 import { canonicalUrl } from "@/lib/seo";
 
@@ -81,9 +81,11 @@ function PostDetailPage() {
 
   return (
     <article className="max-w-2xl">
-      <p className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-        {postTypeLabels[post.type]}
-      </p>
+      {postTypeBadge(post.type) ? (
+        <p className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+          {postTypeBadge(post.type)}
+        </p>
+      ) : null}
       <h2 className="mt-2 text-2xl sm:text-3xl">{post.title}</h2>
       <p className="mt-2 text-sm text-muted-foreground">
         Posted by {post.author_name ?? "a neighbor"}

@@ -11,7 +11,7 @@ import { credentialsSchema, emailOnlySchema } from "@/features/account/types";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
-const POST_TYPES = ["plan", "marketplace", "volunteer"] as const;
+const POST_TYPES = ["bulletin", "plan", "marketplace", "volunteer"] as const;
 type ComposerAction = (typeof POST_TYPES)[number];
 
 /** Only same-origin paths survive; never an absolute or protocol-relative URL. */

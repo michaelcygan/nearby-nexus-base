@@ -16,14 +16,14 @@ import type { PostType } from "@/features/neighborhoods/types";
 import { createPost } from "@/features/posts/post.functions";
 import { useSession } from "@/hooks/use-session";
 
-const POST_TYPES: PostType[] = ["plan", "marketplace", "volunteer"];
+const POST_TYPES: PostType[] = ["bulletin", "plan", "marketplace", "volunteer"];
 
 export const Route = createFileRoute("/_authenticated/post/new")({
   validateSearch: (search: Record<string, unknown>) => ({
     n: typeof search["n"] === "string" ? search["n"] : undefined,
     type: POST_TYPES.includes(search["type"] as PostType)
       ? (search["type"] as PostType)
-      : ("plan" as PostType),
+      : ("bulletin" as PostType),
     returnTo:
       typeof search["returnTo"] === "string" && search["returnTo"].startsWith("/")
         ? search["returnTo"]

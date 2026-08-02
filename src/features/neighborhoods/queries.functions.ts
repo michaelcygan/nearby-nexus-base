@@ -18,7 +18,7 @@ import {
 } from "./data.server";
 import type { PostType } from "./types";
 
-const POST_TYPES: PostType[] = ["plan", "marketplace", "volunteer"];
+const POST_TYPES: PostType[] = ["bulletin", "plan", "marketplace", "volunteer"];
 
 /**
  * Never pass unchecked client values into geographic or database logic:
