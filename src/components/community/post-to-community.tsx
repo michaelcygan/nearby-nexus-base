@@ -24,11 +24,12 @@ export function PostToCommunity({
   name: string;
   size?: "default" | "sm";
 }) {
-  const { session, loading } = useSession();
+  const { session } = useSession();
   const boardPath = `/${slug}`;
 
-  if (loading) return <span className="h-9" aria-hidden />;
-
+  // The trigger renders on the server too, so the board's one call to action is
+  // in the first paint. Only the destination depends on the session, and the
+  // menu contents are read after hydration.
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
