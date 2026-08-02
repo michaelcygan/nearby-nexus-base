@@ -30,7 +30,7 @@ export const Route = createFileRoute("/$slug")({
     }
     const { community } = loaderData;
     const title = `${community.name} Today — Neighborhood Today`;
-    const description = `The free public bulletin board for ${community.name}, ${community.city}. Find neighborhood plans, marketplace posts, requests for help, and useful local places.`;
+    const description = communityDescription(community.slug, community.name, community.city);
     return {
       meta: [
         { title },
