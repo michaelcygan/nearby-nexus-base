@@ -14,6 +14,9 @@ export type Neighborhood = {
   status: CommunityStatus;
   tagline: string | null;
   about: string | null;
+  /** Approximate discovery anchor, not a boundary. Null on unmapped communities. */
+  center_lat: number | null;
+  center_lng: number | null;
 };
 
 /** The smallest shape a component needs to render a community's content. */
