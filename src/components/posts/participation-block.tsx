@@ -74,7 +74,13 @@ export function ParticipationBlock({ post }: { post: PostDetail }) {
           </Button>
         </div>
       ) : isAuthor ? (
-        <AuthorParticipants postId={post.id} />
+        post.type === "bulletin" ? (
+          <p className="mt-4 text-sm text-muted-foreground">
+            This is your post. Neighbors can message you about it.
+          </p>
+        ) : (
+          <AuthorParticipants postId={post.id} />
+        )
       ) : post.type === "marketplace" || post.type === "bulletin" ? (
         <MessageAuthorForm post={post} />
       ) : (
