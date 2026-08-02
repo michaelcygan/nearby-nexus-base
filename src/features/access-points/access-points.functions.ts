@@ -87,9 +87,9 @@ export const updateAccessPoint = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
-    const patch: Record<string, string> = {};
-    if (data.label) patch["label"] = data.label;
-    if (data.status) patch["status"] = data.status;
+    const patch: { label?: string; status?: "active" | "paused" } = {};
+    if (data.label) patch.label = data.label;
+    if (data.status) patch.status = data.status;
     if (Object.keys(patch).length === 0) return { ok: true };
 
     const { error } = await context.supabase

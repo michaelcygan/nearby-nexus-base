@@ -16,7 +16,7 @@ import {
 import { canonicalUrl } from "@/lib/seo";
 
 
-export const Route = createFileRoute("/n/$slug/p/$postId")({
+export const Route = createFileRoute("/$slug/p/$postId")({
   loader: async ({ params, context }) => {
     const post = await context.queryClient.ensureQueryData(postQuery(params.postId));
     if (!post) throw notFound();

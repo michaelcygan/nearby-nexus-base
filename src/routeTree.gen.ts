@@ -21,6 +21,7 @@ import { Route as SlugIndexRouteImport } from './routes/$slug.index'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
 import { Route as AuthenticatedPostsRouteImport } from './routes/_authenticated/posts'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as ACodeRouteImport } from './routes/a.$code'
 import { Route as NSplatRouteImport } from './routes/n.$'
 import { Route as UProfileIdRouteImport } from './routes/u.$profileId'
 import { Route as SlugPPostIdRouteImport } from './routes/$slug.p.$postId'
@@ -95,6 +96,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ACodeRoute = ACodeRouteImport.update({
+  id: '/a/$code',
+  path: '/a/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const NSplatRoute = NSplatRouteImport.update({
   id: '/n/$',
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/orders': typeof AuthenticatedOrdersRoute
   '/posts': typeof AuthenticatedPostsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/a/$code': typeof ACodeRoute
   '/n/$': typeof NSplatRoute
   '/u/$profileId': typeof UProfileIdRoute
   '/$slug/': typeof SlugIndexRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/orders': typeof AuthenticatedOrdersRoute
   '/posts': typeof AuthenticatedPostsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/a/$code': typeof ACodeRoute
   '/n/$': typeof NSplatRoute
   '/u/$profileId': typeof UProfileIdRoute
   '/$slug': typeof SlugIndexRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/posts': typeof AuthenticatedPostsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/a/$code': typeof ACodeRoute
   '/n/$': typeof NSplatRoute
   '/u/$profileId': typeof UProfileIdRoute
   '/$slug/': typeof SlugIndexRoute
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/posts'
     | '/profile'
+    | '/a/$code'
     | '/n/$'
     | '/u/$profileId'
     | '/$slug/'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/posts'
     | '/profile'
+    | '/a/$code'
     | '/n/$'
     | '/u/$profileId'
     | '/$slug'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/_authenticated/orders'
     | '/_authenticated/posts'
     | '/_authenticated/profile'
+    | '/a/$code'
     | '/n/$'
     | '/u/$profileId'
     | '/$slug/'
@@ -361,6 +373,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
+  ACodeRoute: typeof ACodeRoute
   NSplatRoute: typeof NSplatRoute
   UProfileIdRoute: typeof UProfileIdRoute
   StoreCheckoutReturnRoute: typeof StoreCheckoutReturnRoute
@@ -452,6 +465,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/a/$code': {
+      id: '/a/$code'
+      path: '/a/$code'
+      fullPath: '/a/$code'
+      preLoaderRoute: typeof ACodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/n/$': {
       id: '/n/$'
@@ -617,6 +637,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
+  ACodeRoute: ACodeRoute,
   NSplatRoute: NSplatRoute,
   UProfileIdRoute: UProfileIdRoute,
   StoreCheckoutReturnRoute: StoreCheckoutReturnRoute,

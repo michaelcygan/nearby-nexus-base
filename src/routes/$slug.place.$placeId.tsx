@@ -7,7 +7,7 @@ import { ErrorState } from "@/components/common/error-state";
 import { placeQuery } from "@/features/neighborhoods/queries";
 import { canonicalUrl } from "@/lib/seo";
 
-export const Route = createFileRoute("/n/$slug/place/$placeId")({
+export const Route = createFileRoute("/$slug/place/$placeId")({
   loader: async ({ params, context }) => {
     const place = await context.queryClient.ensureQueryData(placeQuery(params.placeId));
     if (!place) throw notFound();
