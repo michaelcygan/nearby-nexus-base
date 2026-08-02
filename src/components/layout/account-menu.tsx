@@ -72,9 +72,8 @@ export function AccountMenu() {
         <DropdownMenuItem asChild>
           <Link to="/messages">Messages</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/orders">Your orders</Link>
-        </DropdownMenuItem>
+        {/* Store and order surfaces are dormant for the Edgewater MVP; the
+            routes still exist but are not linked from navigation. */}
         {profile.data ? (
           <DropdownMenuItem asChild>
             <Link to="/u/$profileId" params={{ profileId: profile.data.id }}>
