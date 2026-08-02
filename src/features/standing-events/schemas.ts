@@ -36,7 +36,9 @@ export const standingEventInputSchema = z.object({
   venue_address: optionalText(160),
   title: z.string().trim().min(2).max(140),
   description: optionalText(600),
-  category: z.enum(standingEventCategories as [string, ...string[]]),
+  category: z.enum(
+    standingEventCategories as [StandingEventCategory, ...StandingEventCategory[]],
+  ),
   days_of_week: z.array(z.number().int().min(0).max(6)).min(1).max(7),
   start_time: wallClock,
   end_time: wallClock.nullable().optional().default(null),
