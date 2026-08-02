@@ -13,7 +13,7 @@ export function SiteHeader() {
           className="group flex min-w-0 items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <span aria-hidden className="h-5 w-5 shrink-0 rounded-sm bg-primary" />
-          <span className="truncate font-display text-base font-semibold tracking-tight">
+          <span className="truncate font-sans text-sm font-semibold tracking-tight text-muted-foreground sm:font-display sm:text-base sm:text-foreground">
             Neighborhood Today
           </span>
         </Link>
@@ -23,7 +23,7 @@ export function SiteHeader() {
               <Link
                 key={item.to}
                 to={item.to}
-                className="rounded-sm px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="hidden rounded-sm px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:inline-block"
                 activeProps={{ className: "text-foreground font-medium" }}
               >
                 {item.label}

@@ -70,29 +70,29 @@ function CommunityLayout() {
   return (
     <AppShell>
       <PageContainer>
-        <header className="flex flex-wrap items-end justify-between gap-4">
+        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 sm:flex sm:flex-wrap sm:justify-between sm:gap-4">
           <div className="min-w-0">
-            <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
-              {community.name}
-            </h1>
-            <p className="mt-2 text-sm uppercase tracking-[0.16em] text-muted-foreground">
+            <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               {placeLine(community)}
             </p>
+            <h1 className="mt-1 font-display text-3xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
+              {community.name}
+            </h1>
             {communitySubareaLine(community.slug) ? (
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 line-clamp-1 text-xs text-muted-foreground sm:text-sm">
                 {communitySubareaLine(community.slug)}
               </p>
             ) : null}
             {community.tagline ? (
-              <p className="mt-3 max-w-prose text-base text-muted-foreground">
+              <p className="mt-2 line-clamp-2 max-w-prose text-sm text-muted-foreground sm:text-base">
                 {community.tagline}
               </p>
             ) : null}
           </div>
-          <PostToCommunity slug={community.slug} name={community.name} />
+          <PostToCommunity slug={community.slug} name={community.name} size="sm" />
         </header>
 
-        <div className="pt-6">
+        <div className="pt-4">
           <Outlet />
         </div>
       </PageContainer>

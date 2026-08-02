@@ -18,7 +18,8 @@ import type {
 } from "./types";
 
 const NEIGHBORHOOD_COLUMNS =
-  "id, slug, name, city, state_code, location_type, timezone, status, tagline, about, center_lat, center_lng";
+  "id, slug, name, city, state_code, location_type, timezone, status, tagline, about, center_lat, center_lng, civic_provider, civic_area_codes";
+
 const COMMUNITY_REF_COLUMNS = "slug, name, city, state_code, timezone";
 const POST_COLUMNS =
   "id, type, status, title, body, created_at, expires_at, starts_at, location, capacity, price_cents, is_free, condition, needed_by, slots, image_paths, author_id, neighborhood_id, going_count, volunteer_count, interested_count";

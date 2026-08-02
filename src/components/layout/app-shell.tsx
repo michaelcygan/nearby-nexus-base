@@ -16,5 +16,5 @@ export function AppShell({ children }: { children: ReactNode }) {
 }
 
 export function PageContainer({ children }: { children: ReactNode }) {
-  return <div className="mx-auto w-full max-w-5xl px-4 py-8">{children}</div>;
+  return <div className="mx-auto w-full max-w-5xl px-4 py-5 sm:py-8">{children}</div>;
 }

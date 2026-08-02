@@ -1,19 +1,15 @@
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Suspense } from "react";
 
+import { PostGrid, useBlockedIds, withoutBlocked } from "@/components/community/board-posts";
 import { EmptyState } from "@/components/common/empty-state";
 import { PostListSkeleton } from "@/components/common/post-list-skeleton";
 import { PostToCommunity } from "@/components/community/post-to-community";
 import { ScopeControl } from "@/components/community/scope-control";
-import { PostCard } from "@/components/neighborhood/post-card";
-import {
-  DEFAULT_RADIUS_MILES,
-  type DiscoveryScope,
-  type RadiusMiles,
-  type ScopedPost,
-} from "@/features/discovery/types";
-import { myBlockedIdsQuery } from "@/features/moderation/queries";
+import { SectionHeading } from "@/components/community/section-heading";
+import { TodayHome } from "@/components/community/today-home";
+import { type DiscoveryScope, type RadiusMiles } from "@/features/discovery/types";
 import { neighborhoodPlacesQuery, scopedPostsQuery } from "@/features/neighborhoods/queries";
 import {
   boardViewPostType,
@@ -22,35 +18,16 @@ import {
   type Place,
   type PostType,
 } from "@/features/neighborhoods/types";
-import { useSession } from "@/hooks/use-session";
-
-/** Today needs at least this many visible local posts to feel like a board. */
-const LOCAL_DENSITY_TARGET = 6;
-const NEARBY_TODAY_MAX = 4;
-const NEARBY_TODAY_PER_COMMUNITY = 2;
-/** Help stays local: proximity and trust, not reach. */
-const NEARBY_TODAY_TYPES: PostType[] = ["plan", "marketplace"];
 
 function typesForView(view: BoardView): PostType[] | null {
   const type = boardViewPostType[view];
   return type ? [type] : null;
 }
 
-/** Private muting — a blocked neighbor's posts disappear for the blocker only. */
-function useBlockedIds() {
-  const { session } = useSession();
-  const blocked = useQuery({ ...myBlockedIdsQuery(), enabled: Boolean(session) });
-  return blocked.data?.blockedIds ?? [];
-}
-
-function withoutBlocked(posts: ScopedPost[], blockedIds: string[]) {
-  if (blockedIds.length === 0) return posts;
-  return posts.filter((post) => !post.author_id || !blockedIds.includes(post.author_id));
-}
-
 /**
  * The single board renderer. Every filter — Today, Plans, Marketplace, Help,
  * Places — routes through here; there is no per-filter page implementation.
+ * Today is the community homepage rather than an unfiltered post list.
  */
 export function BoardContent({
   community,
@@ -74,37 +51,11 @@ export function BoardContent({
       {view === "places" ? (
         <PlaceList slug={community.slug} />
       ) : view === "today" ? (
-        <TodayBoard community={community} />
+        <TodayHome community={community} />
       ) : (
         <ScopedPostList community={community} view={view} scope={scope} radiusMiles={radiusMiles} />
       )}
     </Suspense>
-  );
-}
-
-function SectionHeading({ children }: { children: string }) {
-  return (
-    <h2 className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-      {children}
-    </h2>
-  );
-}
-
-function PostGrid({
-  posts,
-  timeZone,
-  showOrigin,
-}: {
-  posts: ScopedPost[];
-  timeZone?: string | undefined;
-  showOrigin?: boolean | undefined;
-}) {
-  return (
-    <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} timeZone={timeZone} showOrigin={showOrigin} />
-      ))}
-    </ul>
   );
 }
 
@@ -182,89 +133,6 @@ function ScopedPostList({
         </div>
       )}
     </div>
-  );
-}
-
-/**
- * Today is the clearest expression of the current neighborhood: no scope
- * control. When the local board is thin, a clearly separated handful of nearby
- * plans and items help it feel connected — never disguised as local.
- */
-function TodayBoard({ community }: { community: Neighborhood }) {
-  const { data } = useSuspenseQuery(
-    scopedPostsQuery({ slug: community.slug, types: null, scope: "local" }),
-  );
-  const blockedIds = useBlockedIds();
-  const local = withoutBlocked(data.local, blockedIds);
-  const needsFill = local.length < LOCAL_DENSITY_TARGET;
-
-  return (
-    <div>
-      {local.length === 0 ? (
-        <div className="mt-6">
-          <EmptyState
-            title={`The ${community.name} board is ready. Be the first neighbor to post.`}
-            action={<PostToCommunity slug={community.slug} name={community.name} size="sm" />}
-          />
-        </div>
-      ) : (
-        <div className="mt-6">
-          <PostGrid posts={local} timeZone={community.timezone} />
-        </div>
-      )}
-
-      {needsFill ? <NearbyToday community={community} localVisibleCount={local.length} /> : null}
-    </div>
-  );
-}
-
-function NearbyToday({
-  community,
-  localVisibleCount,
-}: {
-  community: Neighborhood;
-  localVisibleCount: number;
-}) {
-  const blockedIds = useBlockedIds();
-  // Optional layer: a failure here must never take the local board down.
-  const { data } = useQuery({
-    ...scopedPostsQuery({
-      slug: community.slug,
-      types: NEARBY_TODAY_TYPES,
-      scope: "nearby",
-      radiusMiles: DEFAULT_RADIUS_MILES,
-      limit: 24,
-    }),
-  });
-
-  const candidates = withoutBlocked(data?.nearby ?? [], blockedIds);
-  if (candidates.length === 0) return null;
-
-  const room = Math.min(NEARBY_TODAY_MAX, Math.max(0, LOCAL_DENSITY_TARGET - localVisibleCount));
-  if (room === 0) return null;
-
-  // Newer first, distance as the tiebreak; at most two per neighboring community.
-  const perCommunity = new Map<string, number>();
-  const picked: ScopedPost[] = [];
-  for (const post of [...candidates].sort((a, b) => {
-    const byDate = b.created_at.localeCompare(a.created_at);
-    if (byDate !== 0) return byDate;
-    return (a.distance_miles ?? 0) - (b.distance_miles ?? 0);
-  })) {
-    const used = perCommunity.get(post.origin.slug) ?? 0;
-    if (used >= NEARBY_TODAY_PER_COMMUNITY) continue;
-    perCommunity.set(post.origin.slug, used + 1);
-    picked.push(post);
-    if (picked.length >= room) break;
-  }
-
-  if (picked.length === 0) return null;
-
-  return (
-    <section className="mt-10 border-t border-border pt-6">
-      <SectionHeading>Nearby today</SectionHeading>
-      <PostGrid posts={picked} showOrigin />
-    </section>
   );
 }
 

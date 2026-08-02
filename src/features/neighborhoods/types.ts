@@ -17,6 +17,10 @@ export type Neighborhood = {
   /** Approximate discovery anchor, not a boundary. Null on unmapped communities. */
   center_lat: number | null;
   center_lng: number | null;
+  /** Which public-data provider (if any) backs this community's civic sections. */
+  civic_provider: string | null;
+  /** Official area identifiers used by that provider (e.g. Chicago area numbers). */
+  civic_area_codes: string[];
 };
 
 /** The smallest shape a component needs to render a community's content. */
