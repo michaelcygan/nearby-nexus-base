@@ -1,3 +1,4 @@
+import { PlaceholderBar } from "@/components/community/section-placeholder";
 import type { CommunityWeather } from "@/features/community-today/types";
 import { formatTimestamp } from "@/features/neighborhoods/types";
 
@@ -9,11 +10,28 @@ import { formatTimestamp } from "@/features/neighborhoods/types";
 export function WeatherStrip({
   weather,
   timeZone,
+  pending,
 }: {
   weather: CommunityWeather | null;
   timeZone: string;
+  pending?: boolean;
 }) {
+  // The strip sits above the board, so its space is held while data is in
+  // flight — nothing below it may move once the reading arrives.
+  if (pending) {
+    return (
+      <section aria-label="Weather now" aria-busy="true" className="border-b border-border py-3">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <PlaceholderBar className="h-6 w-14" />
+          <PlaceholderBar className="h-4 w-48" />
+        </div>
+        <PlaceholderBar className="mt-2 h-3 w-40" />
+      </section>
+    );
+  }
+
   if (!weather) return null;
+
 
   const temperature = weather.observedTemperatureF ?? weather.forecastTemperatureF;
   const parts: string[] = [];

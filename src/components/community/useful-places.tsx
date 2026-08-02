@@ -1,14 +1,25 @@
 import { Link } from "@tanstack/react-router";
 
 import { SectionHeading } from "@/components/community/section-heading";
+import { SectionPlaceholder } from "@/components/community/section-placeholder";
 import type { Place } from "@/features/neighborhoods/types";
 
 const PREVIEW_LIMIT = 4;
 
 /** A short directory taste, with the full Places board one tap away. */
-export function UsefulPlaces({ slug, places }: { slug: string; places: Place[] }) {
+export function UsefulPlaces({
+  slug,
+  places,
+  pending,
+}: {
+  slug: string;
+  places: Place[];
+  pending?: boolean;
+}) {
+  if (pending) return <SectionPlaceholder label="Useful places" rows={2} />;
   if (places.length === 0) return null;
   const preview = places.slice(0, PREVIEW_LIMIT);
+
 
   return (
     <section className="border-t border-border pt-6">
