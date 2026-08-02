@@ -33,7 +33,7 @@ export type PostFormValues = {
   images: UploadedImage[];
 };
 
-export const emptyPostForm = (neighborhoodId = "", type: PostType = "plan"): PostFormValues => ({
+export const emptyPostForm = (neighborhoodId = "", type: PostType = "bulletin"): PostFormValues => ({
   neighborhood_id: neighborhoodId,
   type,
   title: "",
@@ -50,6 +50,7 @@ export const emptyPostForm = (neighborhoodId = "", type: PostType = "plan"): Pos
 });
 
 const typeHints: Record<PostType, string> = {
+  bulletin: "A note for the neighborhood board.",
   plan: "Something happening soon that neighbors can join.",
   marketplace: "Something you're selling, lending or giving away.",
   volunteer: "Help you need from people nearby.",
