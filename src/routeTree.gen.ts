@@ -30,6 +30,7 @@ import { Route as AuthenticatedAdminAccessPointsRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin.directory'
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
 import { Route as AuthenticatedAdminModerationRouteImport } from './routes/_authenticated/admin.moderation'
+import { Route as AuthenticatedAdminStandingEventsRouteImport } from './routes/_authenticated/admin.standing-events'
 import { Route as AuthenticatedAdminStoreRouteImport } from './routes/_authenticated/admin.store'
 import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authenticated/messages.index'
 import { Route as AuthenticatedMessagesThreadIdRouteImport } from './routes/_authenticated/messages.$threadId'
@@ -146,6 +147,12 @@ const AuthenticatedAdminModerationRoute =
     path: '/admin/moderation',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminStandingEventsRoute =
+  AuthenticatedAdminStandingEventsRouteImport.update({
+    id: '/admin/standing-events',
+    path: '/admin/standing-events',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminStoreRoute = AuthenticatedAdminStoreRouteImport.update({
   id: '/admin/store',
   path: '/admin/store',
@@ -207,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/admin/moderation': typeof AuthenticatedAdminModerationRoute
+  '/admin/standing-events': typeof AuthenticatedAdminStandingEventsRoute
   '/admin/store': typeof AuthenticatedAdminStoreRoute
   '/messages/$threadId': typeof AuthenticatedMessagesThreadIdRoute
   '/post/new': typeof AuthenticatedPostNewRoute
@@ -235,6 +243,7 @@ export interface FileRoutesByTo {
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/admin/moderation': typeof AuthenticatedAdminModerationRoute
+  '/admin/standing-events': typeof AuthenticatedAdminStandingEventsRoute
   '/admin/store': typeof AuthenticatedAdminStoreRoute
   '/messages/$threadId': typeof AuthenticatedMessagesThreadIdRoute
   '/post/new': typeof AuthenticatedPostNewRoute
@@ -266,6 +275,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
   '/_authenticated/admin/moderation': typeof AuthenticatedAdminModerationRoute
+  '/_authenticated/admin/standing-events': typeof AuthenticatedAdminStandingEventsRoute
   '/_authenticated/admin/store': typeof AuthenticatedAdminStoreRoute
   '/_authenticated/messages/$threadId': typeof AuthenticatedMessagesThreadIdRoute
   '/_authenticated/post/new': typeof AuthenticatedPostNewRoute
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/admin/directory'
     | '/admin/members'
     | '/admin/moderation'
+    | '/admin/standing-events'
     | '/admin/store'
     | '/messages/$threadId'
     | '/post/new'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/admin/directory'
     | '/admin/members'
     | '/admin/moderation'
+    | '/admin/standing-events'
     | '/admin/store'
     | '/messages/$threadId'
     | '/post/new'
@@ -355,6 +367,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/directory'
     | '/_authenticated/admin/members'
     | '/_authenticated/admin/moderation'
+    | '/_authenticated/admin/standing-events'
     | '/_authenticated/admin/store'
     | '/_authenticated/messages/$threadId'
     | '/_authenticated/post/new'
@@ -529,6 +542,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminModerationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/standing-events': {
+      id: '/_authenticated/admin/standing-events'
+      path: '/admin/standing-events'
+      fullPath: '/admin/standing-events'
+      preLoaderRoute: typeof AuthenticatedAdminStandingEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/store': {
       id: '/_authenticated/admin/store'
       path: '/admin/store'
@@ -589,6 +609,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
   AuthenticatedAdminModerationRoute: typeof AuthenticatedAdminModerationRoute
+  AuthenticatedAdminStandingEventsRoute: typeof AuthenticatedAdminStandingEventsRoute
   AuthenticatedAdminStoreRoute: typeof AuthenticatedAdminStoreRoute
   AuthenticatedMessagesThreadIdRoute: typeof AuthenticatedMessagesThreadIdRoute
   AuthenticatedPostNewRoute: typeof AuthenticatedPostNewRoute
@@ -604,6 +625,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminDirectoryRoute: AuthenticatedAdminDirectoryRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
   AuthenticatedAdminModerationRoute: AuthenticatedAdminModerationRoute,
+  AuthenticatedAdminStandingEventsRoute: AuthenticatedAdminStandingEventsRoute,
   AuthenticatedAdminStoreRoute: AuthenticatedAdminStoreRoute,
   AuthenticatedMessagesThreadIdRoute: AuthenticatedMessagesThreadIdRoute,
   AuthenticatedPostNewRoute: AuthenticatedPostNewRoute,
@@ -646,3 +668,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
