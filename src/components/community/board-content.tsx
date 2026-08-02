@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { EmptyState } from "@/components/common/empty-state";
 import { PostListSkeleton } from "@/components/common/post-list-skeleton";
 import { PostToCommunity } from "@/components/community/post-to-community";
+import { QuietBoardEmpty } from "@/components/community/quiet-board-empty";
 import { ScopeControl } from "@/components/community/scope-control";
 import { PostCard } from "@/components/neighborhood/post-card";
 import {
