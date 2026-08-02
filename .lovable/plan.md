@@ -1,33 +1,32 @@
-# Wave 2 — Standing events on the public board
+# Standing Neighborhood Events MVP — Remaining Waves
 
-Two new read-only sections, both driven by the Wave 1 recurrence engine and the existing public `getStandingEvents` server function. No schema changes, no new dependencies, no writes.
+Wave 1 (data foundation + admin CRUD) and Wave 2 (public "Happening today" and Plans sections) are complete. Two waves remain to finish the MVP.
 
-## What the reader sees
+## Wave 3: Image Discovery
 
-**Today homepage — "Happening today"**
-- Sits directly under "On the board" / "Nearby today", above "Explore the board", so neighbor posts still come first.
-- Only occurrences happening on the community's current local day (including a night that runs past midnight).
-- Local community first; nearby communities fill in only when there are fewer than 3 local ones, capped at 4 items total and clearly labeled with the community name.
-- Each row: event title, venue, "Today · 7:30 PM", category, and a "Check with venue" note linking out to the venue's own page.
-- Absent entirely when nothing is on tonight — no empty box.
+Goal: Let admins attach venue/promoter images to standing events without uploading files manually.
 
-**Plans tab — "Standing local events"**
-- Below the neighbor plans list (both the "In {community}" and "Nearby" sections), separated by a rule so it never reads as resident-posted.
-- Next seven days, grouped by day heading ("Today", "Tomorrow", "Thu, Aug 6"), local community only.
-- One line of context: recurring nights hosted by local venues, verify with the venue.
-- Absent when the community has no active series.
+### Work
+1. Add `image_url` and `image_verified_at` columns to `standing_events`.
+2. Create a server function that fetches a venue `source_url`, parses Open Graph and Twitter Card meta tags, and returns candidate image URLs.
+3. Add an admin UI action on each event row: “Discover image” → preview candidates → approve one → write `image_url` and `image_verified_at`.
+4. Render `image_url` in `StandingEventCard` and `StandingEventsSection` when present, with a safe external link check.
+5. Validate that discovered URLs are HTTPS and from the same host set as the source link.
 
-## Technical notes
+## Wave 4: Proximity & Freshness
 
-- New components: `src/components/community/standing-event-card.tsx` (shared row), `happening-today.tsx`, `standing-events-list.tsx`.
-- Data: `standingEventsQuery` (already built) via `useQuery`, gated on `useHydrated()` exactly like the other ambient sections, with `SectionPlaceholder` holding space while in flight. Client-only is required here, not optional: "Today" is relative to the reader's clock, so rendering it during SSR would produce a hydration mismatch.
-- Occurrence windows come from `todayRange` / `upcomingRange` + `getStandingEventOccurrences`, using the community's `timezone`. No new date math.
-- External links reuse the existing `safeExternalUrl` allow-list treatment used by the city-data sections; every card is `target="_blank" rel="noreferrer noopener"`.
-- Wiring: `today-home.tsx` gains one section; `board-content.tsx`'s `ScopedPostList` renders the Plans section when `view === "plans"` (including the empty-board case, so a community with no neighbor plans still shows real standing events).
-- Failure and empty states stay silent — a curated-events outage must not affect the board.
+Goal: Make standing events useful outside the home community and keep the dataset from going stale.
 
-## Verification
+### Work
+1. Extend `standingEventsQuery` to support a `nearby` radius fallback in the Plans section (reuse existing `resolveCommunityScope` distance logic).
+2. Add a `last_verified_at` column and a `verified_within_days` admin filter.
+3. Add a small admin banner/stale indicator for events older than 90 days.
+4. Implement a lightweight “Verify now” admin action that touches `last_verified_at`.
+5. Production QA: run the full community board flow on mobile and desktop, check DST recurrence correctness, confirm external links open safely, and verify no console errors.
 
-- Playwright screenshots at 390px and desktop for Edgewater, Lakeview, and Lincoln Park: Today and Plans.
-- Confirm a Lakeview late-night series still shows under "Happening today" late in the evening, and that a paused/draft series never appears publicly.
-- Recurrence tests, typecheck, and lint re-run.
+## Deliverables
+
+- Image discovery tooling in admin.
+- Standing events rendered with images where available.
+- Nearby fallback for sparse communities.
+- Staleness guardrails and final QA pass.
