@@ -45,7 +45,8 @@ export const Route = createFileRoute("/$slug/")({
 
 function CommunityBoard() {
   const { slug } = Route.useParams();
-  const { view } = Route.useSearch();
+  const search = Route.useSearch();
+  const view: BoardView = search.view ?? "today";
   const { data: community } = useSuspenseQuery(neighborhoodQuery(slug));
 
   if (!community) return null;
