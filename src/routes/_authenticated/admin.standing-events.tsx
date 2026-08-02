@@ -673,82 +673,103 @@ function AdminStandingEventsPage() {
             <p className="mt-4 text-muted-foreground">Nothing curated here yet.</p>
           ) : (
             <ul className="mt-4 divide-y divide-border">
-              {(events.data ?? []).map((event) => {
-                const stale = isStaleVerification(event.last_verified_at);
-                return (
-                  <li key={event.id} className="py-4">
-                    <div className="flex flex-wrap items-baseline gap-x-2">
-                      <h3 className="text-base">{event.title}</h3>
-                      <span className="text-sm text-muted-foreground">{event.venue_name}</span>
-                      <span className="text-xs uppercase tracking-wide text-muted-foreground">
-                        {event.status}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {cadenceLabelFor({
-                        ...event,
-                        origin: { slug: "", name: "", isNearby: false },
-                      })}
-                      {" · "}
-                      {standingEventCategoryLabels[event.category]}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {event.last_verified_at
-                        ? `Verified ${event.last_verified_at}`
-                        : "Never verified"}
-                      {stale ? " — needs a re-check" : ""}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-3 text-sm">
-                      <button
-                        type="button"
-                        className="underline underline-offset-4"
-                        onClick={() => {
-                          setEditingId(event.id);
-                          setValues(toForm(event));
-                          setErrors({});
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        className="underline underline-offset-4"
-                        onClick={() => verify.mutate(event.id)}
-                      >
-                        Mark verified
-                      </button>
-                      <button
-                        type="button"
-                        className="underline underline-offset-4"
-                        onClick={() =>
-                          changeStatus.mutate({
-                            eventId: event.id,
-                            status: event.status === "active" ? "paused" : "active",
-                          })
-                        }
-                      >
-                        {event.status === "active" ? "Pause" : "Make active"}
-                      </button>
-                      <a
-                        href={event.source_url}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="underline underline-offset-4"
-                      >
-                        Open source
-                      </a>
-                      <button
-                        type="button"
-                        className="text-destructive underline underline-offset-4"
-                        onClick={() => remove.mutate(event.id)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
+              {(events.data ?? [])
+                .filter((event) => {
+                  if (verifiedFilter === "all") return true;
+                  const stale = isStaleVerification(event.last_verified_at);
+                  if (verifiedFilter === "stale") return stale;
+                  return !stale;
+                })
+                .map((event) => {
+                  const stale = isStaleVerification(event.last_verified_at);
+                  const imageStale = isStaleVerification(event.image_verified_at);
+                  return (
+                    <li key={event.id} className="py-4">
+                      <div className="flex flex-wrap items-baseline gap-x-2">
+                        <h3 className="text-base">{event.title}</h3>
+                        <span className="text-sm text-muted-foreground">{event.venue_name}</span>
+                        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                          {event.status}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {cadenceLabelFor({
+                          ...event,
+                          origin: { slug: "", name: "", isNearby: false },
+                        })}
+                        {" · "}
+                        {standingEventCategoryLabels[event.category]}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {event.last_verified_at
+                          ? `Verified ${event.last_verified_at}`
+                          : "Never verified"}
+                        {stale ? " — needs a re-check" : ""}
+                        {event.image_url
+                          ? ` · Image ${event.image_verified_at ? event.image_verified_at : "unapproved"}`
+                          : ""}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-3 text-sm">
+                        <button
+                          type="button"
+                          className="underline underline-offset-4"
+                          onClick={() => {
+                            setEditingId(event.id);
+                            setValues(toForm(event));
+                            setErrors({});
+                            setDiscoveredImages(null);
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="underline underline-offset-4"
+                          onClick={() => verify.mutate(event.id)}
+                        >
+                          Mark verified
+                        </button>
+                        {event.image_url && imageStale ? (
+                          <button
+                            type="button"
+                            className="underline underline-offset-4"
+                            onClick={() => verifyImage.mutate(event.id)}
+                          >
+                            Approve image
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          className="underline underline-offset-4"
+                          onClick={() =>
+                            changeStatus.mutate({
+                              eventId: event.id,
+                              status: event.status === "active" ? "paused" : "active",
+                            })
+                          }
+                        >
+                          {event.status === "active" ? "Pause" : "Make active"}
+                        </button>
+                        <a
+                          href={event.source_url}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="underline underline-offset-4"
+                        >
+                          Open source
+                        </a>
+                        <button
+                          type="button"
+                          className="text-destructive underline underline-offset-4"
+                          onClick={() => remove.mutate(event.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
             </ul>
           )}
         </section>
