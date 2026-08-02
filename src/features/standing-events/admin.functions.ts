@@ -96,6 +96,21 @@ export const verifyStandingEvent = createServerFn({ method: "POST" })
     return { last_verified_at: today };
   });
 
+/** Records that the linked image was reviewed and approved today. */
+export const verifyStandingEventImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ eventId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context as never);
+    const today = new Date().toISOString().slice(0, 10);
+    const { error } = await context.supabase
+      .from("standing_events")
+      .update({ image_verified_at: today })
+      .eq("id", data.eventId);
+    if (error) throw new Error(error.message);
+    return { image_verified_at: today };
+  });
+
 export const deleteStandingEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ eventId: z.string().uuid() }).parse(data))
