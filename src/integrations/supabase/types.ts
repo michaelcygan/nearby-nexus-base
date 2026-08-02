@@ -126,6 +126,8 @@ export type Database = {
       neighborhoods: {
         Row: {
           about: string | null
+          center_lat: number | null
+          center_lng: number | null
           city: string
           created_at: string
           id: string
@@ -140,6 +142,8 @@ export type Database = {
         }
         Insert: {
           about?: string | null
+          center_lat?: number | null
+          center_lng?: number | null
           city: string
           created_at?: string
           id?: string
@@ -154,6 +158,8 @@ export type Database = {
         }
         Update: {
           about?: string | null
+          center_lat?: number | null
+          center_lng?: number | null
           city?: string
           created_at?: string
           id?: string
