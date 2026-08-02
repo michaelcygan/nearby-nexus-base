@@ -496,16 +496,53 @@ function AdminStandingEventsPage() {
               />
               {fieldError("timezone")}
             </div>
-            <div>
+            <div className="relative">
               <Label htmlFor="image_url">Image URL (optional)</Label>
-              <Input
-                id="image_url"
-                className="mt-1.5"
-                placeholder="https://"
-                value={values.image_url}
-                onChange={(event) => setValues({ ...values, image_url: event.target.value })}
-              />
+              <div className="mt-1.5 flex gap-2">
+                <Input
+                  id="image_url"
+                  className="flex-1"
+                  placeholder="https://"
+                  value={values.image_url}
+                  onChange={(event) => setValues({ ...values, image_url: event.target.value })}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => handleDiscoverImages(values.source_url)}
+                  disabled={discovering || !values.source_url}
+                >
+                  {discovering ? "Looking…" : "Discover"}
+                </Button>
+              </div>
               {fieldError("image_url")}
+              {discoveredImages && (
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {discoveredImages.map((url) => (
+                    <button
+                      key={url}
+                      type="button"
+                      onClick={() => setValues({ ...values, image_url: url })}
+                      className="group relative overflow-hidden rounded border border-border text-left"
+                    >
+                      <img
+                        src={url}
+                        alt="Discovered image"
+                        className="h-24 w-full object-cover"
+                        loading="lazy"
+                      />
+                      <span className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                        Use this image
+                      </span>
+                    </button>
+                  ))}
+                  {discoveredImages.length === 0 && (
+                    <p className="col-span-3 text-sm text-muted-foreground">
+                      No images found on that page.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <Label htmlFor="image_attribution">Image credit (optional)</Label>
