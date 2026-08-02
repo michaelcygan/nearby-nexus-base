@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function assertAdmin(context: { supabase: { rpc: (...args: unknown[]) => unknown }; userId: string }) {
+async function assertAdmin(context: { supabase: { rpc: (...args: unknown[]) => Promise<{ data: boolean | null }> }; userId: string }) {
   const { data } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
