@@ -7,7 +7,7 @@ import type { StandingEvent } from "./types";
  */
 
 export const ADMIN_COLUMNS =
-  "id, source_key, neighborhood_id, place_id, venue_name, venue_address, title, description, category, days_of_week, start_time, end_time, end_day_offset, timezone, source_url, image_url, image_attribution, exception_note, starts_on, ends_on, excluded_dates, status, last_verified_at";
+  "id, source_key, neighborhood_id, place_id, venue_name, venue_address, title, description, category, days_of_week, start_time, end_time, end_day_offset, timezone, source_url, image_url, image_attribution, exception_note, starts_on, ends_on, excluded_dates, status, last_verified_at, image_verified_at, verified_by";
 
 type AdminContext = {
   supabase: {
