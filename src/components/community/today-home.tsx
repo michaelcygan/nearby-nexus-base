@@ -73,8 +73,3 @@ export function TodayHome({ community }: { community: Neighborhood }) {
     </div>
   );
 }
-
-/** Kept so the Suspense boundary in BoardContent has something to await. */
-export function useTodayReady(slug: string) {
-  return useSuspenseQuery(communityTodayQuery(slug));
-}
