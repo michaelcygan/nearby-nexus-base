@@ -469,6 +469,114 @@ export type Database = {
           },
         ]
       }
+      standing_events: {
+        Row: {
+          category: Database["public"]["Enums"]["standing_event_category"]
+          created_at: string
+          created_by: string | null
+          days_of_week: number[]
+          description: string | null
+          end_day_offset: number
+          end_time: string | null
+          ends_on: string | null
+          exception_note: string | null
+          excluded_dates: string[]
+          id: string
+          image_attribution: string | null
+          image_url: string | null
+          last_verified_at: string | null
+          neighborhood_id: string | null
+          origin: string
+          place_id: string | null
+          source_key: string
+          source_url: string
+          start_time: string
+          starts_on: string | null
+          status: Database["public"]["Enums"]["standing_event_status"]
+          timezone: string
+          title: string
+          updated_at: string
+          venue_address: string | null
+          venue_name: string
+          verified_by: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["standing_event_category"]
+          created_at?: string
+          created_by?: string | null
+          days_of_week: number[]
+          description?: string | null
+          end_day_offset?: number
+          end_time?: string | null
+          ends_on?: string | null
+          exception_note?: string | null
+          excluded_dates?: string[]
+          id?: string
+          image_attribution?: string | null
+          image_url?: string | null
+          last_verified_at?: string | null
+          neighborhood_id?: string | null
+          origin?: string
+          place_id?: string | null
+          source_key: string
+          source_url: string
+          start_time: string
+          starts_on?: string | null
+          status?: Database["public"]["Enums"]["standing_event_status"]
+          timezone?: string
+          title: string
+          updated_at?: string
+          venue_address?: string | null
+          venue_name: string
+          verified_by?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["standing_event_category"]
+          created_at?: string
+          created_by?: string | null
+          days_of_week?: number[]
+          description?: string | null
+          end_day_offset?: number
+          end_time?: string | null
+          ends_on?: string | null
+          exception_note?: string | null
+          excluded_dates?: string[]
+          id?: string
+          image_attribution?: string | null
+          image_url?: string | null
+          last_verified_at?: string | null
+          neighborhood_id?: string | null
+          origin?: string
+          place_id?: string | null
+          source_key?: string
+          source_url?: string
+          start_time?: string
+          starts_on?: string | null
+          status?: Database["public"]["Enums"]["standing_event_status"]
+          timezone?: string
+          title?: string
+          updated_at?: string
+          venue_address?: string | null
+          venue_name?: string
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standing_events_neighborhood_id_fkey"
+            columns: ["neighborhood_id"]
+            isOneToOne: false
+            referencedRelation: "neighborhoods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "standing_events_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       store_listings: {
         Row: {
           condition: string | null
@@ -739,6 +847,16 @@ export type Database = {
         | "other"
       report_status: "open" | "dismissed" | "actioned"
       report_target: "post" | "place" | "profile" | "thread" | "store_listing"
+      standing_event_category:
+        | "trivia"
+        | "karaoke"
+        | "bingo"
+        | "games"
+        | "drag"
+        | "live_music"
+        | "show_tunes"
+        | "nightlife"
+      standing_event_status: "draft" | "active" | "paused"
       store_listing_status:
         | "draft"
         | "available"
@@ -895,6 +1013,17 @@ export const Constants = {
       ],
       report_status: ["open", "dismissed", "actioned"],
       report_target: ["post", "place", "profile", "thread", "store_listing"],
+      standing_event_category: [
+        "trivia",
+        "karaoke",
+        "bingo",
+        "games",
+        "drag",
+        "live_music",
+        "show_tunes",
+        "nightlife",
+      ],
+      standing_event_status: ["draft", "active", "paused"],
       store_listing_status: [
         "draft",
         "available",
