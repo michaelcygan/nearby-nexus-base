@@ -119,16 +119,12 @@ function ThreadPage() {
               <li
                 key={message.id}
                 className={`max-w-[85%] rounded-md border p-3 text-sm ${
-                  mine
-                    ? "ml-auto border-primary/40 bg-primary/5"
-                    : "border-border bg-card"
+                  mine ? "ml-auto border-primary/40 bg-primary/5" : "border-border bg-card"
                 }`}
               >
                 <p className="whitespace-pre-line">{message.body}</p>
                 <p className="mt-2 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-                  {mine ? "You" : detail.other_name} ·{" "}
-                  {formatTimestamp(message.created_at)}
-
+                  {mine ? "You" : detail.other_name} · {formatTimestamp(message.created_at)}
                 </p>
               </li>
             );

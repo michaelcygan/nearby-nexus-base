@@ -41,9 +41,7 @@ export function PostImageUploader({
           .upload(path, compressed, { contentType: "image/jpeg", upsert: false });
         if (error) throw new Error(error.message);
 
-        const { data } = await supabase.storage
-          .from("post-images")
-          .createSignedUrl(path, 60 * 60);
+        const { data } = await supabase.storage.from("post-images").createSignedUrl(path, 60 * 60);
         next.push({ path, url: data?.signedUrl ?? "" });
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "That photo could not be added.");

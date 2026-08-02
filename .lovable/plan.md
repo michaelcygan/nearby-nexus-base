@@ -15,12 +15,14 @@ Add selective cross-neighborhood discovery as query-time lenses over the existin
 ## Wave 2 — Marketplace vertical slice
 
 Server:
+
 - `src/features/discovery/scope.server.ts`: `resolveCommunityScope({ originCommunity, scope, radiusMiles })` → published communities with valid coordinates plus distance from origin. `city` scope matches normalized city + state, excludes drafts, ignores radius. Missing origin coordinates → local-only fallback.
 - Refactor `fetchNeighborhoodPosts` into a scoped fetcher returning `{ local: ScopedPost[]; nearby: ScopedPost[] }`, where each post carries `origin: PostOrigin` and nearby posts carry `distance_miles`. Add the missing `expires_at is null or expires_at > now()` filter to every public post read and to `fetchNeighborhoodCounts`.
 - Nearby ordering: local first, then other communities by distance, newer posts first within equal distance. Preserve the current overall limit; no pagination.
 - Server-fn input validation: `scope ∈ {local,nearby,city}`, `radius ∈ {3,5,10}`, radius ignored unless nearby, anything unsupported → local.
 
 Client:
+
 - Extend `$slug.index.tsx` `validateSearch` with `scope` and `radius`; local = params omitted; nearby without radius defaults to 5; today/help/places normalize to local. Board tab links reset scope/radius so a Marketplace radius never leaks into Help.
 - React Query key gains slug, type, scope, radius, limit.
 - `PostCard` takes the post's origin slug for its link and optionally renders a quiet origin line (`From Lake View · 2.4 mi`, one decimal). Local-only lists show no origin line.

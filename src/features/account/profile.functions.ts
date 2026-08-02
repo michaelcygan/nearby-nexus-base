@@ -98,9 +98,7 @@ export const listMySavedNeighborhoods = createServerFn({ method: "GET" })
 
 export const saveNeighborhood = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
-    z.object({ neighborhoodId: z.string().uuid() }).parse(data),
-  )
+  .inputValidator((data: unknown) => z.object({ neighborhoodId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("saved_neighborhoods")
@@ -114,9 +112,7 @@ export const saveNeighborhood = createServerFn({ method: "POST" })
 
 export const unsaveNeighborhood = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
-    z.object({ neighborhoodId: z.string().uuid() }).parse(data),
-  )
+  .inputValidator((data: unknown) => z.object({ neighborhoodId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("saved_neighborhoods")

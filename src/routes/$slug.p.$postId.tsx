@@ -19,9 +19,7 @@ export const Route = createFileRoute("/$slug/p/$postId")({
   loader: async ({ params, context }) => {
     // fetchPostById only resolves a post that belongs to this slug, so a post
     // from another community 404s here instead of rendering.
-    const post = await context.queryClient.ensureQueryData(
-      postQuery(params.slug, params.postId),
-    );
+    const post = await context.queryClient.ensureQueryData(postQuery(params.slug, params.postId));
     if (!post) throw notFound();
     return { post };
   },
@@ -114,9 +112,7 @@ function PostDetailPage() {
         <dl className="mt-6 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
           {facts.map(([label, value]) => (
             <div key={label} className="bg-card p-4">
-              <dt className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                {label}
-              </dt>
+              <dt className="text-xs uppercase tracking-[0.12em] text-muted-foreground">{label}</dt>
               <dd className="mt-1 font-display text-base font-semibold">{value}</dd>
             </div>
           ))}

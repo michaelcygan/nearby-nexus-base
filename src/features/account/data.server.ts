@@ -31,7 +31,9 @@ export async function signAvatarUrl(
   avatarPath: string | null,
 ): Promise<string | null> {
   if (!avatarPath) return null;
-  const { data } = await client.storage.from("avatars").createSignedUrl(avatarPath, AVATAR_TTL_SECONDS);
+  const { data } = await client.storage
+    .from("avatars")
+    .createSignedUrl(avatarPath, AVATAR_TTL_SECONDS);
   return data?.signedUrl ?? null;
 }
 

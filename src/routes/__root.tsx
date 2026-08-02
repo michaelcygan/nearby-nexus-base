@@ -14,7 +14,6 @@ import { Toaster } from "../components/ui/sonner";
 import { supabase } from "../integrations/supabase/client";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
-
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -83,13 +82,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Neighborhood Today" },
       {
         name: "description",
-        content: "A local noticeboard for your neighborhood: plans, marketplace, volunteering, directory and merch.",
+        content:
+          "A local noticeboard for your neighborhood: plans, marketplace, volunteering, directory and merch.",
       },
       { property: "og:site_name", content: "Neighborhood Today" },
       { property: "og:title", content: "Neighborhood Today" },
       {
         property: "og:description",
-        content: "A local noticeboard for your neighborhood: plans, marketplace, volunteering, directory and merch.",
+        content:
+          "A local noticeboard for your neighborhood: plans, marketplace, volunteering, directory and merch.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -149,4 +150,3 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
-

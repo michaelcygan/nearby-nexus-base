@@ -51,7 +51,9 @@ function CheckoutReturn() {
         </p>
       ) : order.data ? (
         <div className="mt-4 rounded-md border border-border bg-card p-4">
-          <p className="font-display text-lg font-semibold">{order.data.listing?.title ?? "Store item"}</p>
+          <p className="font-display text-lg font-semibold">
+            {order.data.listing?.title ?? "Store item"}
+          </p>
           <p className="mt-1 text-sm text-muted-foreground">
             {formatMoney(order.data.amount_cents, order.data.currency)} ·{" "}
             {storeOrderStatusLabels[order.data.status]}

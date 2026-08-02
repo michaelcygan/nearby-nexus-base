@@ -25,7 +25,9 @@ export async function signPostImages(
   const unique = [...new Set(paths.filter(Boolean))];
   if (unique.length === 0) return {};
 
-  const { data } = await client.storage.from(POST_IMAGE_BUCKET).createSignedUrls(unique, IMAGE_TTL_SECONDS);
+  const { data } = await client.storage
+    .from(POST_IMAGE_BUCKET)
+    .createSignedUrls(unique, IMAGE_TTL_SECONDS);
   const map: Record<string, string> = {};
   for (const entry of data ?? []) {
     if (entry.path) map[entry.path] = entry.signedUrl;

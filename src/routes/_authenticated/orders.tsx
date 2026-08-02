@@ -59,7 +59,7 @@ function OrdersPage() {
               <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
                 {storeOrderStatusLabels[order.status]}
               </p>
-              {order.pickup_note ?? order.listing?.pickup_notes ? (
+              {(order.pickup_note ?? order.listing?.pickup_notes) ? (
                 <p className="mt-2 text-sm text-muted-foreground">
                   Pickup: {order.pickup_note ?? order.listing?.pickup_notes}
                 </p>

@@ -234,7 +234,9 @@ export async function reconcileBuyerOrder(sessionId: string, userId: string, env
 
   const { data: fresh } = await supabaseAdmin
     .from("store_orders")
-    .select("id, listing_id, status, amount_cents, currency, created_at, paid_at, fulfilled_at, pickup_note")
+    .select(
+      "id, listing_id, status, amount_cents, currency, created_at, paid_at, fulfilled_at, pickup_note",
+    )
     .eq("id", order.id)
     .maybeSingle();
 

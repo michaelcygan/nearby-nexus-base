@@ -9,13 +9,22 @@ export function SiteFooter() {
           A quiet, local noticeboard for the block you actually live on.
         </p>
         <nav aria-label="Footer" className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-          <Link to="/community-guidelines" className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+          <Link
+            to="/community-guidelines"
+            className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
             Community guidelines
           </Link>
-          <Link to="/privacy" className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+          <Link
+            to="/privacy"
+            className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
             Privacy
           </Link>
-          <Link to="/terms" className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+          <Link
+            to="/terms"
+            className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
             Terms
           </Link>
         </nav>

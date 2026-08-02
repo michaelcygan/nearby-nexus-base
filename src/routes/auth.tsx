@@ -121,7 +121,6 @@ function AuthPage() {
     };
   }, [navigate, search.redirect, search.action]);
 
-
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     const parsed = credentialsSchema.safeParse({ email, password });
@@ -209,8 +208,8 @@ function AuthPage() {
             <div className="mt-8 rounded-md border border-border bg-card p-5">
               <h2 className="font-display text-lg">Confirm your email</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                We sent a confirmation link to <strong>{email}</strong>. Click it to finish
-                creating your account, then come back here to sign in.
+                We sent a confirmation link to <strong>{email}</strong>. Click it to finish creating
+                your account, then come back here to sign in.
               </p>
               <Button
                 variant="outline"

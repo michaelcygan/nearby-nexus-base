@@ -25,7 +25,11 @@ import { myParticipationQuery } from "@/features/participation/queries";
 import { roleLabels } from "@/features/participation/types";
 import { unblockNeighbor } from "@/features/moderation/block.functions";
 import { myBlocksQuery, myReportsQuery } from "@/features/moderation/queries";
-import { reportReasonLabels, reportStatusLabels, reportTargetLabels } from "@/features/moderation/types";
+import {
+  reportReasonLabels,
+  reportStatusLabels,
+  reportTargetLabels,
+} from "@/features/moderation/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -73,8 +77,11 @@ function ProfilePage() {
   }, [profile.data]);
 
   const save = useMutation({
-    mutationFn: (values: { display_name: string; about: string; home_neighborhood_id: string | null }) =>
-      updateMyProfile({ data: values }),
+    mutationFn: (values: {
+      display_name: string;
+      about: string;
+      home_neighborhood_id: string | null;
+    }) => updateMyProfile({ data: values }),
     onSuccess: () => {
       toast.success("Profile saved.");
       void queryClient.invalidateQueries({ queryKey: ["my-profile"] });
@@ -108,7 +115,12 @@ function ProfilePage() {
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData.user?.id;
       if (!userId) throw new Error("You're signed out.");
-      const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const extension =
+        file.name
+          .split(".")
+          .pop()
+          ?.toLowerCase()
+          .replace(/[^a-z0-9]/g, "") || "jpg";
       const path = `${userId}/avatar-${Date.now()}.${extension}`;
       const { error: uploadError } = await supabase.storage
         .from("avatars")
@@ -287,8 +299,8 @@ function ProfilePage() {
                 <Skeleton className="h-16 w-full max-w-md" />
               ) : (saved.data ?? []).length === 0 ? (
                 <p className="max-w-prose text-sm text-muted-foreground">
-                  You haven't saved any neighborhoods yet. Open a board and hit “Save
-                  neighborhood” to keep it here.
+                  You haven't saved any neighborhoods yet. Open a board and hit “Save neighborhood”
+                  to keep it here.
                 </p>
               ) : (
                 <ul className="space-y-3">
@@ -445,8 +457,7 @@ function MyReports() {
                 {reportTargetLabels[report.target_type]} · {reportReasonLabels[report.reason]}
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                {reportStatusLabels[report.status]} ·{" "}
-                {formatTimestamp(report.created_at)}
+                {reportStatusLabels[report.status]} · {formatTimestamp(report.created_at)}
               </p>
             </li>
           ))}

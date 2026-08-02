@@ -92,10 +92,7 @@ export const updateAccessPoint = createServerFn({ method: "POST" })
     if (data.status) patch.status = data.status;
     if (Object.keys(patch).length === 0) return { ok: true };
 
-    const { error } = await context.supabase
-      .from("access_points")
-      .update(patch)
-      .eq("id", data.id);
+    const { error } = await context.supabase.from("access_points").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

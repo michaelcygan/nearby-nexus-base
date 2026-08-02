@@ -21,7 +21,8 @@ async function handleEvent(event: { type: string; data: { object: Record<string,
       if (!sessionId) return;
       // Delayed-notification methods stay "unpaid" until settlement; wait for
       // the async event in that case.
-      if (event.type === "checkout.session.completed" && session.payment_status === "unpaid") return;
+      if (event.type === "checkout.session.completed" && session.payment_status === "unpaid")
+        return;
       await markSessionPaid(sessionId, {
         paymentIntentId:
           typeof session.payment_intent === "string"

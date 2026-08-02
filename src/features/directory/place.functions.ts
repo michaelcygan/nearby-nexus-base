@@ -9,7 +9,9 @@ const PLACE_COLUMNS =
 
 /** Role check runs through the caller's own RLS-scoped client, never service role. */
 async function requireAdmin(context: {
-  supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => Promise<{ data: unknown }> };
+  supabase: {
+    rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => Promise<{ data: unknown }>;
+  };
   userId: string;
 }) {
   const { data } = await context.supabase.rpc("has_role", {
@@ -31,9 +33,7 @@ export const getMyAdminStatus = createServerFn({ method: "GET" })
 
 export const listPlacesForAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
-    z.object({ neighborhoodId: z.string().uuid() }).parse(data),
-  )
+  .inputValidator((data: unknown) => z.object({ neighborhoodId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     await requireAdmin(context as never);
     const { data: rows, error } = await context.supabase
@@ -68,10 +68,7 @@ export const updatePlace = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdmin(context as never);
     const values = placeInputSchema.parse(data.values);
-    const { error } = await context.supabase
-      .from("places")
-      .update(values)
-      .eq("id", data.placeId);
+    const { error } = await context.supabase.from("places").update(values).eq("id", data.placeId);
     if (error) throw new Error(error.message);
     return { id: data.placeId };
   });

@@ -83,21 +83,21 @@ export const listReports = createServerFn({ method: "GET" })
 
     const [{ data: posts }, { data: places }, { data: profiles }, { data: listings }] =
       await Promise.all([
-      postIds.length
-        ? supabase
-            .from("posts")
-            .select("id, title, body, hidden, status, neighborhoods:neighborhood_id(slug)")
-            .in("id", postIds)
-        : Promise.resolve({ data: [] as never[] }),
-      placeIds.length
-        ? supabase
-            .from("places")
-            .select("id, name, description, hidden, removed, neighborhoods:neighborhood_id(slug)")
-            .in("id", placeIds)
-        : Promise.resolve({ data: [] as never[] }),
-      profileIds.length
-        ? supabase.from("profiles").select("id, display_name, about").in("id", profileIds)
-        : Promise.resolve({ data: [] as never[] }),
+        postIds.length
+          ? supabase
+              .from("posts")
+              .select("id, title, body, hidden, status, neighborhoods:neighborhood_id(slug)")
+              .in("id", postIds)
+          : Promise.resolve({ data: [] as never[] }),
+        placeIds.length
+          ? supabase
+              .from("places")
+              .select("id, name, description, hidden, removed, neighborhoods:neighborhood_id(slug)")
+              .in("id", placeIds)
+          : Promise.resolve({ data: [] as never[] }),
+        profileIds.length
+          ? supabase.from("profiles").select("id, display_name, about").in("id", profileIds)
+          : Promise.resolve({ data: [] as never[] }),
         listingIds.length
           ? supabase
               .from("store_listings")
