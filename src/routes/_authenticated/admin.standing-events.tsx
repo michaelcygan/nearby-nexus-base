@@ -168,9 +168,12 @@ function AdminStandingEventsPage() {
   const admin = useQuery(myAdminStatusQuery());
   const { data: neighborhoods } = useSuspenseQuery(neighborhoodsQuery());
   const [boardValue, setBoardValue] = useState(neighborhoods[0]?.id ?? UNASSIGNED);
+  const [verifiedFilter, setVerifiedFilter] = useState<"all" | "verified" | "stale">("all");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [values, setValues] = useState<FormValues>(emptyEvent);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [discoveredImages, setDiscoveredImages] = useState<string[] | null>(null);
+  const [discovering, setDiscovering] = useState(false);
 
   const neighborhoodId = boardValue === UNASSIGNED ? null : boardValue;
 
