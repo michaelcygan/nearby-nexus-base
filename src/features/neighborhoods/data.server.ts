@@ -26,6 +26,8 @@ const PLACE_COLUMNS = "id, name, category, address, description, website, phone"
 
 type PublicClient = ReturnType<typeof createPublicSupabaseClient>;
 
+type PostRow = { neighborhood_id: string; created_at: string };
+
 /**
  * A post is publicly visible only while it is active *and* unexpired. RLS
  * already handles hidden/removed rows and unpublished communities; this adds
@@ -119,7 +121,7 @@ async function fetchVisiblePostRows(
 
   const { data, error } = await query.order("created_at", { ascending: false }).limit(limit);
   if (error) throw new Error(error.message);
-  return (data ?? []) as unknown as Array<{ neighborhood_id: string }>;
+  return (data ?? []) as unknown as PostRow[];
 }
 
 /**
@@ -158,7 +160,7 @@ export async function fetchScopedPosts({
   const byCommunity = new Map<string, ScopedCommunity>([[resolved.origin.id, resolved.origin]]);
   for (const other of resolved.others) byCommunity.set(other.id, other);
 
-  let nearbyRows: Array<{ neighborhood_id: string }> = [];
+  let nearbyRows: PostRow[] = [];
   if (scope !== "local" && resolved.others.length > 0 && remaining > 0) {
     const rows = await fetchVisiblePostRows(
       supabase,
@@ -173,9 +175,7 @@ export async function fetchScopedPosts({
         const da = byCommunity.get(a.neighborhood_id)?.distance_miles ?? Number.MAX_SAFE_INTEGER;
         const db = byCommunity.get(b.neighborhood_id)?.distance_miles ?? Number.MAX_SAFE_INTEGER;
         if (da !== db) return da - db;
-        const ca = (a as { created_at: string }).created_at;
-        const cb = (b as { created_at: string }).created_at;
-        return cb.localeCompare(ca);
+        return b.created_at.localeCompare(a.created_at);
       })
       .slice(0, remaining);
   }
