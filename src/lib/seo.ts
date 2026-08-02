@@ -1,4 +1,4 @@
-export const SITE_ORIGIN = "https://nearby-nexus-base.lovable.app";
+export const SITE_ORIGIN = "https://neighborhood.today";
 
 export function canonicalUrl(path: string) {
   return `${SITE_ORIGIN}${path.startsWith("/") ? path : `/${path}`}`;

@@ -91,7 +91,7 @@ function NeighborProfilePage() {
               <p className="mt-1 text-sm text-muted-foreground">
                 Around{" "}
                 <Link
-                  to="/n/$slug"
+                  to="/$slug"
                   params={{ slug: profile.home_neighborhood.slug }}
                   className="underline underline-offset-4"
                 >

@@ -11,11 +11,29 @@ import { credentialsSchema, emailOnlySchema } from "@/features/account/types";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
+const POST_TYPES = ["plan", "marketplace", "volunteer"] as const;
+type ComposerAction = (typeof POST_TYPES)[number];
+
+/** Only same-origin paths survive; never an absolute or protocol-relative URL. */
+function safePath(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
+  return value.slice(0, 300);
+}
+
+const RETURN_KEY = "nt:auth-return";
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: safePath(search["redirect"]),
+    action: POST_TYPES.includes(search["action"] as ComposerAction)
+      ? (search["action"] as ComposerAction)
+      : undefined,
+  }),
   head: () => {
     const title = "Sign in — Neighborhood Today";
     const description =
-      "Sign in or create a Neighborhood Today account to post plans, list items, offer help and save your neighborhoods.";
+      "Sign in or create a Neighborhood Today account to post a plan, offer something, or ask your neighbors for help.";
     return {
       meta: [
         { title },
@@ -32,6 +50,7 @@ type Mode = "signin" | "signup";
 
 function AuthPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,21 +58,69 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [awaitingConfirm, setAwaitingConfirm] = useState(false);
 
+  // The OAuth round trip leaves this page entirely, so the intended
+  // destination and composer action are stashed before the redirect and read
+  // back once a session exists.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (search.redirect) {
+      window.sessionStorage.setItem(
+        RETURN_KEY,
+        JSON.stringify({ redirect: search.redirect, action: search.action ?? null }),
+      );
+    }
+  }, [search.redirect, search.action]);
+
   useEffect(() => {
     let active = true;
+
+    function resumeIntent() {
+      let redirect = search.redirect;
+      let action: string | null = search.action ?? null;
+      if (typeof window !== "undefined") {
+        const stored = window.sessionStorage.getItem(RETURN_KEY);
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored) as { redirect?: string; action?: string | null };
+            redirect = safePath(parsed.redirect) ?? redirect;
+            action = parsed.action ?? action;
+          } catch {
+            // ignore malformed state
+          }
+          window.sessionStorage.removeItem(RETURN_KEY);
+        }
+      }
+
+      if (redirect) {
+        const slug = redirect.replace(/^\//, "").split("/")[0];
+        if (action && slug) {
+          navigate({
+            to: "/post/new",
+            search: { n: slug, type: action as ComposerAction, returnTo: redirect },
+            replace: true,
+          });
+          return;
+        }
+        navigate({ href: redirect, replace: true });
+        return;
+      }
+      navigate({ to: "/profile", replace: true });
+    }
+
     supabase.auth.getSession().then(({ data }) => {
-      if (active && data.session) navigate({ to: "/profile", replace: true });
+      if (active && data.session) resumeIntent();
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-        navigate({ to: "/profile", replace: true });
+        resumeIntent();
       }
     });
     return () => {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, search.redirect, search.action]);
+
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -95,7 +162,8 @@ function AuthPage() {
     setBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        // Public route: the stashed return path is applied after the session lands.
+        redirect_uri: `${window.location.origin}/auth`,
       });
       if (result.error) {
         toast.error("Google sign-in didn't complete. Try again.");

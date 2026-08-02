@@ -41,14 +41,14 @@ export const neighborhoodPlacesQuery = (slug: string) =>
     queryFn: () => getNeighborhoodPlaces({ data: { slug } }),
   });
 
-export const postQuery = (postId: string) =>
+export const postQuery = (slug: string, postId: string) =>
   queryOptions({
-    queryKey: ["post", postId],
-    queryFn: () => getPost({ data: { postId } }),
+    queryKey: ["post", slug, postId],
+    queryFn: () => getPost({ data: { slug, postId } }),
   });
 
-export const placeQuery = (placeId: string) =>
+export const placeQuery = (slug: string, placeId: string) =>
   queryOptions({
-    queryKey: ["place", placeId],
-    queryFn: () => getPlace({ data: { placeId } }),
+    queryKey: ["place", slug, placeId],
+    queryFn: () => getPlace({ data: { slug, placeId } }),
   });

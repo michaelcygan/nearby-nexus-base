@@ -91,7 +91,7 @@ function EditPostPage() {
       queryClient.invalidateQueries({ queryKey: ["post", postId] });
       toast.success("Post updated.");
       if (result.slug) {
-        navigate({ to: "/n/$slug/p/$postId", params: { slug: result.slug, postId } });
+        navigate({ to: "/$slug/p/$postId", params: { slug: result.slug, postId } });
       } else {
         navigate({ to: "/posts" });
       }

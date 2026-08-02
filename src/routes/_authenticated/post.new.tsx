@@ -19,6 +19,10 @@ export const Route = createFileRoute("/_authenticated/post/new")({
     type: POST_TYPES.includes(search["type"] as PostType)
       ? (search["type"] as PostType)
       : ("plan" as PostType),
+    returnTo:
+      typeof search["returnTo"] === "string" && search["returnTo"].startsWith("/")
+        ? search["returnTo"]
+        : undefined,
   }),
   head: () => ({
     meta: [
@@ -67,7 +71,7 @@ function NewPostPage() {
       queryClient.invalidateQueries({ queryKey: ["my-posts"] });
       toast.success("Posted to the board.");
       if (result.slug) {
-        navigate({ to: "/n/$slug/p/$postId", params: { slug: result.slug, postId: result.id } });
+        navigate({ to: "/$slug/p/$postId", params: { slug: result.slug, postId: result.id } });
       } else {
         navigate({ to: "/posts" });
       }

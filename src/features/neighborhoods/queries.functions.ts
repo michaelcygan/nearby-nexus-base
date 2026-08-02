@@ -36,9 +36,15 @@ export const getNeighborhoodCounts = createServerFn({ method: "GET" })
   .handler(async ({ data }) => fetchNeighborhoodCounts(data.slug));
 
 export const getPost = createServerFn({ method: "GET" })
-  .inputValidator((data: { postId: string }) => ({ postId: String(data.postId).slice(0, 64) }))
-  .handler(async ({ data }) => fetchPostById(data.postId));
+  .inputValidator((data: { postId: string; slug: string }) => ({
+    postId: String(data.postId).slice(0, 64),
+    slug: String(data.slug).slice(0, 120),
+  }))
+  .handler(async ({ data }) => fetchPostById(data.postId, data.slug));
 
 export const getPlace = createServerFn({ method: "GET" })
-  .inputValidator((data: { placeId: string }) => ({ placeId: String(data.placeId).slice(0, 64) }))
-  .handler(async ({ data }) => fetchPlaceById(data.placeId));
+  .inputValidator((data: { placeId: string; slug: string }) => ({
+    placeId: String(data.placeId).slice(0, 64),
+    slug: String(data.slug).slice(0, 120),
+  }))
+  .handler(async ({ data }) => fetchPlaceById(data.placeId, data.slug));

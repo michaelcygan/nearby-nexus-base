@@ -2,10 +2,10 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/common/empty-state";
+import { ErrorState } from "@/components/common/error-state";
 import { BlockButton } from "@/components/moderation/block-button";
 import { ReportButton } from "@/components/moderation/report-button";
 import { ParticipationBlock } from "@/components/posts/participation-block";
-import { ErrorState } from "@/components/common/error-state";
 import { postQuery } from "@/features/neighborhoods/queries";
 import {
   formatDate,
@@ -15,10 +15,13 @@ import {
 } from "@/features/neighborhoods/types";
 import { canonicalUrl } from "@/lib/seo";
 
-
-export const Route = createFileRoute("/n/$slug/p/$postId")({
+export const Route = createFileRoute("/$slug/p/$postId")({
   loader: async ({ params, context }) => {
-    const post = await context.queryClient.ensureQueryData(postQuery(params.postId));
+    // fetchPostById only resolves a post that belongs to this slug, so a post
+    // from another community 404s here instead of rendering.
+    const post = await context.queryClient.ensureQueryData(
+      postQuery(params.slug, params.postId),
+    );
     if (!post) throw notFound();
     return { post };
   },
@@ -29,11 +32,12 @@ export const Route = createFileRoute("/n/$slug/p/$postId")({
     const { post } = loaderData;
     const title = `${post.title} — ${post.neighborhood.name}`;
     const description = post.body.slice(0, 155);
+    const href = canonicalUrl(`/${params.slug}/p/${params.postId}`);
     return {
-      links: [{ rel: "canonical", href: canonicalUrl(`/n/${params.slug}/p/${params.postId}`) }],
+      links: [{ rel: "canonical", href }],
       meta: [
         { title },
-        { property: "og:url", content: canonicalUrl(`/n/${params.slug}/p/${params.postId}`) },
+        { property: "og:url", content: href },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
@@ -52,15 +56,16 @@ export const Route = createFileRoute("/n/$slug/p/$postId")({
 
 function PostDetailPage() {
   const { slug, postId } = Route.useParams();
-  const { data: post } = useSuspenseQuery(postQuery(postId));
+  const { data: post } = useSuspenseQuery(postQuery(slug, postId));
 
   if (!post) {
     return <EmptyState title="This post is gone" />;
   }
 
+  const timeZone = post.neighborhood.timezone;
   const facts: Array<[string, string]> = [];
   if (post.type === "plan") {
-    const when = formatDateTime(post.starts_at);
+    const when = formatDateTime(post.starts_at, timeZone);
     if (when) facts.push(["When", when]);
     if (post.location) facts.push(["Where", post.location]);
     if (post.capacity) facts.push(["Spots", String(post.capacity)]);
@@ -71,7 +76,7 @@ function PostDetailPage() {
     if (post.condition) facts.push(["Condition", post.condition]);
   }
   if (post.type === "volunteer") {
-    const by = formatDate(post.needed_by);
+    const by = formatDate(post.needed_by, timeZone);
     if (by) facts.push(["Needed by", by]);
     if (post.slots) facts.push(["People needed", String(post.slots)]);
   }
@@ -82,6 +87,9 @@ function PostDetailPage() {
         {postTypeLabels[post.type]}
       </p>
       <h2 className="mt-2 text-2xl sm:text-3xl">{post.title}</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Posted by {post.author_name ?? "a neighbor"}
+      </p>
       {post.image_urls.length > 0 ? (
         <ul className="mt-5 grid gap-3 sm:grid-cols-2">
           {post.image_urls.map((url) => (
@@ -128,8 +136,9 @@ function PostDetailPage() {
 
       <p className="mt-6 text-sm">
         <Link
-          to="/n/$slug"
+          to="/$slug"
           params={{ slug }}
+          search={{ view: "today" as const }}
           className="text-muted-foreground underline underline-offset-4 hover:text-foreground"
         >
           Back to {post.neighborhood.name}

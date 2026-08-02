@@ -101,7 +101,7 @@ function ThreadPage() {
           About{" "}
           {detail.neighborhood_slug ? (
             <Link
-              to="/n/$slug/p/$postId"
+              to="/$slug/p/$postId"
               params={{ slug: detail.neighborhood_slug, postId: detail.post_id }}
               className="underline underline-offset-4"
             >

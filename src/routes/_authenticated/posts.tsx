@@ -120,7 +120,7 @@ function MyPostsPage() {
                 {post.neighborhood ? (
                   <Button asChild size="sm" variant="outline">
                     <Link
-                      to="/n/$slug/p/$postId"
+                      to="/$slug/p/$postId"
                       params={{ slug: post.neighborhood.slug, postId: post.id }}
                     >
                       View
