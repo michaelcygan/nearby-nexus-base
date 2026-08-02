@@ -32,6 +32,7 @@ export function StandingEventRow({
 }) {
   const { event } = occurrence;
   const href = httpsHref(event.source_url);
+  const image = event.image_verified_at ? event.image_url : null;
 
   const details = [
     showWhen ? occurrence.whenLabel : occurrence.timeLabel,
@@ -43,28 +44,40 @@ export function StandingEventRow({
 
   return (
     <li className="p-4">
-      {href ? (
-        <a
-          href={href}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="font-display text-base font-semibold leading-snug underline-offset-4 hover:underline"
-        >
-          {event.title}
-        </a>
-      ) : (
-        <span className="font-display text-base font-semibold leading-snug">{event.title}</span>
-      )}
+      <div className="flex gap-3">
+        {image ? (
+          <img
+            src={image}
+            alt=""
+            loading="lazy"
+            className="h-14 w-14 shrink-0 rounded-sm object-cover"
+          />
+        ) : null}
+        <div className="min-w-0 flex-1">
+          {href ? (
+            <a
+              href={href}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="font-display text-base font-semibold leading-snug underline-offset-4 hover:underline"
+            >
+              {event.title}
+            </a>
+          ) : (
+            <span className="font-display text-base font-semibold leading-snug">{event.title}</span>
+          )}
 
-      <p className="mt-1 text-sm text-muted-foreground">{details}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{details}</p>
 
-      {event.exception_note ? (
-        <p className="mt-0.5 text-sm text-muted-foreground">{event.exception_note}</p>
-      ) : null}
+          {event.exception_note ? (
+            <p className="mt-0.5 text-sm text-muted-foreground">{event.exception_note}</p>
+          ) : null}
 
-      <p className="mt-1 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-        {standingEventCategoryLabels[event.category]} · Check with venue
-      </p>
+          <p className="mt-1 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+            {standingEventCategoryLabels[event.category]} · Check with venue
+          </p>
+        </div>
+      </div>
     </li>
   );
 }
