@@ -6,9 +6,17 @@ import { ErrorState } from "@/components/common/error-state";
 import { BoardContent } from "@/components/community/board-content";
 import { BoardFilters } from "@/components/community/board-filters";
 import {
+  DEFAULT_RADIUS_MILES,
+  isDiscoveryScope,
+  isRadiusMiles,
+  scopedBoardViews,
+  type DiscoveryScope,
+  type RadiusMiles,
+} from "@/features/discovery/types";
+import {
   neighborhoodPlacesQuery,
-  neighborhoodPostsQuery,
   neighborhoodQuery,
+  scopedPostsQuery,
 } from "@/features/neighborhoods/queries";
 import { boardViewPostType, isBoardView, type BoardView } from "@/features/neighborhoods/types";
 import { canonicalUrl } from "@/lib/seo";
@@ -17,21 +25,57 @@ function boardPath(slug: string, view: BoardView) {
   return view === "today" ? `/${slug}` : `/${slug}?view=${view}`;
 }
 
+type BoardSearch = { view?: BoardView; scope?: DiscoveryScope; radius?: RadiusMiles };
+
+/**
+ * Local is represented by *omitting* scope and radius, so a bare board URL
+ * always means "this community only". Only Plans and Marketplace may look
+ * wider; Today, Help, and Places normalize back to local.
+ */
+function normalizeSearch(search: Record<string, unknown>): BoardSearch {
+  const view = isBoardView(search["view"]) ? search["view"] : undefined;
+  const result: BoardSearch = view ? { view } : {};
+
+  const scopeable = view && (scopedBoardViews as readonly string[]).includes(view);
+  if (!scopeable) return result;
+
+  const rawScope = search["scope"];
+  if (!isDiscoveryScope(rawScope) || rawScope === "local") return result;
+  if (rawScope === "city") return { ...result, scope: "city" };
+
+  const rawRadius = Number(search["radius"]);
+  return {
+    ...result,
+    scope: "nearby",
+    radius: isRadiusMiles(rawRadius) ? rawRadius : DEFAULT_RADIUS_MILES,
+  };
+}
+
 export const Route = createFileRoute("/$slug/")({
   // `view` stays optional so a bare /edgewater renders 200 with no redirect hop.
-  validateSearch: (search: Record<string, unknown>): { view?: BoardView } =>
-    isBoardView(search["view"]) ? { view: search["view"] } : {},
-  loaderDeps: ({ search }) => ({ view: search.view ?? ("today" as BoardView) }),
+  validateSearch: normalizeSearch,
+  loaderDeps: ({ search }) => ({
+    view: search.view ?? ("today" as BoardView),
+    scope: search.scope ?? ("local" as DiscoveryScope),
+    radiusMiles: search.radius ?? DEFAULT_RADIUS_MILES,
+  }),
   loader: ({ params, deps, context }) => {
     if (deps.view === "places") {
       context.queryClient.ensureQueryData(neighborhoodPlacesQuery(params.slug));
-    } else {
-      context.queryClient.ensureQueryData(
-        neighborhoodPostsQuery(params.slug, boardViewPostType[deps.view]),
-      );
+      return;
     }
+    const type = boardViewPostType[deps.view];
+    context.queryClient.ensureQueryData(
+      scopedPostsQuery({
+        slug: params.slug,
+        types: type ? [type] : null,
+        scope: deps.scope,
+        radiusMiles: deps.radiusMiles,
+      }),
+    );
   },
   head: ({ params, match }) => {
+    // Radius-filtered views are the same page: one canonical per board view.
     const href = canonicalUrl(boardPath(params.slug, match.search.view ?? "today"));
     return {
       links: [{ rel: "canonical", href }],
@@ -58,10 +102,10 @@ function CommunityBoard() {
         <p className="mt-6 max-w-prose text-base text-muted-foreground">{community.about}</p>
       ) : null}
       <BoardContent
-        slug={slug}
-        name={community.name}
-        timeZone={community.timezone}
+        community={community}
         view={view}
+        scope={search.scope ?? "local"}
+        radiusMiles={search.radius ?? DEFAULT_RADIUS_MILES}
       />
     </div>
   );
