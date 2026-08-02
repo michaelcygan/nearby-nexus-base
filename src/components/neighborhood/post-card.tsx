@@ -8,10 +8,10 @@ import {
   type PostSummary,
 } from "@/features/neighborhoods/types";
 
-function metaFor(post: PostSummary) {
+function metaFor(post: PostSummary, timeZone: string) {
   if (post.type === "plan") {
     return [
-      formatDateTime(post.starts_at),
+      formatDateTime(post.starts_at, timeZone),
       post.location,
       post.capacity
         ? `${post.going_count} of ${post.capacity} spots taken`
@@ -28,7 +28,7 @@ function metaFor(post: PostSummary) {
     ];
   }
   return [
-    post.needed_by ? `Needed by ${formatDate(post.needed_by)}` : null,
+    post.needed_by ? `Needed by ${formatDate(post.needed_by, timeZone)}` : null,
     post.slots
       ? `${post.volunteer_count} of ${post.slots} helpers`
       : post.volunteer_count > 0
@@ -37,13 +37,21 @@ function metaFor(post: PostSummary) {
   ];
 }
 
-export function PostCard({ post, slug }: { post: PostSummary; slug: string }) {
-  const meta = metaFor(post).filter(Boolean) as string[];
+export function PostCard({
+  post,
+  slug,
+  timeZone,
+}: {
+  post: PostSummary;
+  slug: string;
+  timeZone: string;
+}) {
+  const meta = metaFor(post, timeZone).filter(Boolean) as string[];
 
   return (
     <li className="rounded-md border border-border bg-card transition-colors hover:border-primary/50">
       <Link
-        to="/n/$slug/p/$postId"
+        to="/$slug/p/$postId"
         params={{ slug, postId: post.id }}
         className="block rounded-md p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
@@ -60,8 +68,11 @@ export function PostCard({ post, slug }: { post: PostSummary; slug: string }) {
         ) : null}
         <h3 className="mt-2 font-display text-lg font-semibold leading-snug">{post.title}</h3>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.body}</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Posted by {post.author_name ?? "a neighbor"}
+        </p>
         {meta.length > 0 ? (
-          <p className="mt-3 text-xs text-muted-foreground">{meta.join(" · ")}</p>
+          <p className="mt-2 text-xs text-muted-foreground">{meta.join(" · ")}</p>
         ) : null}
       </Link>
     </li>

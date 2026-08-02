@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_points: {
+        Row: {
+          code: string
+          created_at: string
+          destination_path: string
+          id: string
+          label: string
+          last_scanned_at: string | null
+          neighborhood_id: string
+          scan_count: number
+          status: Database["public"]["Enums"]["access_point_status"]
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          destination_path: string
+          id?: string
+          label: string
+          last_scanned_at?: string | null
+          neighborhood_id: string
+          scan_count?: number
+          status?: Database["public"]["Enums"]["access_point_status"]
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          destination_path?: string
+          id?: string
+          label?: string
+          last_scanned_at?: string | null
+          neighborhood_id?: string
+          scan_count?: number
+          status?: Database["public"]["Enums"]["access_point_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_points_neighborhood_id_fkey"
+            columns: ["neighborhood_id"]
+            isOneToOne: false
+            referencedRelation: "neighborhoods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blocks: {
         Row: {
           blocked_id: string
@@ -82,9 +129,13 @@ export type Database = {
           city: string
           created_at: string
           id: string
+          location_type: Database["public"]["Enums"]["location_type"]
           name: string
           slug: string
+          state_code: string | null
+          status: Database["public"]["Enums"]["community_status"]
           tagline: string | null
+          timezone: string
           updated_at: string
         }
         Insert: {
@@ -92,9 +143,13 @@ export type Database = {
           city: string
           created_at?: string
           id?: string
+          location_type?: Database["public"]["Enums"]["location_type"]
           name: string
           slug: string
+          state_code?: string | null
+          status?: Database["public"]["Enums"]["community_status"]
           tagline?: string | null
+          timezone?: string
           updated_at?: string
         }
         Update: {
@@ -102,9 +157,13 @@ export type Database = {
           city?: string
           created_at?: string
           id?: string
+          location_type?: Database["public"]["Enums"]["location_type"]
           name?: string
           slug?: string
+          state_code?: string | null
+          status?: Database["public"]["Enums"]["community_status"]
           tagline?: string | null
+          timezone?: string
           updated_at?: string
         }
         Relationships: []
@@ -641,13 +700,21 @@ export type Database = {
         Returns: boolean
       }
       is_blocked_pair: { Args: { _a: string; _b: string }; Returns: boolean }
+      is_published_community: {
+        Args: { _neighborhood_id: string }
+        Returns: boolean
+      }
       is_thread_member: {
         Args: { _thread_id: string; _user_id: string }
         Returns: boolean
       }
+      record_access_point_scan: { Args: { _code: string }; Returns: string }
     }
     Enums: {
+      access_point_status: "active" | "paused"
       app_role: "admin" | "moderator" | "member"
+      community_status: "draft" | "published"
+      location_type: "neighborhood" | "town" | "village" | "city"
       moderation_action: "dismiss" | "hide" | "remove" | "restore"
       participation_role: "going" | "volunteer" | "interested"
       post_status: "active" | "completed" | "expired" | "removed"
@@ -799,7 +866,10 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      access_point_status: ["active", "paused"],
       app_role: ["admin", "moderator", "member"],
+      community_status: ["draft", "published"],
+      location_type: ["neighborhood", "town", "village", "city"],
       moderation_action: ["dismiss", "hide", "remove", "restore"],
       participation_role: ["going", "volunteer", "interested"],
       post_status: ["active", "completed", "expired", "removed"],
