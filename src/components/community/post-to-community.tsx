@@ -33,7 +33,10 @@ export function PostToCommunity({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size={size}>Post to {name}</Button>
+        <Button size={size} className="shrink-0">
+          <span className="sm:hidden">Post</span>
+          <span className="hidden sm:inline">Post to {name}</span>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         {composerActions.map((action) => (
