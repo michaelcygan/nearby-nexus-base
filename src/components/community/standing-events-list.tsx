@@ -34,7 +34,7 @@ export function StandingEventsList({
 }: {
   community: Neighborhood;
   includeNearby?: boolean;
-  radiusMiles?: number;
+  radiusMiles?: RadiusMiles;
 }) {
   const hydrated = useHydrated();
 
