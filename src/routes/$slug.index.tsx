@@ -13,11 +13,14 @@ import {
   type DiscoveryScope,
   type RadiusMiles,
 } from "@/features/discovery/types";
+import { communityTodayQuery } from "@/features/community-today/queries";
 import {
+  neighborhoodCountsQuery,
   neighborhoodPlacesQuery,
   neighborhoodQuery,
   scopedPostsQuery,
 } from "@/features/neighborhoods/queries";
+
 import { boardViewPostType, isBoardView, type BoardView } from "@/features/neighborhoods/types";
 import { canonicalUrl } from "@/lib/seo";
 
