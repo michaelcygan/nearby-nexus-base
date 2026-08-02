@@ -197,7 +197,11 @@ function escapeRegex(value: string): string {
 }
 
 function resolveUrl(baseUrl: string, candidate: string): string {
-  if (/^https?:\/\//i.test(candidate)) return candidate;
+  if (/^https?:\/\//i.test(candidate)) {
+    const url = new URL(candidate);
+    url.protocol = "https:";
+    return url.toString();
+  }
   return new URL(candidate, baseUrl).toString();
 }
 
