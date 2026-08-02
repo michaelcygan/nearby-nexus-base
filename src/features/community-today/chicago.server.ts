@@ -83,6 +83,18 @@ const serviceSchema = z
   .array(z.object({ sr_type: z.string().optional(), total: z.string().optional() }))
   .default([]);
 
+/** Park fees are published as bare numbers; free programs publish nothing. */
+function formatFee(value: unknown): string | null {
+  const text = plainText(value, 24);
+  if (!text) return null;
+  if (/^\d+(\.\d+)?$/.test(text)) {
+    const amount = Number(text);
+    if (amount === 0) return "Free";
+    return `$${amount % 1 === 0 ? amount : amount.toFixed(2)}`;
+  }
+  return text;
+}
+
 /** Upcoming, non-cancelled library events near the community center. */
 export async function fetchLibraryEvents({
   lat,
@@ -159,7 +171,7 @@ export async function fetchParkActivities({
           scheduleText: plainText(row.date_notes, 120) || null,
           locationName: plainText(row.location_facility, 80) || "Chicago Park District",
           audience: plainText(row.age_range, 40) || null,
-          fee: plainText(row.fee, 24) || null,
+          fee: formatFee(row.fee),
           url: safeExternalUrl(row.information_link, "https://www.chicagoparkdistrict.com/"),
         },
       ];
