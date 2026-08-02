@@ -841,7 +841,7 @@ export type Database = {
       moderation_action: "dismiss" | "hide" | "remove" | "restore"
       participation_role: "going" | "volunteer" | "interested"
       post_status: "active" | "completed" | "expired" | "removed"
-      post_type: "plan" | "marketplace" | "volunteer"
+      post_type: "plan" | "marketplace" | "volunteer" | "bulletin"
       report_reason:
         | "spam"
         | "unsafe"
@@ -1006,7 +1006,7 @@ export const Constants = {
       moderation_action: ["dismiss", "hide", "remove", "restore"],
       participation_role: ["going", "volunteer", "interested"],
       post_status: ["active", "completed", "expired", "removed"],
-      post_type: ["plan", "marketplace", "volunteer"],
+      post_type: ["plan", "marketplace", "volunteer", "bulletin"],
       report_reason: [
         "spam",
         "unsafe",
