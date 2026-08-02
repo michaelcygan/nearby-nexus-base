@@ -300,27 +300,45 @@ function AdminStandingEventsPage() {
           current.
         </p>
 
-        <div className="mt-6 max-w-xs">
-          <Label htmlFor="board">Board</Label>
-          <Select
-            value={boardValue}
-            onValueChange={(value) => {
-              setBoardValue(value);
-              reset();
-            }}
-          >
-            <SelectTrigger id="board" className="mt-1.5">
-              <SelectValue placeholder="Pick a board" />
-            </SelectTrigger>
-            <SelectContent>
-              {neighborhoods.map((neighborhood) => (
-                <SelectItem key={neighborhood.id} value={neighborhood.id}>
-                  {neighborhood.name}
-                </SelectItem>
-              ))}
-              <SelectItem value={UNASSIGNED}>Unassigned (held drafts)</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 sm:items-end">
+          <div>
+            <Label htmlFor="board">Board</Label>
+            <Select
+              value={boardValue}
+              onValueChange={(value) => {
+                setBoardValue(value);
+                reset();
+              }}
+            >
+              <SelectTrigger id="board" className="mt-1.5">
+                <SelectValue placeholder="Pick a board" />
+              </SelectTrigger>
+              <SelectContent>
+                {neighborhoods.map((neighborhood) => (
+                  <SelectItem key={neighborhood.id} value={neighborhood.id}>
+                    {neighborhood.name}
+                  </SelectItem>
+                ))}
+                <SelectItem value={UNASSIGNED}>Unassigned (held drafts)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="verified-filter">Verification</Label>
+            <Select
+              value={verifiedFilter}
+              onValueChange={(value) => setVerifiedFilter(value as typeof verifiedFilter)}
+            >
+              <SelectTrigger id="verified-filter" className="mt-1.5">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All events</SelectItem>
+                <SelectItem value="verified">Verified within 30 days</SelectItem>
+                <SelectItem value="stale">Needs a re-check</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <form onSubmit={submit} className="mt-8 max-w-2xl space-y-4">
