@@ -1,20 +1,13 @@
+# Add Nearby and Citywide Discovery Lenses
+
 ## Goal
 
-Add nearby and citywide discovery as query-time lenses over the existing board, without duplicating posts, adding navigation, or changing the visual system. Every post keeps one owning community; cards link to their canonical community URL.
-
-## What I confirmed by reading the repo
-
-- `src/routes/$slug.index.tsx` validates only `view`, uses `loaderDeps` + `ensureQueryData`, and canonicalizes on community + view.
-- `BoardContent` renders one post list (`neighborhoodPostsQuery(slug, type)`) and applies blocked-author filtering client-side.
-- `PostCard` builds its link from the page `slug` — this is what must change for nearby cards.
-- `fetchNeighborhoodPosts` filters `status = 'active'` only; there is **no** `expires_at` filter today (same for `fetchNeighborhoodCounts`). This is the correctness bug called out in the brief and I will fix it in the scoped-query work.
-- `neighborhoods` has no coordinate columns.
-- Scripts available: `lint`, `build`, `build:dev`. There is **no test runner installed** (no vitest/jest, no test files). Rather than add a dependency, I will verify the distance helper with a temporary throwaway Node script during Wave 1 and report the boundary results. If you'd prefer real committed unit tests, say so and I'll add vitest as a devDependency.
+Add selective cross-neighborhood discovery as query-time lenses over the existing neighborhood board, without duplicating posts, adding navigation, or changing the visual system. Every post keeps one owning community; cards link to their canonical community URL.
 
 ## Wave 1 — Geographic foundation (no UI change)
 
-- New forward-only migration: add `center_lat double precision`, `center_lng double precision` to `neighborhoods`, nullable, plus CHECK constraints (lat -90..90, lng -180..180, both-or-neither present).
-- Backfill approximate community centers for the three published communities (Edgewater, Lakeview, Lincoln Park), documented in the migration as approximate discovery anchors, not boundaries. Draft Pittsburgh communities stay null.
+- New forward-only migration: add `center_lat double precision`, `center_lng double precision` to `neighborhoods`, nullable, with CHECK constraints (lat -90..90, lng -180..180, both-or-neither present).
+- Backfill approximate community centers for the three published Chicago communities (Edgewater, Lakeview, Lincoln Park). Draft Pittsburgh communities stay null.
 - Add `src/features/discovery/distance.ts`: pure `haversineMiles(a, b)` and `withinRadius`.
 - Extend `Neighborhood` type with the two nullable coordinate fields.
 - Verify: migration applies, existing boards unchanged, `lint` + production build pass.
@@ -52,7 +45,8 @@ Verify: local, 3/5/10-mile, city, and empty behaviors; a Lakeview card from Edge
 
 ## Wave 5 — Hardening and QA
 
-De-duplicate query/UI logic, confirm no new packages, no replaced routes, no edited published migrations, RLS still authoritative, expired/hidden/blocked content cannot surface, loading/error/empty states, keyboard and screen-reader labels, 320px layout, SSR/hydration stability, NFC links to the three communities unchanged. Full lint + build, then a final diff review for unrelated changes.
+- De-duplicate query/UI logic, confirm no new packages, no replaced routes, no edited published migrations, RLS still authoritative, expired/hidden/blocked content cannot surface, loading/error/empty states, keyboard and screen-reader labels, 320px layout, SSR/hydration stability, NFC links to the three communities unchanged.
+- Full lint + build, then a final diff review for unrelated changes.
 
 ## Technical notes
 
