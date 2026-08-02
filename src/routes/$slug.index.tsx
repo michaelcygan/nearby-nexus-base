@@ -18,10 +18,10 @@ function boardPath(slug: string, view: BoardView) {
 }
 
 export const Route = createFileRoute("/$slug/")({
-  validateSearch: (search: Record<string, unknown>): { view: BoardView } => ({
-    view: isBoardView(search["view"]) ? search["view"] : "today",
-  }),
-  loaderDeps: ({ search }) => ({ view: search.view }),
+  // `view` stays optional so a bare /edgewater renders 200 with no redirect hop.
+  validateSearch: (search: Record<string, unknown>): { view?: BoardView } =>
+    isBoardView(search["view"]) ? { view: search["view"] } : {},
+  loaderDeps: ({ search }) => ({ view: search.view ?? ("today" as BoardView) }),
   loader: ({ params, deps, context }) => {
     if (deps.view === "places") {
       context.queryClient.ensureQueryData(neighborhoodPlacesQuery(params.slug));
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/$slug/")({
     }
   },
   head: ({ params, match }) => {
-    const href = canonicalUrl(boardPath(params.slug, match.search.view));
+    const href = canonicalUrl(boardPath(params.slug, match.search.view ?? "today"));
     return {
       links: [{ rel: "canonical", href }],
       meta: [{ property: "og:url", content: href }],
