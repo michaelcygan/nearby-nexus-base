@@ -4,7 +4,13 @@ export const POST_TYPES = ["plan", "marketplace", "volunteer"] as const;
 export const MAX_POST_IMAGES = 4;
 
 const optionalText = (max: number) =>
-  z.string().trim().max(max).optional().or(z.literal("")).transform((value) => value || null);
+  z
+    .string()
+    .trim()
+    .max(max)
+    .optional()
+    .or(z.literal(""))
+    .transform((value) => value || null);
 
 const optionalCount = z
   .union([z.number(), z.string()])

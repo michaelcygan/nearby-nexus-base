@@ -16,11 +16,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { submitReport } from "@/features/moderation/report.functions";
-import {
-  reportReasonLabels,
-  reportReasons,
-  reportTargetLabels,
-} from "@/features/moderation/types";
+import { reportReasonLabels, reportReasons, reportTargetLabels } from "@/features/moderation/types";
 import type { ReportReason, ReportTarget } from "@/features/moderation/types";
 import { useSession } from "@/hooks/use-session";
 import { Link } from "@tanstack/react-router";

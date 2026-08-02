@@ -1,20 +1,13 @@
+# Add Nearby and Citywide Discovery Lenses
+
 ## Goal
 
-Add nearby and citywide discovery as query-time lenses over the existing board, without duplicating posts, adding navigation, or changing the visual system. Every post keeps one owning community; cards link to their canonical community URL.
-
-## What I confirmed by reading the repo
-
-- `src/routes/$slug.index.tsx` validates only `view`, uses `loaderDeps` + `ensureQueryData`, and canonicalizes on community + view.
-- `BoardContent` renders one post list (`neighborhoodPostsQuery(slug, type)`) and applies blocked-author filtering client-side.
-- `PostCard` builds its link from the page `slug` — this is what must change for nearby cards.
-- `fetchNeighborhoodPosts` filters `status = 'active'` only; there is **no** `expires_at` filter today (same for `fetchNeighborhoodCounts`). This is the correctness bug called out in the brief and I will fix it in the scoped-query work.
-- `neighborhoods` has no coordinate columns.
-- Scripts available: `lint`, `build`, `build:dev`. There is **no test runner installed** (no vitest/jest, no test files). Rather than add a dependency, I will verify the distance helper with a temporary throwaway Node script during Wave 1 and report the boundary results. If you'd prefer real committed unit tests, say so and I'll add vitest as a devDependency.
+Add selective cross-neighborhood discovery as query-time lenses over the existing neighborhood board, without duplicating posts, adding navigation, or changing the visual system. Every post keeps one owning community; cards link to their canonical community URL.
 
 ## Wave 1 — Geographic foundation (no UI change)
 
-- New forward-only migration: add `center_lat double precision`, `center_lng double precision` to `neighborhoods`, nullable, plus CHECK constraints (lat -90..90, lng -180..180, both-or-neither present).
-- Backfill approximate community centers for the three published communities (Edgewater, Lakeview, Lincoln Park), documented in the migration as approximate discovery anchors, not boundaries. Draft Pittsburgh communities stay null.
+- New forward-only migration: add `center_lat double precision`, `center_lng double precision` to `neighborhoods`, nullable, with CHECK constraints (lat -90..90, lng -180..180, both-or-neither present).
+- Backfill approximate community centers for the three published Chicago communities (Edgewater, Lakeview, Lincoln Park). Draft Pittsburgh communities stay null.
 - Add `src/features/discovery/distance.ts`: pure `haversineMiles(a, b)` and `withinRadius`.
 - Extend `Neighborhood` type with the two nullable coordinate fields.
 - Verify: migration applies, existing boards unchanged, `lint` + production build pass.
@@ -22,12 +15,14 @@ Add nearby and citywide discovery as query-time lenses over the existing board, 
 ## Wave 2 — Marketplace vertical slice
 
 Server:
+
 - `src/features/discovery/scope.server.ts`: `resolveCommunityScope({ originCommunity, scope, radiusMiles })` → published communities with valid coordinates plus distance from origin. `city` scope matches normalized city + state, excludes drafts, ignores radius. Missing origin coordinates → local-only fallback.
 - Refactor `fetchNeighborhoodPosts` into a scoped fetcher returning `{ local: ScopedPost[]; nearby: ScopedPost[] }`, where each post carries `origin: PostOrigin` and nearby posts carry `distance_miles`. Add the missing `expires_at is null or expires_at > now()` filter to every public post read and to `fetchNeighborhoodCounts`.
 - Nearby ordering: local first, then other communities by distance, newer posts first within equal distance. Preserve the current overall limit; no pagination.
 - Server-fn input validation: `scope ∈ {local,nearby,city}`, `radius ∈ {3,5,10}`, radius ignored unless nearby, anything unsupported → local.
 
 Client:
+
 - Extend `$slug.index.tsx` `validateSearch` with `scope` and `radius`; local = params omitted; nearby without radius defaults to 5; today/help/places normalize to local. Board tab links reset scope/radius so a Marketplace radius never leaks into Help.
 - React Query key gains slug, type, scope, radius, limit.
 - `PostCard` takes the post's origin slug for its link and optionally renders a quiet origin line (`From Lake View · 2.4 mi`, one decimal). Local-only lists show no origin line.
@@ -52,7 +47,8 @@ Verify: local, 3/5/10-mile, city, and empty behaviors; a Lakeview card from Edge
 
 ## Wave 5 — Hardening and QA
 
-De-duplicate query/UI logic, confirm no new packages, no replaced routes, no edited published migrations, RLS still authoritative, expired/hidden/blocked content cannot surface, loading/error/empty states, keyboard and screen-reader labels, 320px layout, SSR/hydration stability, NFC links to the three communities unchanged. Full lint + build, then a final diff review for unrelated changes.
+- De-duplicate query/UI logic, confirm no new packages, no replaced routes, no edited published migrations, RLS still authoritative, expired/hidden/blocked content cannot surface, loading/error/empty states, keyboard and screen-reader labels, 320px layout, SSR/hydration stability, NFC links to the three communities unchanged.
+- Full lint + build, then a final diff review for unrelated changes.
 
 ## Technical notes
 

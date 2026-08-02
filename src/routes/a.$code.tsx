@@ -8,9 +8,8 @@ export const Route = createFileRoute("/a/$code")({
   server: {
     handlers: {
       GET: async ({ params }) => {
-        const { recordScanAndResolveDestination } = await import(
-          "@/features/access-points/scan.server"
-        );
+        const { recordScanAndResolveDestination } =
+          await import("@/features/access-points/scan.server");
         const destination = await recordScanAndResolveDestination(params.code);
         return new Response(null, {
           status: 302,

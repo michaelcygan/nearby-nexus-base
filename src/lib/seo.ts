@@ -68,4 +68,3 @@ export function communityDescription(slug: string, name: string, city: string) {
     `The free public bulletin board for ${name}, ${city}. Find neighborhood plans, marketplace posts, requests for help, and useful local places.`
   );
 }
-

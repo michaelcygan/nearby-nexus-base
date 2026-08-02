@@ -5,7 +5,12 @@ import { toast } from "sonner";
 
 import { ErrorState } from "@/components/common/error-state";
 import { AppShell, PageContainer } from "@/components/layout/app-shell";
-import { PostForm, emptyPostForm, toPostPayload, type PostFormValues } from "@/components/posts/post-form";
+import {
+  PostForm,
+  emptyPostForm,
+  toPostPayload,
+  type PostFormValues,
+} from "@/components/posts/post-form";
 import { neighborhoodsQuery } from "@/features/neighborhoods/queries";
 import type { PostType } from "@/features/neighborhoods/types";
 import { createPost } from "@/features/posts/post.functions";
@@ -29,12 +34,14 @@ export const Route = createFileRoute("/_authenticated/post/new")({
       { title: "New post — Neighborhood Today" },
       {
         name: "description",
-        content: "Publish a plan, a marketplace listing or a volunteer ask to your neighborhood board.",
+        content:
+          "Publish a plan, a marketplace listing or a volunteer ask to your neighborhood board.",
       },
       { property: "og:title", content: "New post — Neighborhood Today" },
       {
         property: "og:description",
-        content: "Publish a plan, a marketplace listing or a volunteer ask to your neighborhood board.",
+        content:
+          "Publish a plan, a marketplace listing or a volunteer ask to your neighborhood board.",
       },
     ],
   }),

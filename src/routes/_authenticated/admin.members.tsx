@@ -38,8 +38,7 @@ function MembersPage() {
   });
 
   const setModerator = useMutation({
-    mutationFn: (input: { userId: string; grant: boolean }) =>
-      setMemberModerator({ data: input }),
+    mutationFn: (input: { userId: string; grant: boolean }) => setMemberModerator({ data: input }),
     onSuccess: (result) => {
       toast.success(result.grant ? "Moderator role granted." : "Moderator role revoked.");
       void queryClient.invalidateQueries({ queryKey: ["moderation"] });

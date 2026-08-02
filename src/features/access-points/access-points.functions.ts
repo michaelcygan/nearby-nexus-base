@@ -2,7 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function assertAdmin(context: { supabase: { rpc: Function }; userId: string }) {
+async function assertAdmin(context: {
+  supabase: { rpc: (...args: unknown[]) => Promise<{ data: boolean | null }> };
+  userId: string;
+}) {
   const { data } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
@@ -92,10 +95,7 @@ export const updateAccessPoint = createServerFn({ method: "POST" })
     if (data.status) patch.status = data.status;
     if (Object.keys(patch).length === 0) return { ok: true };
 
-    const { error } = await context.supabase
-      .from("access_points")
-      .update(patch)
-      .eq("id", data.id);
+    const { error } = await context.supabase.from("access_points").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

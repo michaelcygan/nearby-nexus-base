@@ -54,8 +54,7 @@ function AccessPointsPage() {
   const [copied, setCopied] = useState<string | null>(null);
 
   const create = useMutation({
-    mutationFn: () =>
-      createAccessPoint({ data: { neighborhoodId: communityId, label } }),
+    mutationFn: () => createAccessPoint({ data: { neighborhoodId: communityId, label } }),
     onSuccess: () => {
       setLabel("");
       queryClient.invalidateQueries({ queryKey: ["access-points"] });
@@ -203,12 +202,16 @@ function AccessPointsPage() {
                     <div className="min-w-0">
                       <h2 className="font-display text-xl font-semibold">{point.label}</h2>
                       <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                        {community?.name ?? "Community"} · {point.status} ·{" "}
-                        {point.scan_count ?? 0} scans
+                        {community?.name ?? "Community"} · {point.status} · {point.scan_count ?? 0}{" "}
+                        scans
                       </p>
                     </div>
                     <div className="flex gap-2 print:hidden">
-                      <Button size="sm" variant="outline" onClick={() => void copy(url, point.code)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void copy(url, point.code)}
+                      >
                         {copied === point.code ? "Copied" : "Copy link"}
                       </Button>
                       <Button

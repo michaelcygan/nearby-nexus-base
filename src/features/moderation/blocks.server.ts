@@ -8,9 +8,7 @@ export async function isBlockedPair(a: string, b: string): Promise<boolean> {
   const { data, error } = await supabaseAdmin
     .from("blocks")
     .select("id")
-    .or(
-      `and(blocker_id.eq.${a},blocked_id.eq.${b}),and(blocker_id.eq.${b},blocked_id.eq.${a})`,
-    )
+    .or(`and(blocker_id.eq.${a},blocked_id.eq.${b}),and(blocker_id.eq.${b},blocked_id.eq.${a})`)
     .limit(1);
 
   if (error) throw new Error(error.message);

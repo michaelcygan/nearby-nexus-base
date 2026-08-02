@@ -175,7 +175,11 @@ export const listStoreOrders = createServerFn({ method: "GET" })
     return rows.map((row) => ({
       ...row,
       buyer_name: row.buyer_id ? (names.get(row.buyer_id) ?? "Neighbor") : null,
-      listing: row.store_listings as { id: string; title: string; pickup_notes: string | null } | null,
+      listing: row.store_listings as {
+        id: string;
+        title: string;
+        pickup_notes: string | null;
+      } | null,
     })) as unknown as AdminStoreOrder[];
   });
 

@@ -116,10 +116,7 @@ function ReportQueue({ status }: { status: ReportStatus }) {
   const [reasons, setReasons] = useState<Record<string, string>>({});
 
   const act = useMutation({
-    mutationFn: (input: {
-      reportId: string;
-      action: "dismiss" | "hide" | "remove" | "restore";
-    }) =>
+    mutationFn: (input: { reportId: string; action: "dismiss" | "hide" | "remove" | "restore" }) =>
       actOnReport({
         data: {
           reportId: input.reportId,
@@ -162,9 +159,7 @@ function ReportQueue({ status }: { status: ReportStatus }) {
             <p className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-primary">
               {reportTargetLabels[report.target_type]} · {reportReasonLabels[report.reason]}
             </p>
-            <p className="text-xs text-muted-foreground">
-              {formatTimestamp(report.created_at)}
-            </p>
+            <p className="text-xs text-muted-foreground">{formatTimestamp(report.created_at)}</p>
           </div>
 
           <h2 className="mt-2 font-display text-lg font-semibold">{report.preview.title}</h2>
@@ -218,9 +213,7 @@ function ReportQueue({ status }: { status: ReportStatus }) {
             {report.preview.hidden ? (
               <span className="text-muted-foreground">Currently hidden</span>
             ) : null}
-            {report.preview.removed ? (
-              <span className="text-muted-foreground">Removed</span>
-            ) : null}
+            {report.preview.removed ? <span className="text-muted-foreground">Removed</span> : null}
           </div>
 
           {status === "open" ? (

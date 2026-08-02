@@ -29,7 +29,6 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-
 const modules = [
   {
     name: "Plans",
@@ -83,7 +82,6 @@ function Index() {
           </Suspense>
         </section>
 
-
         <section className="py-10">
           <h2 className="text-xl">Five things per neighborhood</h2>
           <ul className="mt-5 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2">
@@ -100,8 +98,8 @@ function Index() {
           <h2 className="text-xl">Built for reading first</h2>
           <p className="mt-3 max-w-prose text-sm text-muted-foreground">
             Neighborhood pages are public. Tap an NFC sticker on a lamppost or open a link a
-            neighbor sent you and you land straight in context — no sign-up wall, no feed
-            algorithm, no popularity counts. Signing in is only for taking part.
+            neighbor sent you and you land straight in context — no sign-up wall, no feed algorithm,
+            no popularity counts. Signing in is only for taking part.
           </p>
           <p className="mt-4 text-sm text-muted-foreground">
             Read the{" "}
@@ -150,13 +148,10 @@ function NeighborhoodList() {
               {n.city}
             </p>
 
-            {n.tagline ? (
-              <p className="mt-2 text-sm text-muted-foreground">{n.tagline}</p>
-            ) : null}
+            {n.tagline ? <p className="mt-2 text-sm text-muted-foreground">{n.tagline}</p> : null}
           </Link>
         </li>
       ))}
     </ul>
   );
 }
-

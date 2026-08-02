@@ -7,10 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { PostDetail } from "@/features/neighborhoods/types";
 import { startThread } from "@/features/messages/thread.functions";
-import {
-  joinPost,
-  leavePost,
-} from "@/features/participation/participation.functions";
+import { joinPost, leavePost } from "@/features/participation/participation.functions";
 import {
   myParticipationForPostQuery,
   postParticipantsQuery,
@@ -201,9 +198,7 @@ function AuthorParticipants({ postId }: { postId: string }) {
             >
               {participant.display_name}
             </Link>
-            <span className="text-xs text-muted-foreground">
-              {roleLabels[participant.role]}
-            </span>
+            <span className="text-xs text-muted-foreground">{roleLabels[participant.role]}</span>
             {participant.note ? (
               <span className="text-xs text-muted-foreground">— {participant.note}</span>
             ) : null}

@@ -66,9 +66,7 @@ export const updateMyPost = createServerFn({ method: "POST" })
 export const setMyPostStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z
-      .object({ postId: z.string().uuid(), status: z.enum(["active", "completed"]) })
-      .parse(data),
+    z.object({ postId: z.string().uuid(), status: z.enum(["active", "completed"]) }).parse(data),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase

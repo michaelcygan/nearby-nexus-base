@@ -51,9 +51,7 @@ export const createStoreCheckout = createServerFn({ method: "POST" })
 export const getMyStoreOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z
-      .object({ sessionId: z.string().min(6).max(200), environment: environmentSchema })
-      .parse(data),
+    z.object({ sessionId: z.string().min(6).max(200), environment: environmentSchema }).parse(data),
   )
   .handler(async ({ data, context }) => {
     try {
@@ -77,6 +75,10 @@ export const listMyStoreOrders = createServerFn({ method: "GET" })
 
     return (data ?? []).map((row) => ({
       ...row,
-      listing: row.store_listings as { id: string; title: string; pickup_notes: string | null } | null,
+      listing: row.store_listings as {
+        id: string;
+        title: string;
+        pickup_notes: string | null;
+      } | null,
     }));
   });

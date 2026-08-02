@@ -33,10 +33,7 @@ export type PostFormValues = {
   images: UploadedImage[];
 };
 
-export const emptyPostForm = (
-  neighborhoodId = "",
-  type: PostType = "plan",
-): PostFormValues => ({
+export const emptyPostForm = (neighborhoodId = "", type: PostType = "plan"): PostFormValues => ({
   neighborhood_id: neighborhoodId,
   type,
   title: "",
@@ -105,9 +102,7 @@ export function PostForm({
   }
 
   const error = (key: string) =>
-    errors[key] ? (
-      <p className="mt-1 text-xs text-destructive">{errors[key]}</p>
-    ) : null;
+    errors[key] ? <p className="mt-1 text-xs text-destructive">{errors[key]}</p> : null;
 
   return (
     <form onSubmit={handleSubmit} className="max-w-xl space-y-6">

@@ -58,7 +58,10 @@ export const startThread = createServerFn({ method: "POST" })
 
     await supabase
       .from("threads")
-      .update({ last_message_at: new Date().toISOString(), initiator_last_read_at: new Date().toISOString() })
+      .update({
+        last_message_at: new Date().toISOString(),
+        initiator_last_read_at: new Date().toISOString(),
+      })
       .eq("id", threadId);
 
     return { threadId };
@@ -167,9 +170,10 @@ export const listMyThreads = createServerFn({ method: "GET" })
       const otherId = isAuthor ? thread.initiator_id : thread.author_id;
       const lastRead = isAuthor ? thread.author_last_read_at : thread.initiator_last_read_at;
       const last = latest.get(thread.id) ?? null;
-      const post = thread.posts as unknown as
-        | { title: string; neighborhoods: { slug: string } | null }
-        | null;
+      const post = thread.posts as unknown as {
+        title: string;
+        neighborhoods: { slug: string } | null;
+      } | null;
 
       return {
         id: thread.id,
@@ -180,9 +184,7 @@ export const listMyThreads = createServerFn({ method: "GET" })
         other_name: names.get(otherId) ?? "Neighbor",
         last_message: last?.body ?? null,
         last_message_at: last?.created_at ?? thread.last_message_at,
-        unread: Boolean(
-          last && (!lastRead || new Date(last.created_at) > new Date(lastRead)),
-        ),
+        unread: Boolean(last && (!lastRead || new Date(last.created_at) > new Date(lastRead))),
       } satisfies ThreadSummary;
     });
   });
@@ -218,9 +220,10 @@ export const getThread = createServerFn({ method: "POST" })
       .eq("id", otherId)
       .maybeSingle();
 
-    const post = thread.posts as unknown as
-      | { title: string; neighborhoods: { slug: string } | null }
-      | null;
+    const post = thread.posts as unknown as {
+      title: string;
+      neighborhoods: { slug: string } | null;
+    } | null;
 
     return {
       id: thread.id,

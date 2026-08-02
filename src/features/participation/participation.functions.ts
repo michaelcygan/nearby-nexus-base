@@ -77,16 +77,14 @@ export const listMyParticipation = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
 
     return (data ?? []).map((row) => {
-      const post = row.posts as unknown as
-        | {
-            id: string;
-            title: string;
-            type: string;
-            starts_at: string | null;
-            needed_by: string | null;
-            neighborhoods: { slug: string; name: string } | null;
-          }
-        | null;
+      const post = row.posts as unknown as {
+        id: string;
+        title: string;
+        type: string;
+        starts_at: string | null;
+        needed_by: string | null;
+        neighborhoods: { slug: string; name: string } | null;
+      } | null;
       return {
         id: row.id,
         post_id: row.post_id,

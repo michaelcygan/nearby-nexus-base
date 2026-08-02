@@ -141,7 +141,10 @@ function ListingComposer() {
   });
 
   const ready =
-    form.neighborhood_id && form.title.trim().length > 2 && form.description.trim().length > 9 && Number(form.price) >= 0.5;
+    form.neighborhood_id &&
+    form.title.trim().length > 2 &&
+    form.description.trim().length > 9 &&
+    Number(form.price) >= 0.5;
 
   return (
     <form
@@ -300,9 +303,7 @@ function ListingTable() {
                   size="sm"
                   variant="outline"
                   disabled={setStatus.isPending}
-                  onClick={() =>
-                    setStatus.mutate({ listingId: listing.id, status: "available" })
-                  }
+                  onClick={() => setStatus.mutate({ listingId: listing.id, status: "available" })}
                 >
                   Put on sale
                 </Button>

@@ -13,9 +13,7 @@ import { canonicalUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/u/$profileId")({
   loader: async ({ params, context }) => {
-    const profile = await context.queryClient.ensureQueryData(
-      publicProfileQuery(params.profileId),
-    );
+    const profile = await context.queryClient.ensureQueryData(publicProfileQuery(params.profileId));
     if (!profile) throw notFound();
     return { profile };
   },
